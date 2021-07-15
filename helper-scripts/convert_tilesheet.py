@@ -51,6 +51,8 @@ if __name__ == "__main__":
             os.makedirs("Output/")
         for name in input_args:
             base_name = os.path.splitext(os.path.basename(name))[0]
+            print(f'Converting {os.path.basename(name)}...')
             convert_tilesheet_to_2bpp(name, "Output/" + base_name + "_tilesheet.bin", "Output/" + base_name + "_tilesheet.png")
+            print(f'Finished converting {os.path.basename(name)}!')
     else:
         print('Please enter the filename of the tilesheet you would like to convert')
