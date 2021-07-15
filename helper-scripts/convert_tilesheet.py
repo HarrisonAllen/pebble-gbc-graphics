@@ -23,23 +23,21 @@ def convert_tile_to_bytes(tile):
 def convert_tilesheet_to_2bpp(sheet_filename, out_filename, img_out_filename=None):
     input_img = Image.open(sheet_filename)
     dims = input_img.size
-    x_sprites = dims[0] // SPRITE_SIZE
-    y_sprites = dims[1] // SPRITE_SIZE
+    x_tiles = dims[0] // TILE_SIZE
+    y_tiles = dims[1] // TILE_SIZE
     output_img = Image.new("RGB", (dims[0] * dims[1] // TILE_SIZE, TILE_SIZE))
-    i = 0
+    tile_num = 0
     with open(out_filename, 'wb') as out_file:
-        for y_sprite in range(y_sprites):
-            for x_sprite in range(x_sprites):
-                for y_tile_root in (y_sprite * SPRITE_SIZE, y_sprite * SPRITE_SIZE + TILE_SIZE):
-                    for x_tile_root in (x_sprite * SPRITE_SIZE, x_sprite * SPRITE_SIZE + TILE_SIZE):
-                        tile_root = (x_tile_root, y_tile_root)
-                        tile_bounds = (tile_root[0], tile_root[1],
-                                    tile_root[0] + TILE_SIZE, tile_root[1] + TILE_SIZE)
-                        tile = input_img.crop(tile_bounds)
-                        output_img.paste(tile, (i * TILE_SIZE, 0))
-                        i += 1
-                        out_file.write(convert_tile_to_bytes(tile))
-    print(f'Size reduced from {dims[0] * dims[1]} to {os.path.getsize(out_filename)}')
+        for y_tile in range(y_tiles):
+            for x_tile in range(x_tiles):
+                tile_root = (x_tile * TILE_SIZE, y_tile * TILE_SIZE)
+                tile_bounds = (tile_root[0], tile_root[1],
+                            tile_root[0] + TILE_SIZE, tile_root[1] + TILE_SIZE)
+                tile = input_img.crop(tile_bounds)
+
+                output_img.paste(tile, (tile_num * TILE_SIZE, 0))
+                tile_num += 1
+                out_file.write(convert_tile_to_bytes(tile))
     if img_out_filename:
         output_img.save(img_out_filename)
     else:
