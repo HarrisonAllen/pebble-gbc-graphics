@@ -370,7 +370,7 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       sprite_tile_attr = 0;
       for (i = 0; i < num_overlapped_sprites; i++) {
         sprite = &self->oam[overlapped_sprites[i]*4];
-        sprite_x = sprite[0] - SPRITE_OFFSET_X;
+        sprite_x = sprite[0] - SPRITE_OFFSET_X + self->screen_x_origin;
         sprite_y = sprite[1] - SPRITE_OFFSET_Y;
 
         // Clear last bit of offset if we're in 8x16 mode
