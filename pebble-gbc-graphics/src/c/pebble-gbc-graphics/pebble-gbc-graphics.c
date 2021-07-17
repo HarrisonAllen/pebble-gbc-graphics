@@ -449,14 +449,10 @@ static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *c
           map_tile_x = map_x >> 3; // map_x / TILE_WIDTH
           map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
 
-          // Check if the background pixel has priority
+          // Get the background priority bit
           bg_tile_attr = self->bg_attrmap[map_tile_x + (map_tile_y << 5)];
-          if (bg_tile_attr & ATTR_PRIORITY_FLAG) {
-            continue;
-          }
-
           // Now check if the sprite priority bit is set, and if this pixel should be transparent b/c of that
-          if (sprite[3] & ATTR_PRIORITY_FLAG) {
+          if ((sprite[3] & ATTR_PRIORITY_FLAG) || (bg_tile_attr & ATTR_PRIORITY_FLAG)) {
             bg_tile_num = self->bg_tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * TILEMAP_WIDTH
             
             // Get the tile from vram
