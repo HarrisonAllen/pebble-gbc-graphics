@@ -53,8 +53,6 @@ static void draw_cloud_at_location(GBC_Graphics *graphics, uint8_t cloud_id, uin
     uint8_t cloud_height = data[2];
     uint8_t cloud_index = 0;
     uint8_t cloud_attrs = GBC_Graphics_attr_make(0, 0, false, false, false);
-    bool should_cloud_be_foreground = rand()%10 == 0;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Drawing cloud %d->%d at (%d, %d) with offset %d+%d, width %d, and height %d", cloud_id, cloud_id * 3, x_pos, y_pos, cloud_vram_start, vram_offset, cloud_width, cloud_height);
 
     for (uint8_t y = 0; y < cloud_height; y++) {
         for (uint8_t x = 0; x < cloud_width; x++) {
@@ -104,7 +102,7 @@ void draw_clouds(GBC_Graphics *graphics, uint8_t cloud_vram_start) {
 
             uint8_t x_offset = rand()%empty_x_tiles;
             uint8_t y_offset = rand()%empty_y_tiles;
-            bool should_cloud_be_foreground = rand()%10 == 0;
+            bool should_cloud_be_foreground = rand()%2 == 0;
             uint8_t cloud_attrs = GBC_Graphics_attr_make(0, 0, false, false, should_cloud_be_foreground);
 
             uint8_t x_pos = (x) * s_cloud_box_dims[0] + x_offset;
@@ -112,5 +110,4 @@ void draw_clouds(GBC_Graphics *graphics, uint8_t cloud_vram_start) {
             draw_cloud(graphics, cloud_id, x_pos, y_pos, cloud_vram_start, cloud_attrs);
         }
     }
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Clouds generated");
 }
