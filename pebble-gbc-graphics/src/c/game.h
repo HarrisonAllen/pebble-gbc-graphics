@@ -3,10 +3,20 @@
 #include <pebble.h>
 #include "pebble-gbc-graphics/pebble-gbc-graphics.h"
 
-// I'm going for 20 fps here, thus 50ms, but you can definitely go faster
-// a 2ms frame duration is "as fast as possible"
-// I tend to get weird results when using a 1ms frame duration
+// This is the duration of a frame, in milliseconds
+// E.g. a FRAME_DURATION of 33ms will give ~30 fps
+// For "as fast as possible" (i.e. render as soon as the
+// graphics engine has completed its last draw cycle),
+// use a FRAME_DURATION of 2. Keep in mind that black
+// and white pebbles will render much faster than the
+// color pebbles. I manually tested different values for
+// the non-color frame duration to find one that matched the
+// color fps, giving a consistent experience across all pebbles
+#if defined(PBL_COLOR)
 #define FRAME_DURATION 50
+#else
+#define FRAME_DURATION 20
+#endif
 
 void game_init(Window *window);
 void game_deinit();
