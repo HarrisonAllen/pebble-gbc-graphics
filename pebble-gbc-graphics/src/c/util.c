@@ -18,6 +18,12 @@ uint8_t clamp_uint8_t(uint8_t min, uint8_t val, uint8_t max) {
     return val;
 }
 
+uint8_t clamp_int8_t(int8_t min, int8_t val, int8_t max) {
+    if (val < min) return min;
+    if (val > max) return max;
+    return val;
+}
+
 int8_t *dir_to_point(Direction dir) {
     return &s_dir_to_point[dir * 2];
 }
