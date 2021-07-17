@@ -69,12 +69,6 @@ void draw_road(GBC_Graphics *graphics, uint8_t road_vram_offset) {
         tile_odds = rand()%4;
         switch (tile_odds) {
             case 0:
-                GBC_Graphics_bg_set_tile(graphics, x, TILEMAP_HEIGHT - 2, road_vram_offset + TREE_TOP);
-                GBC_Graphics_bg_set_tile_palette(graphics, x, TILEMAP_HEIGHT - 2, TREE_ROAD_PALETTE);
-                GBC_Graphics_bg_set_tile(graphics, x, TILEMAP_HEIGHT - 1, road_vram_offset + TREE_BOT_GROUND);
-                x++;
-                break; 
-            case 1:
                 GBC_Graphics_bg_set_tile(graphics, x, TILEMAP_HEIGHT - 1, road_vram_offset + TREE_SMALL_GROUND);
                 x++;
                 break;
