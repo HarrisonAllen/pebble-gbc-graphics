@@ -1,5 +1,4 @@
 #include "player.h"
-#include "../util.h"
 
 static uint32_t s_player_x;
 static uint8_t s_player_y;
@@ -10,7 +9,7 @@ extern uint8_t base_vram_offset, cloud_vram_offset, fuel_vram_offset, road_vram_
 
 void player_init(GBC_Graphics *graphics) {
     s_player_x = 0;
-    s_player_y = 104;
+    s_player_y = 40;
     s_player_speed = 2;
 }
 
