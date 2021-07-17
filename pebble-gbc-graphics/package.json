@@ -6,7 +6,7 @@
   "private": true,
   "dependencies": {},
   "pebble": {
-    "displayName": "GBC Graphics Demo",
+    "displayName": "Tiny Pilot",
     "uuid": "9cb735ea-e323-47dd-b2dc-3756517b9e78",
     "sdkVersion": "3",
     "enableMultiJS": true,
