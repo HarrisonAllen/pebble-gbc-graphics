@@ -13,7 +13,7 @@
 /**
  * Number of bytes that one tile takes up, calculated by:
  * 2 bits per pixel * 8 pixels wide * 8 pixels tall = 128 bits
- * 128 bits / 8 bits per byte = 16 butes
+ * 128 bits / 8 bits per byte = 16 bytes
  */
 #define TILE_SIZE 16
 /**
@@ -21,8 +21,8 @@
  * 256 tiles per bank * 16 bytes per tile = 4096 bytes
  */
 #define VRAM_BANK_SIZE 4096
-#define MAP_WIDTH 32  ///> Width of the background and window maps in tiles
-#define MAP_HEIGHT 32 ///> Height of the background and window maps in tiles
+#define LAYER_WIDTH 32  ///> Width of the background and window layers in tiles
+#define LAYER_HEIGHT 32 ///> Height of the background and window layers in tiles
 /**
  * Size of the tilemap in bytes, calculated by:
  * 1 byte per tile location * 32 tiles wide * 32 tiles tall = 1024 bytes
@@ -88,7 +88,7 @@
 /** Helpful macros */
 #define MIN(x, y) (y) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the minimum of two values
 #define MAX(x, y) (x) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the maximum of two values
-#define POINT_TO_OFFSET(x, y) ((x) & (MAP_WIDTH - 1)) + ((y) & (MAP_HEIGHT - 1)) * MAP_WIDTH ///> Converts an x, y point on a bg/window map to the tile/attrmap offset
+#define POINT_TO_OFFSET(x, y) ((x) & (LAYER_WIDTH - 1)) + ((y) & (LAYER_HEIGHT - 1)) * LAYER_WIDTH ///> Converts an x, y point on a bg/window map to the tile/attrmap offset
 
 /** Predefined Screen boundaries for convenience*/
 #if defined(PBL_ROUND)
@@ -102,6 +102,11 @@
     #define SCREEN_BOUNDS_SQUARE GRect(0, 12, 144, 144) ///> Best fit, great FPS. Consistent viewing across all Pebbles.
     #define SCREEN_BOUNDS_SMALL GRect(8, 16, 128, 128)  ///> Small, great FPS.
 #endif
+
+/** Colors for black and white palettes */
+#define GBC_BLACK 0b00
+#define GBC_GRAY 0b10
+#define GBC_WHITE 0b11
 
 /** The GBC Graphics "class" struct */
 typedef struct _gbc_graphics GBC_Graphics;
@@ -132,9 +137,9 @@ struct _gbc_graphics {
      * OAM Buffer - Stores the data for the current sprites
      * The OAM contains 40 slots for 4 bytes of sprite information, which is as follows:
      *  -Byte 0: Sprite x position, offset by -8 (sprite width) to allow for off-screen rendering
-     *      When x == 0 or x >= 144, the sprite will be hidden
+     *      When x == 0 or x >= screen_width, the sprite will be hidden
      *  -Byte 1: Sprite y position, offset by -16 (sprite height) to allow for off-screen rendering
-     *      When y == 0 or y >= 168, the sprite will be hidden
+     *      When y == 0 or y >= screen_height, the sprite will be hidden
      *  -Byte 2: Sprite tile position in VRAM bank
      *      Note: When the Sprite Size bit of LCDC is set, Bit 0 will be ignored, and the two tiles 
      *            at the memory location will be used to render the 8x16 sprite
@@ -196,8 +201,8 @@ struct _gbc_graphics {
     uint8_t *sprite_palette_bank;
     short bg_scroll_x; ///> The x position of the screen view into the background tilemap
     short bg_scroll_y; ///> The y position of the screen view into the background tilemap
-    short window_offset_x; ///> The x offset of the window tilemap in the screen view, >= 144 == hidden
-    short window_offset_y; ///> The y offset of the window tilemap in the screen view, >= 168 == hidden
+    short window_offset_x; ///> The x offset of the window tilemap in the screen view, >= screen_width == hidden
+    short window_offset_y; ///> The y offset of the window tilemap in the screen view, >= screen_height == hidden
     /**
      * LCD Status Byte
      *  -Bit 0: HBlank Flag - Set to 1 between rendering lines - READ ONLY
@@ -372,7 +377,7 @@ uint8_t *GBC_Graphics_get_vram_bank(GBC_Graphics *self, uint8_t vram_bank_number
  * Sets the four colors of one of the background palettes
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param palette_num The number of the palette to set, from 0 to 8
+ * @param palette_num The number of the palette to set, from 0 to 7
  * @param c0 The 0th color of the new palette
  * @param c1 The 1st color of the new palette
  * @param c2 The 2nd color of the new palette
@@ -384,10 +389,20 @@ void GBC_Graphics_set_bg_palette(GBC_Graphics *self, uint8_t palette_num, uint8_
  * Sets the four colors of one of the background palettes from an array
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param palette_num The number of the palette to set, from 0 to 8
+ * @param palette_num The number of the palette to set, from 0 to 7
  * @param palette_array A pointer to a 4-byte array containing the palette colors
  */
 void GBC_Graphics_set_bg_palette_array(GBC_Graphics *self, uint8_t palette_num, uint8_t *palette_array);
+
+/**
+ * Sets one color of one of the background palettes
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param palette_num The number of the palette to set, from 0 to 7
+ * @param color_num The number of the palette color to set, from 0 to 3
+ * @param c The new color
+ */
+void GBC_Graphics_set_bg_palette_color(GBC_Graphics *self, uint8_t palette_num, uint8_t color_num, uint8_t c);
 
 /**
  * Copies the specified bg palette into a target array
@@ -410,7 +425,7 @@ void GBC_Graphics_copy_all_bg_palettes(GBC_Graphics *self, uint8_t *target_array
  * Sets the four colors of one of the sprite palettes
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param palette_num The number of the palette to set, from 0 to 8
+ * @param palette_num The number of the palette to set, from 0 to 7
  * @param c0 The 0th color of the new palette
  * @param c1 The 1st color of the new palette
  * @param c2 The 2nd color of the new palette
@@ -422,10 +437,20 @@ void GBC_Graphics_set_sprite_palette(GBC_Graphics *self, uint8_t palette_num, ui
  * Sets the four colors of one of the sprite palettes from an array
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param palette_num The number of the palette to set, from 0 to 8
+ * @param palette_num The number of the palette to set, from 0 to 7
  * @param palette_array A pointer to a 4-byte array containing the palette colors
  */
 void GBC_Graphics_set_sprite_palette_array(GBC_Graphics *self, uint8_t palette_num, uint8_t *palette_array);
+
+/**
+ * Sets one color of one of the sprite palettes
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param palette_num The number of the palette to set, from 0 to 7
+ * @param color_num The number of the palette color to set, from 0 to 3
+ * @param c The new color
+ */
+void GBC_Graphics_set_sprite_palette_color(GBC_Graphics *self, uint8_t palette_num, uint8_t color_num, uint8_t c);
 
 /**
  * Copies the specified sprite palette into a target array
@@ -904,7 +929,7 @@ void GBC_Graphics_window_move(GBC_Graphics *self, short dx, short dy);
  * Sets the window offset x
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param x The new offset x, x > 144 will hide the window layer
+ * @param x The new offset x, x > screen_width will hide the window layer
  */
 void GBC_Graphics_window_set_offset_x(GBC_Graphics *self, uint8_t x);
 
@@ -912,7 +937,7 @@ void GBC_Graphics_window_set_offset_x(GBC_Graphics *self, uint8_t x);
  * Sets the window offset y
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param y The new offset y, y > 168 will hide the window layer
+ * @param y The new offset y, y > screen_height will hide the window layer
  */
 void GBC_Graphics_window_set_offset_y(GBC_Graphics *self, uint8_t y);
 
@@ -920,8 +945,8 @@ void GBC_Graphics_window_set_offset_y(GBC_Graphics *self, uint8_t y);
  * Sets the window offset x and offset y
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param x The new offset x, x > 144 will hide the window layer
- * @param y The new offset y, y > 168 will hide the window layer
+ * @param x The new offset x, x > screen_width will hide the window layer
+ * @param y The new offset y, y > screen_height will hide the window layer
  */
 void GBC_Graphics_window_set_offset_pos(GBC_Graphics *self, uint8_t x, uint8_t y);
 
