@@ -1,13 +1,19 @@
 #include "game.h"
 #include "graphics/background.h"
+#include "graphics/text.h"
 #include "actors/player.h"
 #include "util.h"
+
 static AppTimer *s_frame_timer; // Timer to animate the frames
 static GBC_Graphics *s_graphics; // Need to keep a reference to the graphics object
 
 static void game_step() {
   player_step(s_graphics);
   render_background(s_graphics, get_player_x(), get_player_y());
+
+  char top_banner_text[33];
+  snprintf(top_banner_text, 32, "DISTANCE: %u", get_player_x());
+  draw_text_at_location(s_graphics, top_banner_text, 0, 0, 0);
 }
 
 static void frame_timer_handle(void* context) {
