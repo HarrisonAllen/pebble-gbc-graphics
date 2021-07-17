@@ -11,6 +11,8 @@
 #define WINDOW_FRAME_HORIZONTAL 5
 #define WINDOW_FRAME_VERTICAL 6
 
+#define WINDOW_PALETTE 7
+
 void generate_new_game_background(GBC_Graphics *graphics);
 void animate_graphics(GBC_Graphics *graphics);
 void start_bg_animation();

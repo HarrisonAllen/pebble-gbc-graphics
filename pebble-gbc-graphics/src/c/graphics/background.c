@@ -68,14 +68,20 @@ static void clear_window_layer(GBC_Graphics *graphics) {
 
 // Place the frame on the window layer and make the window layer visible
 static void setup_window_layer(GBC_Graphics *graphics) {
+  #if defined(PBL_COLOR)
+    GBC_Graphics_set_bg_palette(graphics, WINDOW_PALETTE, GColorBlackARGB8, GColorWhiteARGB8, GColorWindsorTanARGB8, GColorPastelYellowARGB8);
+  #else
+    GBC_Graphics_set_bg_palette(graphics, WINDOW_PALETTE, GBC_BLACK, GBC_BLACK, GBC_WHITE, GBC_WHITE);
+  #endif
+
   // Find the boundaries of the screen, in tiles
   uint8_t left_boundary = 0;
-  uint8_t right_boundary = GBC_Graphics_get_screen_width(graphics) / TILE_WIDTH - 1;
+  uint8_t right_boundary = (GBC_Graphics_get_screen_width(graphics) / 2) / TILE_WIDTH - 1;
   uint8_t upper_boundary = 0;
   uint8_t lower_boundary = 6;
   
   // These attributes set a tile to palette 1, vram bank 0, no x flip, no y flip, no priority over sprite
-  uint8_t window_attrs = GBC_Graphics_attr_make(1, 0, false, false, false);
+  uint8_t window_attrs = GBC_Graphics_attr_make(WINDOW_PALETTE, 0, false, false, false);
 
   // Draw the corners
   GBC_Graphics_window_set_tile_and_attrs(graphics, left_boundary, upper_boundary, WINDOW_FRAME_CORNER, window_attrs);
@@ -108,6 +114,7 @@ static void setup_window_layer(GBC_Graphics *graphics) {
 
   // And now we hide the window layer by setting it to the edge of the screen
   GBC_Graphics_window_set_offset_y(graphics, GBC_Graphics_get_screen_height(graphics));
+  GBC_Graphics_window_set_offset_x(graphics, GBC_Graphics_get_screen_width(graphics) / 2);
 }
 
 static void setup_bg_layer(GBC_Graphics *graphics) {
@@ -126,6 +133,8 @@ void generate_new_game_background(GBC_Graphics *graphics) {
 
   clear_window_layer(graphics);
   setup_window_layer(graphics);
+
+  s_bg_max_scroll_y = TILEMAP_HEIGHT * TILE_HEIGHT - GBC_Graphics_get_screen_height(graphics);
 
   GBC_Graphics_render(graphics);
 }
@@ -149,22 +158,45 @@ static void animate_window(GBC_Graphics *graphics) {
 
 
 static void handle_scroll_interrupt(GBC_Graphics *graphics) {
+  int8_t tree_position = s_bg_scroll_y - (s_bg_max_scroll_y - TILE_HEIGHT * 5);
+  int8_t road_position = s_bg_scroll_y - (s_bg_max_scroll_y - TILE_HEIGHT * 3);
+  int8_t bottom_position = s_bg_scroll_y - (s_bg_max_scroll_y - TILE_HEIGHT * 1);
   if (GBC_Graphics_stat_get_line_y_compare(graphics) == 0) {
     GBC_Graphics_bg_set_scroll_pos(graphics, 0, 0);
     GBC_Graphics_stat_set_line_y_compare(graphics, 8);
   } else if (GBC_Graphics_stat_get_line_y_compare(graphics) == 8) {
     GBC_Graphics_bg_set_scroll_pos(graphics, s_bg_scroll_x, s_bg_scroll_y);
-    GBC_Graphics_stat_set_line_y_compare(graphics, 0);
-  } else if (GBC_Graphics_stat_get_line_y_compare(graphics) == 96) {
-    GBC_Graphics_bg_set_scroll_x(graphics, 0);
-    GBC_Graphics_stat_set_line_y_compare(graphics, 0);
+    if (tree_position > 0) {
+      GBC_Graphics_stat_set_line_y_compare(graphics, GBC_Graphics_get_screen_height(graphics) - tree_position);
+    } else {
+      GBC_Graphics_stat_set_line_y_compare(graphics, 0);
+    }
+  } else {
+    if (GBC_Graphics_stat_get_line_y_compare(graphics) == GBC_Graphics_get_screen_height(graphics) - tree_position) {
+      GBC_Graphics_bg_set_scroll_x(graphics, s_bg_scroll_x * 2);
+      if (road_position > 0) {
+        GBC_Graphics_stat_set_line_y_compare(graphics, GBC_Graphics_get_screen_height(graphics) - road_position);
+      } else {
+        GBC_Graphics_stat_set_line_y_compare(graphics, 0);
+      }
+    } else if (GBC_Graphics_stat_get_line_y_compare(graphics) == GBC_Graphics_get_screen_height(graphics) - road_position) {
+      GBC_Graphics_bg_set_scroll_x(graphics, s_bg_scroll_x * 3);
+      if (bottom_position > 0) {
+        GBC_Graphics_stat_set_line_y_compare(graphics, GBC_Graphics_get_screen_height(graphics) - bottom_position);
+      } else {
+        GBC_Graphics_stat_set_line_y_compare(graphics, 0);
+      }
+    } else {
+      GBC_Graphics_bg_set_scroll_x(graphics, s_bg_scroll_x * 4);
+      GBC_Graphics_stat_set_line_y_compare(graphics, 0);
+    }
   } 
 }
 
 void render_background(GBC_Graphics *graphics, uint player_x, uint8_t player_y) {
   // Here, I explicity set the scroll pos based on the player pos.
   // However, you could use GBC_Graphics_bg_move() to move the background, like I do with the window
-  s_bg_scroll_y = clamp_uint8_t(0, player_y - TILE_HEIGHT, TILEMAP_HEIGHT * TILE_HEIGHT - GBC_Graphics_get_screen_height(graphics));
+  s_bg_scroll_y = clamp_uint8_t(0, player_y - TILE_HEIGHT, s_bg_max_scroll_y);
   s_bg_scroll_x = (uint8_t)player_x;
 
   
@@ -172,6 +204,12 @@ void render_background(GBC_Graphics *graphics, uint player_x, uint8_t player_y) 
   GBC_Graphics_stat_set_line_compare_interrupt_enabled(graphics, true);
 
   GBC_Graphics_render(graphics);
+}
+
+void animate_graphics(GBC_Graphics *graphics) {
+  if (s_animate_window_tiles) {
+    animate_window(graphics);
+  }
 }
 
 void start_window_animation() {
