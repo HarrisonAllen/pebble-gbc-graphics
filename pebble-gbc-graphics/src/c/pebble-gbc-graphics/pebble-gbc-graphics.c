@@ -275,6 +275,7 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
   uint8_t flip;
   bool in_window;
   bool priority;
+  bool line_overlap;
 
   uint8_t i, x;
   uint8_t sprite_x, sprite_y;
@@ -296,10 +297,10 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
     for (i = 0; i < 40; i++) {
       sprite = &self->oam[i*4];
       sprite_y = sprite[1] - SPRITE_OFFSET_Y;
-      if (((uint8_t)(self->line_y - sprite_y)) < (TILE_HEIGHT << ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0))) {
-        overlapped_sprites[num_overlapped_sprites] = i;
-        num_overlapped_sprites++;
-      }
+      line_overlap = ((uint8_t)(self->line_y - sprite_y)) < (TILE_HEIGHT << ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0));
+      
+      overlapped_sprites[num_overlapped_sprites] = i * line_overlap;
+      num_overlapped_sprites += line_overlap;
     }
     
     GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, self->line_y + self->screen_y_origin);
