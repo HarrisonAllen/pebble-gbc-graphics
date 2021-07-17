@@ -173,7 +173,7 @@ struct _gbc_graphics {
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
      *      -Bit 5: X Flip - Setting bit will flip the tile horizontally when rendered
      *      -Bit 6: Y Flip - Setting bit will flip the tile vertically when rendered
-     *      -Bit 7: BG Priority - Setting bit will cause tile to be rendered over sprites
+     *      -Bit 7: BG Priority - Setting bit will make any non-zero background pixel take priority over sprites
      */
     uint8_t *bg_attrmap;
     /**
@@ -185,7 +185,7 @@ struct _gbc_graphics {
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
      *      -Bit 5: X Flip - Setting bit will flip the tile horizontally when rendered
      *      -Bit 6: Y Flip - Setting bit will flip the tile vertically when rendered
-     *      -Bit 7: Window Priority - Setting bit will cause tile to be rendered over sprites
+     *      -Bit 7: Window Priority - Setting bit will make any non-zero window pixel take priority over sprites
      */
     uint8_t *window_attrmap;
     /**
