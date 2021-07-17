@@ -9,6 +9,6 @@
 
 void player_init(GBC_Graphics *graphics);
 void player_step(GBC_Graphics *graphics);
-uint32_t get_player_x();
+uint get_player_x();
 uint8_t get_player_y();
 void player_set_vertical_direction(Direction new_scroll_dir);
