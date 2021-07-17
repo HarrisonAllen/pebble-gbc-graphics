@@ -1,12 +1,12 @@
 {
   "name": "pebble-gbc-graphics",
-  "author": "MakeAwesomeHappen",
+  "author": "Harrison Allen",
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
   "dependencies": {},
   "pebble": {
-    "displayName": "pebble-gbc-graphics",
+    "displayName": "GBC Graphics Demo",
     "uuid": "9cb735ea-e323-47dd-b2dc-3756517b9e78",
     "sdkVersion": "3",
     "enableMultiJS": true,
@@ -23,7 +23,38 @@
       "dummy"
     ],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "raw",
+          "name": "DATA_BASE_TILESHEET",
+          "file": "data/BaseTilesheet.bin"
+        },
+        {
+          "type": "raw",
+          "name": "DATA_CLOUD_TILESHEET",
+          "file": "data/CloudTilesheet.bin"
+        },
+        {
+          "type": "raw",
+          "name": "DATA_FUEL_BAR_TILESHEET",
+          "file": "data/FuelBarTilesheet.bin"
+        },
+        {
+          "type": "raw",
+          "name": "DATA_ROAD_TILESHEET",
+          "file": "data/RoadTilesheet.bin"
+        },
+        {
+          "type": "raw",
+          "name": "DATA_SPRITES_TILESHEET",
+          "file": "data/SpritesTilesheet.bin"
+        },
+        {
+          "type": "raw",
+          "name": "DATA_TEXT_TILESHEET",
+          "file": "data/TextTilesheet.bin"
+        }
+      ]
     }
   }
 }
