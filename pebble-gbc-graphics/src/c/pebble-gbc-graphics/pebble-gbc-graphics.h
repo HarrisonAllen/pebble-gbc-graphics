@@ -111,8 +111,7 @@
 /** The GBC Graphics "class" struct */
 typedef struct _gbc_graphics GBC_Graphics;
 struct _gbc_graphics {
-    Layer *bg_layer; ///< The Layer on which to draw the background and window tiles
-    Layer *sprite_layer; ///< The Layer on which to draw the sprite tiles
+    Layer *graphics_layer; ///< The Layer on which to render the graphics
     /**
      * The LCD Control Byte
      *  -Bit 0: Enable - Setting bit to 0 disables drawing of background, window, and sprites
