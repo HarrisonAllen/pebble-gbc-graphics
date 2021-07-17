@@ -1,6 +1,7 @@
 #include "background.h"
 #include "clouds.h"
 #include "road.h"
+#include "text.h"
 #include "../util.h"
 
 static uint8_t s_bg_anim_frame, s_window_anim_frame;
@@ -8,6 +9,7 @@ static bool s_animate_bg_tiles = false;
 static bool s_animate_window_tiles = false;
 static bool s_window_up = false;
 static uint8_t s_bg_min_scroll_y, s_bg_max_scroll_y;
+static uint8_t s_bg_scroll_x, s_bg_scroll_y;
 
 extern uint8_t base_vram_offset, cloud_vram_offset, fuel_vram_offset, road_vram_offset, sprites_vram_offset, text_vram_offset;
 
@@ -49,16 +51,16 @@ static void setup_palettes(GBC_Graphics *graphics) {
 }
 
 static void clear_background_layer(GBC_Graphics *graphics) {
-  for (uint8_t x = 0; x < LAYER_WIDTH; x++) {
-    for (uint8_t y = 0; y < LAYER_HEIGHT; y++) {
+  for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
+    for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
       GBC_Graphics_bg_set_tile_and_attrs(graphics, x, y, SOLID_TILE_11, GBC_Graphics_attr_make(0, 0, false, false, false));
     }
   }
 }
 
 static void clear_window_layer(GBC_Graphics *graphics) {
-  for (uint8_t x = 0; x < LAYER_WIDTH; x++) {
-    for (uint8_t y = 0; y < LAYER_HEIGHT; y++) {
+  for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
+    for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
       GBC_Graphics_window_set_tile_and_attrs(graphics, x, y, SOLID_TILE_11, GBC_Graphics_attr_make(0, 0, false, false, false));
     }
   }
@@ -114,6 +116,7 @@ static void setup_bg_layer(GBC_Graphics *graphics) {
   // lastly, draw the score layer
   
   draw_clouds(graphics, cloud_vram_offset);
+  clear_top_row(graphics);
   draw_road(graphics, road_vram_offset);
 }
 
@@ -144,8 +147,30 @@ static void animate_window(GBC_Graphics *graphics) {
   GBC_Graphics_render(graphics);
 }
 
-void render_background(GBC_Graphics *graphics, uint32_t player_x, uint8_t player_y) {
-  GBC_Graphics_bg_set_scroll_pos(graphics, (uint8_t)player_x, clamp_uint8_t(TILE_HEIGHT, player_y, LAYER_HEIGHT * TILE_HEIGHT - GBC_Graphics_get_screen_height(graphics)));
+
+static void handle_scroll_interrupt(GBC_Graphics *graphics) {
+  if (GBC_Graphics_stat_get_line_y_compare(graphics) == 0) {
+    GBC_Graphics_bg_set_scroll_pos(graphics, 0, 0);
+    GBC_Graphics_stat_set_line_y_compare(graphics, 8);
+  } else if (GBC_Graphics_stat_get_line_y_compare(graphics) == 8) {
+    GBC_Graphics_bg_set_scroll_pos(graphics, s_bg_scroll_x, s_bg_scroll_y);
+    GBC_Graphics_stat_set_line_y_compare(graphics, 0);
+  } else if (GBC_Graphics_stat_get_line_y_compare(graphics) == 96) {
+    GBC_Graphics_bg_set_scroll_x(graphics, 0);
+    GBC_Graphics_stat_set_line_y_compare(graphics, 0);
+  } 
+}
+
+void render_background(GBC_Graphics *graphics, uint player_x, uint8_t player_y) {
+  // Here, I explicity set the scroll pos based on the player pos.
+  // However, you could use GBC_Graphics_bg_move() to move the background, like I do with the window
+  s_bg_scroll_y = clamp_uint8_t(0, player_y - TILE_HEIGHT, TILEMAP_HEIGHT * TILE_HEIGHT - GBC_Graphics_get_screen_height(graphics));
+  s_bg_scroll_x = (uint8_t)player_x;
+
+  
+  GBC_Graphics_set_line_compare_interrupt_callback(graphics, handle_scroll_interrupt);
+  GBC_Graphics_stat_set_line_compare_interrupt_enabled(graphics, true);
+
   GBC_Graphics_render(graphics);
 }
 

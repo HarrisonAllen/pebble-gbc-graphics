@@ -16,4 +16,4 @@ void animate_graphics(GBC_Graphics *graphics);
 void start_bg_animation();
 void start_window_animation();
 void change_bg_scroll();
-void render_background(GBC_Graphics *graphics, uint32_t player_x, uint8_t player_y);
+void render_background(GBC_Graphics *graphics, uint player_x, uint8_t player_y);
