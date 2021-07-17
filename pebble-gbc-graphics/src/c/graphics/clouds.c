@@ -33,7 +33,7 @@ static uint8_t cloud_palette[] = {
 #if defined(PBL_COLOR)
     GColorPictonBlueARGB8, GColorCelesteARGB8, GColorWhiteARGB8, GColorWhiteARGB8
 #else
-    GBC_WHITE, GBC_BLACK, GBC_WHITE, GBC_WHITE
+    GBC_WHITE, GBC_BLACK, GBC_BLACK, GBC_WHITE
 #endif
 };
 
@@ -58,7 +58,7 @@ static void draw_cloud_at_location(GBC_Graphics *graphics, uint8_t cloud_id, uin
 
     for (uint8_t y = 0; y < cloud_height; y++) {
         for (uint8_t x = 0; x < cloud_width; x++) {
-            GBC_Graphics_bg_set_tile_and_attrs(graphics, (x_pos + x) % LAYER_WIDTH, (y_pos + y) % LAYER_HEIGHT, vram_offset + cloud_vram_start + cloud_index, cloud_attrs);
+            GBC_Graphics_bg_set_tile_and_attrs(graphics, (x_pos + x) % TILEMAP_WIDTH, (y_pos + y) % TILEMAP_HEIGHT, vram_offset + cloud_vram_start + cloud_index, cloud_attrs);
             cloud_index++;
         }
     }
@@ -73,7 +73,7 @@ static void draw_cloud(GBC_Graphics *graphics, uint8_t cloud_id, uint8_t x_pos, 
     uint8_t cloud_index = 0;
     for (uint8_t y = 0; y < cloud_height; y++) {
         for (uint8_t x = 0; x < cloud_width; x++) {
-            GBC_Graphics_bg_set_tile_and_attrs(graphics, (x_pos + x) % LAYER_WIDTH, (y_pos + y) % LAYER_HEIGHT, vram_offset + cloud_vram_start + cloud_index, cloud_attrs);
+            GBC_Graphics_bg_set_tile_and_attrs(graphics, (x_pos + x) % TILEMAP_WIDTH, (y_pos + y) % TILEMAP_HEIGHT, vram_offset + cloud_vram_start + cloud_index, cloud_attrs);
             cloud_index++;
         }
     }
@@ -83,14 +83,14 @@ void draw_clouds(GBC_Graphics *graphics, uint8_t cloud_vram_start) {
     load_cloud_palette(graphics, CLOUD_PALETTE);
     uint8_t sky_attrs = GBC_Graphics_attr_make(0, 0, false, false, false);
     
-    for (uint8_t x = 0; x < LAYER_WIDTH; x++) {
-        for (uint8_t y = 0; y < LAYER_HEIGHT; y++) {
+    for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
+        for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
             GBC_Graphics_bg_set_tile_and_attrs(graphics, x, y, CLOUD_SKY_TILE, sky_attrs);
         }
     }
 
-    uint8_t num_clouds_x = LAYER_WIDTH / s_cloud_box_dims[0];
-    uint8_t num_clouds_y = LAYER_HEIGHT / s_cloud_box_dims[1];
+    uint8_t num_clouds_x = TILEMAP_WIDTH / s_cloud_box_dims[0];
+    uint8_t num_clouds_y = TILEMAP_HEIGHT / s_cloud_box_dims[1];
 
     for (uint8_t y = 0; y < num_clouds_y; y++) {
         for (uint8_t x = 0; x < num_clouds_x; x++) {

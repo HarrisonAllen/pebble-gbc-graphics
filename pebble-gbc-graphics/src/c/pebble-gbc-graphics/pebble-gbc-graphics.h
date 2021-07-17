@@ -21,8 +21,8 @@
  * 256 tiles per bank * 16 bytes per tile = 4096 bytes
  */
 #define VRAM_BANK_SIZE 4096
-#define LAYER_WIDTH 32  ///> Width of the background and window layers in tiles
-#define LAYER_HEIGHT 32 ///> Height of the background and window layers in tiles
+#define TILEMAP_WIDTH 32  ///> Width of the background and window layers in tiles
+#define TILEMAP_HEIGHT 32 ///> Height of the background and window layers in tiles
 /**
  * Size of the tilemap in bytes, calculated by:
  * 1 byte per tile location * 32 tiles wide * 32 tiles tall = 1024 bytes
@@ -88,7 +88,7 @@
 /** Helpful macros */
 #define MIN(x, y) (y) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the minimum of two values
 #define MAX(x, y) (x) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the maximum of two values
-#define POINT_TO_OFFSET(x, y) ((x) & (LAYER_WIDTH - 1)) + ((y) & (LAYER_HEIGHT - 1)) * LAYER_WIDTH ///> Converts an x, y point on a bg/window map to the tile/attrmap offset
+#define POINT_TO_OFFSET(x, y) ((x) & (TILEMAP_WIDTH - 1)) + ((y) & (TILEMAP_HEIGHT - 1)) * TILEMAP_WIDTH ///> Converts an x, y point on a bg/window map to the tile/attrmap offset
 
 /** Predefined Screen boundaries for convenience*/
 #if defined(PBL_ROUND)

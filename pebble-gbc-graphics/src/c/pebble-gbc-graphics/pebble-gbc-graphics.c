@@ -310,7 +310,7 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
 
       // Get the tile and attrs from the map
-      tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * LAYER_WIDTH
+      tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * TILEMAP_WIDTH
       tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
       
       // Get the tile from vram
@@ -457,7 +457,7 @@ static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *c
 
           // Now check if the sprite priority bit is set, and if this pixel should be transparent b/c of that
           if (sprite[3] & ATTR_PRIORITY_FLAG) {
-            bg_tile_num = self->bg_tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * LAYER_WIDTH
+            bg_tile_num = self->bg_tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * TILEMAP_WIDTH
             
             // Get the tile from vram
             offset = bg_tile_num << 4; // tile_num * TILE_SIZE
@@ -698,15 +698,15 @@ void GBC_Graphics_bg_move(GBC_Graphics *self, short dx, short dy) {
   short new_y = self->bg_scroll_y + dy;
 
   if (new_x < 0) { // Wrap x 
-    new_x = LAYER_WIDTH * TILE_WIDTH + new_x;
+    new_x = TILEMAP_WIDTH * TILE_WIDTH + new_x;
   } else {
-    new_x = new_x % (LAYER_WIDTH * TILE_WIDTH);
+    new_x = new_x % (TILEMAP_WIDTH * TILE_WIDTH);
   }
 
   if (new_y < 0) { // Wrap y
-    new_y = LAYER_HEIGHT * TILE_HEIGHT + new_y;
+    new_y = TILEMAP_HEIGHT * TILE_HEIGHT + new_y;
   } else {
-    new_y = new_y % (LAYER_HEIGHT * TILE_HEIGHT);
+    new_y = new_y % (TILEMAP_HEIGHT * TILE_HEIGHT);
   }
 
   self->bg_scroll_x = new_x;
