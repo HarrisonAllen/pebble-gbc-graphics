@@ -2,12 +2,25 @@
 
 uint8_t base_vram_offset, cloud_vram_offset, fuel_vram_offset, road_vram_offset, sprites_vram_offset, text_vram_offset;
 
+static int8_t s_dir_to_point[] = {
+  // x, y
+  0, 0, // D_NONE
+  0, -1, // D_UP
+  -1, 0, // D_LEFT
+  0, 1, // D_DOWN
+  1, 0, // D_RIGHT
+  0, 0, // D_END
+};
+
 uint8_t clamp_uint8_t(uint8_t min, uint8_t val, uint8_t max) {
     if (val < min) return min;
     if (val > max) return max;
     return val;
 }
 
+int8_t *dir_to_point(Direction dir) {
+    return &s_dir_to_point[dir * 2];
+}
 
 // Load the tilesheets
 void load_tilesheets(GBC_Graphics *graphics) {

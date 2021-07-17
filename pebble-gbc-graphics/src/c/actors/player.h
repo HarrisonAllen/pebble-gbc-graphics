@@ -2,18 +2,10 @@
 
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
+#include "../util.h"
 
 #define MIN_PLAYER_Y 8
 #define MAX_PLAYER_Y 208
-
-typedef enum {
-    D_NONE,
-    D_UP,
-    D_LEFT,
-    D_DOWN,
-    D_RIGHT,
-    D_END
-} Direction;
 
 void player_init(GBC_Graphics *graphics);
 void player_step(GBC_Graphics *graphics);
