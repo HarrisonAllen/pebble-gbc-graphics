@@ -183,6 +183,14 @@ void GBC_Graphics_set_sprite_palette_array(GBC_Graphics *self, uint8_t palette_n
   set_palette_array(self->sprite_palette_bank, palette_num, palette_array);
 }
 
+void GBC_Graphics_set_bg_palette_color(GBC_Graphics *self, uint8_t palette_num, uint8_t color_num, uint8_t c) {
+  self->bg_palette_bank[palette_num*PALETTE_SIZE+color_num] = c;
+}
+
+void GBC_Graphics_set_sprite_palette_color(GBC_Graphics *self, uint8_t palette_num, uint8_t color_num, uint8_t c) {
+  self->bg_palette_bank[palette_num*PALETTE_SIZE+color_num] = c;
+}
+
 static void copy_palette_array(uint8_t *palette_bank, uint8_t palette_num, uint8_t *target_array) {
   memcpy(target_array, &palette_bank[palette_num*PALETTE_SIZE], PALETTE_SIZE);
 }
@@ -302,7 +310,7 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
 
       // Get the tile and attrs from the map
-      tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
+      tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * LAYER_WIDTH
       tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
       
       // Get the tile from vram
@@ -338,6 +346,7 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       memset(&info.data[x], pixel_color, 1);
       // memset(&fb_data[x + ((self->line_y + self->screen_y_origin) << 7) + ((self->line_y + self->screen_y_origin) << 4)], pixel_color, 1); // x + self->line_y * row_size
 #else
+      pixel_color = (pixel_color >> 1) & ((pixel_color & 1) | ((x + self->line_y) & 0b11));
       uint16_t byte = (x >> 3); // x / 8
       uint8_t bit = x & 7; // x % 8
       uint8_t *byte_mod = &info.data[byte];
@@ -448,7 +457,7 @@ static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *c
 
           // Now check if the sprite priority bit is set, and if this pixel should be transparent b/c of that
           if (sprite[3] & ATTR_PRIORITY_FLAG) {
-            bg_tile_num = self->bg_tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
+            bg_tile_num = self->bg_tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * LAYER_WIDTH
             
             // Get the tile from vram
             offset = bg_tile_num << 4; // tile_num * TILE_SIZE
@@ -515,6 +524,7 @@ static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *c
           memset(&info.data[screen_x], pixel_color, 1);
           // memset(&fb_data[(screen_x + self->screen_x_origin) + ((screen_y + self->screen_y_origin) << 7) + ((screen_y + self->screen_y_origin) << 4)], pixel_color, 1); // x + self->line_y * row_size
 #else
+          pixel_color = (pixel_color >> 1) & ((pixel_color & 1) | ((screen_x + screen_y) & 0b11));
           uint16_t byte = ((screen_x) >> 3);
           uint8_t bit = screen_x & 7; // x % 8
           uint8_t *byte_mod = &info.data[byte];
@@ -688,15 +698,15 @@ void GBC_Graphics_bg_move(GBC_Graphics *self, short dx, short dy) {
   short new_y = self->bg_scroll_y + dy;
 
   if (new_x < 0) { // Wrap x 
-    new_x = MAP_WIDTH * TILE_WIDTH + new_x;
+    new_x = LAYER_WIDTH * TILE_WIDTH + new_x;
   } else {
-    new_x = new_x % (MAP_WIDTH * TILE_WIDTH);
+    new_x = new_x % (LAYER_WIDTH * TILE_WIDTH);
   }
 
   if (new_y < 0) { // Wrap y
-    new_y = MAP_HEIGHT * TILE_HEIGHT + new_y;
+    new_y = LAYER_HEIGHT * TILE_HEIGHT + new_y;
   } else {
-    new_y = new_y % (MAP_HEIGHT * TILE_HEIGHT);
+    new_y = new_y % (LAYER_HEIGHT * TILE_HEIGHT);
   }
 
   self->bg_scroll_x = new_x;
@@ -877,8 +887,6 @@ void GBC_Graphics_oam_move_sprite(GBC_Graphics *self, uint8_t sprite_num, short 
   new_y = self->oam[sprite_num*4+1] + dy;
   self->oam[sprite_num*4+0] = new_x;
   self->oam[sprite_num*4+1] = new_y;
-  // self->oam[sprite_num*4+0] = clamp_short_to_uint8_t(new_x, 0, SCREEN_WIDTH);
-  // self->oam[sprite_num*4+1] = clamp_short_to_uint8_t(new_y, 0, SCREEN_HEIGHT);
 }
 
 void GBC_Graphics_oam_set_sprite_x(GBC_Graphics *self, uint8_t sprite_num, uint8_t x) {
