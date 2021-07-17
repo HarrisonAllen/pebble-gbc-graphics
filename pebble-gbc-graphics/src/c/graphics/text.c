@@ -15,7 +15,6 @@ void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_
     uint char_index = 0;
     char cur_char = text[char_index];
     while (cur_char != '\0') {
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "Char %c", cur_char);
         if (cur_char >= 'A' && cur_char <= 'Z') {
             GBC_Graphics_bg_set_tile(graphics, x, y, text_vram_offset + (cur_char - 'A'));
         } else if (cur_char >= '0' && cur_char <= '9') {
