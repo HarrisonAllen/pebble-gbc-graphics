@@ -54,6 +54,7 @@ void game_init(Window *window) {
   app_focus_service_subscribe(will_focus_handler);
 
   player_init(s_graphics);
+  render_background(s_graphics, get_player_x(), get_player_y());
 }
 
 void game_deinit() {
