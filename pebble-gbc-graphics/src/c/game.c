@@ -10,6 +10,7 @@ static GBC_Graphics *s_graphics; // Need to keep a reference to the graphics obj
 static void game_step() {
   player_step(s_graphics);
   render_background(s_graphics, get_player_x(), get_player_y());
+  animate_graphics(s_graphics);
 
   char top_banner_text[33];
   snprintf(top_banner_text, 32, "DISTANCE: %u", get_player_x());
@@ -45,6 +46,9 @@ GBC_Graphics *init_gbc_graphics(Window *window) {
   // have a decent frame rate. I prefer SCREEN_BOUNDS_SQUARE for the best
   // compromise between size and frame rate. You can also define your own bounds!
   GBC_Graphics_set_screen_bounds(graphics, SCREEN_BOUNDS_LARGE);
+  
+  // One OAM slot will use two tiles
+  GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(graphics, true);
 
   load_tilesheets(graphics);
 
@@ -68,7 +72,7 @@ void game_deinit() {
 }
 
 void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  
+  start_window_animation();
 }
 
 void up_press_handler(ClickRecognizerRef recognizer, void *context) {
