@@ -6,10 +6,10 @@ extern uint8_t text_vram_offset, sprites_vram_offset;
 static void setup_text_palettes(GBC_Graphics *graphics) {
 #if defined(PBL_COLOR)
     GBC_Graphics_set_bg_palette(graphics, BALLOON_TEXT_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
-    GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorWhiteARGB8);
+    GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorIslamicGreenARGB8);
 #else
     GBC_Graphics_set_bg_palette(graphics, BALLOON_TEXT_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
-    GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GBC_WHITE, GBC_BLACK, GBC_WHITE, GBC_WHITE);
+    GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
 #endif
 }
 
