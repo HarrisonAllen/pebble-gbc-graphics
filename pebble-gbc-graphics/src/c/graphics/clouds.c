@@ -31,9 +31,9 @@ static uint8_t s_cloud_box_dims[] = {8, 8};
 // Palettes can be stored in arrays, and loaded!
 static uint8_t cloud_palette[] = {
 #if defined(PBL_COLOR)
-    GColorPictonBlueARGB8, GColorCelesteARGB8, GColorWhiteARGB8, GColorWhiteARGB8
+    GColorPictonBlueARGB8, GColorPictonBlueARGB8, GColorCelesteARGB8, GColorWhiteARGB8
 #else
-    GBC_WHITE, GBC_BLACK, GBC_BLACK, GBC_WHITE
+    GBC_WHITE, GBC_WHITE, GBC_BLACK, GBC_BLACK
 #endif
 };
 
