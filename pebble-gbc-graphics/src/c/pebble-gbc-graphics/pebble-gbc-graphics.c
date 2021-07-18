@@ -379,8 +379,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
       }
 
       // Get the tile from vram
-      // Clear last bit of offset if we're in 8x16 mode
-      offset = (sprite[2] & (0xFE | (!(self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0))) << 4; // tile_num * TILE_SIZE
+      offset = sprite[2] << 4; // tile_num * TILE_SIZE
       tile = self->vram + ((((sprite[3] & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
 
       // Then we draw the tile row by row
