@@ -2,19 +2,25 @@
 #include "graphics/background.h"
 #include "graphics/text.h"
 #include "actors/player.h"
+#include "actors/items.h"
 #include "util.h"
 
 static AppTimer *s_frame_timer; // Timer to animate the frames
 static GBC_Graphics *s_graphics; // Need to keep a reference to the graphics object
+static uint16_t player_score;
+static uint8_t player_fuel;
 
 static void game_step() {
   player_step(s_graphics);
   render_background(s_graphics, get_player_x(), get_player_y());
+  items_step(s_graphics);
   animate_graphics(s_graphics);
 
+  // TODO: Add collision, only on the body and nose of the plane
+
   char top_banner_text[33];
-  snprintf(top_banner_text, 32, "DISTANCE: %u", get_player_x());
-  draw_text_at_location(s_graphics, top_banner_text, 0, 0, 0);
+  snprintf(top_banner_text, 32, "bx001 f  ");
+  draw_text_at_location(s_graphics, top_banner_text, PBL_IF_ROUND_ELSE(8, 5), 0, 0);
 }
 
 static void frame_timer_handle(void* context) {
@@ -65,6 +71,8 @@ void game_init(Window *window) {
 
   player_init(s_graphics);
   render_background(s_graphics, get_player_x(), get_player_y());
+  items_init(s_graphics);
+  text_init(s_graphics);
 }
 
 void game_deinit() {
