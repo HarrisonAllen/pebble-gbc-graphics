@@ -12,6 +12,12 @@ static int8_t s_dir_to_point[] = {
   0, 0, // D_END
 };
 
+int clamp_int(int min, int val, int max) {
+    if (val < min) return min;
+    if (val > max) return max;
+    return val;
+}
+
 uint8_t clamp_uint8_t(uint8_t min, uint8_t val, uint8_t max) {
     if (val < min) return min;
     if (val > max) return max;
