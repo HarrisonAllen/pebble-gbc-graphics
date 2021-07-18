@@ -6,7 +6,7 @@
 
 #define MIN_PLAYER_Y 8
 #define MAX_PLAYER_Y 208
-#define MAX_PLAYER_Y_SPEED 3
+#define MAX_PLAYER_Y_SPEED 6
 
 #define PLAYER_SPRITE_PALETTE 0
 #define PLANE_RUDDER 0
@@ -25,5 +25,5 @@ uint get_player_x();
 uint8_t get_player_y();
 uint8_t get_player_screen_x();
 uint8_t get_player_screen_y(GBC_Graphics *graphics);
-GSize get_player_size();
+GRect get_player_collision();
 void player_set_vertical_direction(Direction new_scroll_dir);

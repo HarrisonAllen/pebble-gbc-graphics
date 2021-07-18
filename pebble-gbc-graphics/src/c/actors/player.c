@@ -78,7 +78,7 @@ static void draw_player_sprites(GBC_Graphics *graphics) {
 void player_init(GBC_Graphics *graphics) {
     s_player_x = 0;
     s_player_y = 80;
-    s_player_x_speed = 2;
+    s_player_x_speed = 4;
     s_player_y_speed = 0;
     s_player_screen_x = 16;
     set_player_sprite_palette(graphics);
@@ -88,9 +88,9 @@ void player_init(GBC_Graphics *graphics) {
 void player_step(GBC_Graphics *graphics) {
     s_player_x += s_player_x_speed;
     if (s_player_y_direction == D_NONE && s_player_y_speed != 0) {
-        s_player_y_speed -= abs(s_player_y_speed) / s_player_y_speed; // just a trick to normalize an integer
+        s_player_y_speed -= 1 * abs(s_player_y_speed) / s_player_y_speed; // just a trick to normalize an integer
     } else {
-        s_player_y_speed = clamp_int8_t(-MAX_PLAYER_Y_SPEED, s_player_y_speed + dir_to_point(s_player_y_direction)[1], MAX_PLAYER_Y_SPEED);
+        s_player_y_speed = clamp_int8_t(-MAX_PLAYER_Y_SPEED, s_player_y_speed + dir_to_point(s_player_y_direction)[1] * 2, MAX_PLAYER_Y_SPEED);
     }
     s_player_y = clamp_uint8_t(MIN_PLAYER_Y, s_player_y + s_player_y_speed, MAX_PLAYER_Y);
 
@@ -117,8 +117,8 @@ uint8_t get_player_screen_y(GBC_Graphics *graphics) {
     return player_screen_y;
 }
 
-GSize get_player_size() {
-    return GSize(4 * TILE_SIZE, 2 * TILE_SIZE);
+GRect get_player_collision() {
+    return GRect(s_player_x + 20, s_player_y + s_bob_offsets[s_bob_frame / 3] + 7, 8, 3);
 }
 
 void player_set_vertical_direction(Direction new_scroll_dir) {
