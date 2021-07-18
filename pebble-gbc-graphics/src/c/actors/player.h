@@ -23,4 +23,7 @@ void player_init(GBC_Graphics *graphics);
 void player_step(GBC_Graphics *graphics);
 uint get_player_x();
 uint8_t get_player_y();
+uint8_t get_player_screen_x();
+uint8_t get_player_screen_y(GBC_Graphics *graphics);
+GSize get_player_size();
 void player_set_vertical_direction(Direction new_scroll_dir);

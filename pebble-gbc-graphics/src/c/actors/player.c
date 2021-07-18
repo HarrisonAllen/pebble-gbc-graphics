@@ -43,9 +43,9 @@ static const uint8_t s_prop_frames[] = {
 static void set_player_sprite_palette(GBC_Graphics *graphics) {
     // The first color in a sprite palette is treated as transparency, and won't be visible
 #if defined(PBL_COLOR)
-    GBC_Graphics_set_sprite_palette(graphics, PLAYER_SPRITE_PALETTE, GColorBlackARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
+    GBC_Graphics_set_sprite_palette(graphics, PLAYER_SPRITE_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
 #else
-    GBC_Graphics_set_sprite_palette(graphics, PLAYER_SPRITE_PALETTE, GBC_BLACK, GBC_BLACK, GBC_GRAY, GBC_WHITE);
+    GBC_Graphics_set_sprite_palette(graphics, PLAYER_SPRITE_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
 #endif
 }
 
@@ -105,6 +105,20 @@ uint get_player_x() {
 
 uint8_t get_player_y() {
     return s_player_y;
+}
+
+uint8_t get_player_screen_x() {
+    return s_player_screen_x;
+}
+
+uint8_t get_player_screen_y(GBC_Graphics *graphics) {
+    uint8_t player_screen_y = s_player_y - GBC_Graphics_bg_get_scroll_y(graphics) + SPRITE_OFFSET_Y;
+    player_screen_y += s_bob_offsets[s_bob_frame / 3];
+    return player_screen_y;
+}
+
+GSize get_player_size() {
+    return GSize(4 * TILE_SIZE, 2 * TILE_SIZE);
 }
 
 void player_set_vertical_direction(Direction new_scroll_dir) {
