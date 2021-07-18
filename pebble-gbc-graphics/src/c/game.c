@@ -1,14 +1,15 @@
 #include "game.h"
 #include "graphics/background.h"
 #include "graphics/text.h"
+#include "graphics/fuel.h"
 #include "actors/player.h"
 #include "actors/items.h"
 #include "util.h"
 
 static AppTimer *s_frame_timer; // Timer to animate the frames
 static GBC_Graphics *s_graphics; // Need to keep a reference to the graphics object
-static uint16_t player_score;
-static uint16_t player_fuel;
+static uint16_t s_player_score;
+static uint16_t s_player_fuel = MAX_PLAYER_FUEL;
 
 static void check_collision() {
   for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
@@ -18,10 +19,10 @@ static void check_collision() {
       uint *item = get_item(i);
       switch(item[0]) {
         case BALLOON_ID:
-          player_score++;
+          s_player_score++;
           break;
         case FUEL_ID:
-          player_fuel += 5;
+          s_player_fuel += MAX_PLAYER_FUEL / NUM_FUEL_BARS;
           break;
         default:
           break;
@@ -29,6 +30,16 @@ static void check_collision() {
       handle_collision(s_graphics, i);
     }
   }
+}
+
+static void update_fuel() {
+  if (s_player_fuel > 0) {
+    s_player_fuel--;
+  }
+  if (s_player_fuel > MAX_PLAYER_FUEL) {
+    s_player_fuel = MAX_PLAYER_FUEL;
+  }
+  draw_fuel_bar(s_graphics, s_player_fuel, MAX_PLAYER_FUEL, NUM_FUEL_BARS, SCORE_BAR_OFFSET + 8, 0);
 }
 
 static void game_step() {
@@ -40,8 +51,18 @@ static void game_step() {
   check_collision();
 
   char top_banner_text[33];
-  snprintf(top_banner_text, 32, "bx%04d f%03d", player_score, player_fuel);
-  draw_text_at_location(s_graphics, top_banner_text, PBL_IF_ROUND_ELSE(6, 3), 0, 0);
+  snprintf(top_banner_text, 32, "bx%04d f", s_player_score);
+  draw_text_at_location(s_graphics, top_banner_text, SCORE_BAR_OFFSET, 0, 0);
+
+  update_fuel();
+
+  // TODO:
+  // - End game by having plane slide out to the left, window slide in from the right
+  // - On the window, write "GAME OVER\nSCORE: 123\nHIGH SCORE: 1234"
+  // - "PRESS SELECT TO START AGAIN"
+  // - Reload the game 
+  // - Have a start to the game, where the window is chilling and it says "PRESS SELECT TO BEGIN\nHIGH SCORE: 1234"
+  // - And the plane is also chilling there, vibing
 }
 
 static void frame_timer_handle(void* context) {

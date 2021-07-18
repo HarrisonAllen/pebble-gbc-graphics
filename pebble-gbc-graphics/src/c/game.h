@@ -18,6 +18,16 @@
 #define FRAME_DURATION 20
 #endif
 
+#define MAX_PLAYER_FUEL 500
+#define NUM_FUEL_BARS 5
+#define SCORE_BAR_OFFSET PBL_IF_ROUND_ELSE(5, 2)
+
+typedef enum {
+    GS_NEW_GAME,
+    GS_PLAYING,
+    GS_GAME_OVER
+} GameState;
+
 void game_init(Window *window);
 void game_deinit();
 
