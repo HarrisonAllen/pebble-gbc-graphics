@@ -5,6 +5,7 @@
         "pokemon.h": "c",
         "main_window.h": "c",
         "cstdlib": "c",
-        "pebble-gbc-graphics.h": "c"
+        "pebble-gbc-graphics.h": "c",
+        "util.h": "c"
     }
 }
