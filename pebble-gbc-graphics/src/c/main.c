@@ -13,7 +13,7 @@ static void click_config_provider(void *context) {
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-  window_set_background_color(window, GColorBlack);
+  window_set_background_color(window, GColorPictonBlue);
 
   // First, create our game window
   game_init(window);
