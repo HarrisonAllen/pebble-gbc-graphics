@@ -294,7 +294,7 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
     }
 
     num_overlapped_sprites = 0;
-    for (i = 0; i < 40; i++) {
+    for (i = 0; i < 40 * sprites_enabled; i++) {
       sprite = &self->oam[i*4];
       sprite_y = sprite[1] - SPRITE_OFFSET_Y;
       line_overlap = ((uint8_t)(self->line_y - sprite_y)) < (TILE_HEIGHT << ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0));
@@ -411,11 +411,8 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
         new_pixel = (new_pixel * ((uint8_t)(tile_x) < TILE_WIDTH)) * (!(priority && bg_pixel > 0));
         
         // If the sprite pixel hasn't already been claimed by a higher priority sprite, claim it
-        sprite_tile_attr = sprite_tile_attr | ((sprite_pixel == 0) * sprite[3]);
+        sprite_tile_attr = ((sprite_pixel != 0) * sprite_tile_attr) | ((sprite_pixel == 0) * sprite[3]);
         sprite_pixel = sprite_pixel | ((sprite_pixel == 0) * new_pixel);
-        
-        // And make sure sprites are actually enabled
-        sprite_pixel = sprite_pixel * sprites_enabled;
       }
 
       // Get the corresponding colors for each pixel from their palettes
