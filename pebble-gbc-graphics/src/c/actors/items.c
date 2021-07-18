@@ -1,5 +1,6 @@
 #include "items.h"
 #include "player.h"
+#include "../graphics/background.h"
 
 // contains item_type, x_position, y_position
 static uint s_items_data[NUMBER_OF_ITEMS][3];
@@ -9,12 +10,14 @@ extern uint8_t sprites_vram_offset;
 static uint8_t s_item_sprites[] = {
     BALLOON_SPRITE,
     PLUS_ONE_SPRITE,
-    FUEL_SPRITE
+    FUEL_SPRITE,
+    PLUS_FUEL_SPRITE
 };
 
 static uint8_t s_item_palettes[] = {
     BALLOON_PALETTE,
     BALLOON_PALETTE,
+    FUEL_PALETTE,
     FUEL_PALETTE
 };
 
@@ -33,7 +36,7 @@ static void setup_item_palettes(GBC_Graphics *graphics) {
     GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorWhiteARGB8);
 #else
     GBC_Graphics_set_sprite_palette(graphics, BALLOON_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
-    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
+    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GBC_WHITE, GBC_BLACK, GBC_WHITE, GBC_WHITE);
 #endif
 }
 
@@ -52,12 +55,12 @@ static bool is_item_on_screen(GBC_Graphics *graphics, uint8_t item_index) {
 
 static void draw_item_sprites(GBC_Graphics *graphics) {
     for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
-        int item_screen_y = s_items_data[i][2] - GBC_Graphics_bg_get_scroll_y(graphics) + SPRITE_OFFSET_Y;
-        if (item_screen_y <= 0 || item_screen_y > (GBC_Graphics_get_screen_height(graphics) + TILE_SIZE * 2)) {
+        int item_screen_y = s_items_data[i][2] - get_bg_scroll_y(graphics) + SPRITE_OFFSET_Y;
+        if (item_screen_y <= 0 || item_screen_y > (GBC_Graphics_get_screen_height(graphics) + TILE_HEIGHT * 2)) {
             GBC_Graphics_oam_hide_sprite(graphics, ITEM_SPRITE_OFFSET + i);
         } else {
-            int item_screen_x = s_items_data[i][1] - get_player_x() + get_player_screen_x() + TILE_SIZE;
-            if (item_screen_x <= 0 || item_screen_x > (GBC_Graphics_get_screen_width(graphics) + TILE_SIZE)) {
+            int item_screen_x = s_items_data[i][1] - get_player_x() + get_player_screen_x();
+            if (item_screen_x <= 0 || item_screen_x > (GBC_Graphics_get_screen_width(graphics) + TILE_WIDTH)) {
                 GBC_Graphics_oam_hide_sprite(graphics, ITEM_SPRITE_OFFSET + i);
             } else {
                 GBC_Graphics_oam_set_sprite_pos(graphics, ITEM_SPRITE_OFFSET + i, item_screen_x, item_screen_y);
@@ -66,10 +69,39 @@ static void draw_item_sprites(GBC_Graphics *graphics) {
     }
 }
 
+GRect get_item_collision(uint8_t item_id) {
+    uint *item = s_items_data[item_id];
+    return GRect(item[1], item[2], TILE_WIDTH, TILE_HEIGHT * 2);
+}
+
+uint *get_item(uint8_t item_id) {
+    return s_items_data[item_id];
+}
+
+void handle_collision(GBC_Graphics *graphics, uint8_t item_id) {
+    uint *item = s_items_data[item_id];
+    switch (item[0]) {
+        case BALLOON_ID:
+            item[0] = PLUS_ONE_ID;
+            GBC_Graphics_oam_set_sprite_tile(graphics, ITEM_SPRITE_OFFSET + item_id, sprites_vram_offset + s_item_sprites[item[0]]);
+            break;
+        case FUEL_ID:
+            item[0] = PLUS_FUEL_ID;
+            GBC_Graphics_oam_set_sprite_tile(graphics, ITEM_SPRITE_OFFSET + item_id, sprites_vram_offset + s_item_sprites[item[0]]);
+            break;
+        default:
+            break;
+    }
+}
+
 void items_step(GBC_Graphics *graphics) {
     for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
-        s_items_data[i][1] -= 1;
-        int item_screen_x = s_items_data[i][1] - get_player_x() + get_player_screen_x() + TILE_SIZE;
+        uint *item= s_items_data[i];
+        item[1] -= 1;
+        if (item[0] == PLUS_ONE_ID || item[0] == PLUS_FUEL_ID) {
+            item[2] -= 1;
+        }
+        int item_screen_x = item[1] - get_player_x() + get_player_screen_x();
         if (item_screen_x <= 0) {
             set_item(graphics, i);
         }
