@@ -123,7 +123,6 @@ static void setup_bg_layer(GBC_Graphics *graphics) {
   // lastly, draw the score layer
   
   draw_clouds(graphics, cloud_vram_offset);
-  clear_top_row(graphics);
   draw_road(graphics, road_vram_offset);
 }
 
