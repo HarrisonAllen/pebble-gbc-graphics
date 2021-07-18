@@ -33,10 +33,10 @@ static void set_item(GBC_Graphics *graphics, uint8_t item_index) {
 static void setup_item_palettes(GBC_Graphics *graphics) {
 #if defined(PBL_COLOR)
     GBC_Graphics_set_sprite_palette(graphics, BALLOON_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
-    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorWhiteARGB8);
+    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorIslamicGreenARGB8);
 #else
     GBC_Graphics_set_sprite_palette(graphics, BALLOON_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
-    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GBC_WHITE, GBC_BLACK, GBC_WHITE, GBC_WHITE);
+    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
 #endif
 }
 
