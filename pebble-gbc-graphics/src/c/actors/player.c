@@ -51,7 +51,8 @@ static void set_player_sprite_palette(GBC_Graphics *graphics) {
 
 static void draw_player_sprites(GBC_Graphics *graphics) {
     uint8_t plane_attrs = GBC_Graphics_attr_make(PLAYER_SPRITE_PALETTE, 0, false, false, false);
-    uint8_t player_screen_y = GBC_Graphics_get_screen_height(graphics) / 2 - TILE_HEIGHT;
+    uint8_t player_screen_y = s_player_y - GBC_Graphics_bg_get_scroll_y(graphics) + SPRITE_OFFSET_Y;
+    
     player_screen_y += s_bob_offsets[s_bob_frame / 3];
 
     GBC_Graphics_oam_set_sprite(graphics, 0, s_player_screen_x, player_screen_y, sprites_vram_offset + PLANE_RUDDER, plane_attrs);
@@ -76,7 +77,7 @@ static void draw_player_sprites(GBC_Graphics *graphics) {
 
 void player_init(GBC_Graphics *graphics) {
     s_player_x = 0;
-    s_player_y = 40;
+    s_player_y = 80;
     s_player_x_speed = 2;
     s_player_y_speed = 0;
     s_player_screen_x = 16;
