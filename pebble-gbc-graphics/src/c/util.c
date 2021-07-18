@@ -34,6 +34,21 @@ int8_t *dir_to_point(Direction dir) {
     return &s_dir_to_point[dir * 2];
 }
 
+bool grects_overlap(GRect rect1, GRect rect2) {
+  // Check if rect1 is right of rect2 or rect2 is right of rect1
+  if ((rect1.origin.x > rect2.origin.x + rect2.size.w) || (rect2.origin.x > rect1.origin.x + rect1.size.w)) {
+    return false;
+  }
+
+  // Check if rect1 is below rect2 or rect2 is below rect1
+  if ((rect1.origin.y > rect2.origin.y + rect2.size.h) || (rect2.origin.y > rect1.origin.y + rect1.size.h)) {
+    return false;
+  }
+
+  // Otherwise they overlap!
+  return true;
+}
+
 // Load the tilesheets
 void load_tilesheets(GBC_Graphics *graphics) {
   ResHandle handle = resource_get_handle(RESOURCE_ID_DATA_BASE_TILESHEET);
