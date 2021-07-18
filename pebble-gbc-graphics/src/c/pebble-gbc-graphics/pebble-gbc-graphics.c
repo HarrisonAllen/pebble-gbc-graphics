@@ -247,9 +247,9 @@ static void modify_byte(uint8_t *byte, uint8_t mask, uint8_t new_value, uint8_t 
  * @param layer A pointer to the layer to modify
  * @param ctx The graphics context for drawing
  */
-static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
+static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
   // Return early if we don't need to render the background or window
-  if (!(self->lcdc & LCDC_ENABLE_FLAG) || (!(self->lcdc & LCDC_BCKGND_ENABLE_FLAG) && !(self->lcdc & LCDC_WINDOW_ENABLE_FLAG))) {
+  if (!(self->lcdc & LCDC_ENABLE_FLAG) || (!(self->lcdc & LCDC_BCKGND_ENABLE_FLAG) && !(self->lcdc & LCDC_WINDOW_ENABLE_FLAG) && !(self->lcdc & LCDC_SPRITE_ENABLE_FLAG))) {
     return;
   }
   GBitmap *fb = graphics_capture_frame_buffer(ctx);
@@ -267,6 +267,17 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
   uint8_t x;
   uint8_t flip;
   bool in_window_y;
+  
+  short screen_x, screen_y;
+  uint8_t tile_x, tile_y;
+  uint8_t bg_tile_num, bg_tile_attr;
+  uint8_t *sprite, *bg_tile;
+  uint8_t num_overlapped_sprites;
+  uint8_t overlapped_sprites[40];
+  bool line_overlap;
+  uint8_t i;
+  uint8_t sprite_y;
+  short sprite_id;
 
   self->stat &= ~STAT_VBLANK_FLAG; // No longer in VBlank while we draw
   for (self->line_y = 0; self->line_y < self->screen_height; self->line_y++) {
@@ -277,13 +288,14 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       self->line_compare_interrupt_callback(self);
     }
 
-    in_window_y = self->line_y >= window_offset_y;
+    in_window_y = self->line_y >= window_offset_y && (self->lcdc & LCDC_WINDOW_ENABLE_FLAG);
 
     GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, self->line_y + self->screen_y_origin);
     uint8_t min_x = MAX(info.min_x, self->screen_x_origin);
     uint8_t max_x = MIN(info.max_x+1, self->screen_x_origin + self->screen_width);
 
     self->stat &= ~STAT_HBLANK_FLAG; // No longer in HBlank while we draw the line
+    // First, draw the background / window
     for(x = min_x; x < max_x; x++) {
       // Decide what pixel to draw, first check if we're in the window bounds
       if (in_window_y && (x - self->screen_x_origin) >= window_offset_x) {
@@ -346,65 +358,10 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       *byte_mod ^= (-pixel_color ^ *byte_mod) & (1 << bit);
 #endif
     }
-    // Now we're in the HBlank state, run the callback
-    self->stat |= STAT_HBLANK_FLAG;
-    if (self->stat & STAT_HBLANK_INT_FLAG) {
-      self->hblank_interrupt_callback(self);
-    }
-  }
-  self->stat &= ~STAT_LINE_COMP_FLAG; // Clear line compare flag
 
-  graphics_release_frame_buffer(ctx, fb);
-  // Done drawing, now we're in VBlank, run the callback
-  self->stat |= STAT_VBLANK_FLAG;
-  if (self->stat & STAT_VBLANK_INT_FLAG) {
-    self->vblank_interrupt_callback(self);
-  }
-}
-
-/**
- * Renders the sprites, called from an update proc
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param layer A pointer to the layer to modify
- * @param ctx The graphics context for drawing
- */
-static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
-  // Return early if we don't need to draw the sprites
-  if (!(self->lcdc & LCDC_ENABLE_FLAG) || !(self->lcdc & LCDC_SPRITE_ENABLE_FLAG)) {
-    return;
-  }
-  GBitmap *fb = graphics_capture_frame_buffer(ctx);
-
-  // Predefine the variables we're going to use
-  short screen_x, screen_y;
-  uint8_t tile_x, tile_y;
-  uint8_t map_x, map_y, map_tile_x, map_tile_y, bg_tile_num, bg_tile_attr;
-  uint8_t *sprite, *tile, *bg_tile;
-  uint16_t offset;
-  uint8_t pixel_x, pixel_y, pixel, pixel_byte, pixel_color;
-  uint8_t shift;
-  uint8_t flip;
-  uint8_t num_overlapped_sprites;
-  uint8_t overlapped_sprites[40];
-  bool line_overlap;
-  uint8_t i;
-  uint8_t sprite_y;
-  short sprite_id;
-
-  self->stat &= ~STAT_VBLANK_FLAG; // No longer in VBlank while we draw
-  self->stat &= ~STAT_OAM_FLAG; // Drawing sprites, clear OAM flag
-  for (self->line_y = 0; self->line_y < self->screen_height; self->line_y++) {
-    // Check if the current line matches the line compare value, and then do the callback
-    self->stat &= ~STAT_LINE_COMP_FLAG;
-    self->stat |= STAT_LINE_COMP_FLAG * (self->line_y == self->line_y_compare);
-    if ((self->stat & (STAT_LINE_COMP_INT_FLAG | STAT_LINE_COMP_FLAG)) == (STAT_LINE_COMP_INT_FLAG | STAT_LINE_COMP_FLAG)) {
-      self->line_compare_interrupt_callback(self);
-    }
-    GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, self->line_y + self->screen_y_origin);
-
+    // Next, draw any sprites that happen to be on this line
     num_overlapped_sprites = 0;
-    for (sprite_id = 39; sprite_id >= 0; sprite_id--) {
+    for (sprite_id = 39 * ((self->lcdc & LCDC_SPRITE_ENABLE_FLAG) > 0); sprite_id >= 0; sprite_id--) {
       sprite = &self->oam[sprite_id*4];
       sprite_y = sprite[1] - SPRITE_OFFSET_Y;
       line_overlap = ((uint8_t)(self->line_y - sprite_y)) < (TILE_HEIGHT << ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0));
@@ -530,7 +487,15 @@ static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *c
 #endif
       }
     }
+    // Now we're in the HBlank state, run the callback
+    self->stat |= STAT_HBLANK_FLAG;
+    if (self->stat & STAT_HBLANK_INT_FLAG) {
+      self->hblank_interrupt_callback(self);
+    }
   }
+  self->stat &= ~STAT_LINE_COMP_FLAG; // Clear line compare flag
+
+  graphics_release_frame_buffer(ctx, fb);
 
   // Finished drawing sprites, call OAM callback
   self->stat |= STAT_OAM_FLAG;
@@ -538,7 +503,11 @@ static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *c
     self->oam_interrupt_callback(self);
   }
 
-  graphics_release_frame_buffer(ctx, fb);
+  // Done drawing, now we're in VBlank, run the callback
+  self->stat |= STAT_VBLANK_FLAG;
+  if (self->stat & STAT_VBLANK_INT_FLAG) {
+    self->vblank_interrupt_callback(self);
+  }
 }
 
 void GBC_Graphics_render(GBC_Graphics *self) {
@@ -552,8 +521,7 @@ void GBC_Graphics_render(GBC_Graphics *self) {
  * @param ctx A pointer to the graphics context
  */
 static void graphics_update_proc(Layer *layer, GContext *ctx) {
-  render_bg_graphics(*(GBC_Graphics * *)layer_get_data(layer), layer, ctx);
-  render_sprite_graphics(*(GBC_Graphics * *)layer_get_data(layer), layer, ctx);
+  render_graphics(*(GBC_Graphics * *)layer_get_data(layer), layer, ctx);
 }
 
 void GBC_Graphics_lcdc_set(GBC_Graphics *self, uint8_t new_lcdc) {
