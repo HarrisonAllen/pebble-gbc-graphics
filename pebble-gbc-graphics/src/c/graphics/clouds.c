@@ -20,6 +20,7 @@ static const uint8_t cloud_data[] = {
     84, 2, 1,
     86, 2, 1,
     88, 2, 1,
+    // These small clouds are just too small
     // 90, 1, 1,
     // 91, 1, 1,
     // 92, 1, 1,
