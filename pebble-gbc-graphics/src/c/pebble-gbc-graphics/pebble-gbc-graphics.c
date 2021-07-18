@@ -241,7 +241,7 @@ static void modify_byte(uint8_t *byte, uint8_t mask, uint8_t new_value, uint8_t 
 }
 
 /**
- * Renders the graphics, called from an update proc
+ * Renders the background and window, called from an update proc
  * 
  * @param self A pointer to the target GBC Graphics object
  * @param layer A pointer to the layer to modify
@@ -249,40 +249,24 @@ static void modify_byte(uint8_t *byte, uint8_t mask, uint8_t new_value, uint8_t 
  */
 static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
   // Return early if we don't need to render the background or window
-  if (!(self->lcdc & LCDC_ENABLE_FLAG)) {
+  if (!(self->lcdc & LCDC_ENABLE_FLAG) || (!(self->lcdc & LCDC_BCKGND_ENABLE_FLAG) && !(self->lcdc & LCDC_WINDOW_ENABLE_FLAG))) {
     return;
   }
   GBitmap *fb = graphics_capture_frame_buffer(ctx);
 
   uint8_t window_offset_y = clamp_short_to_uint8_t(self->window_offset_y, 0, self->screen_height);
   uint8_t window_offset_x = clamp_short_to_uint8_t(self->window_offset_x, 0, self->screen_width);
-  
-  bool bg_enabled = (self->lcdc & LCDC_BCKGND_ENABLE_FLAG) > 0;
-  bool window_enabled = (self->lcdc & LCDC_WINDOW_ENABLE_FLAG) > 0;
-  bool sprites_enabled = (self->lcdc & LCDC_SPRITE_ENABLE_FLAG) > 0;
 
   // Predefine the variables we'll use in the loop
-  uint8_t map_x, map_y, bg_map_x, bg_map_y, window_map_x, window_map_y;
-  uint8_t sprite_tile_attr, bg_tile_attr, window_tile_attr;
+  uint8_t map_x, map_y, map_tile_x, map_tile_y, tile_num, tile_attr;
+  uint8_t *tilemap, *attrmap;
   uint16_t offset;
-  uint8_t shift;
   uint8_t *tile;
-  uint8_t pixel_x, pixel_y, pixel_byte;
-  uint8_t bg_pixel_color, sprite_pixel_color, pixel_color;
-  uint8_t bg_pixel, sprite_pixel, new_pixel;
-  uint8_t tile_x, tile_y, bg_map_tile_x, bg_map_tile_y, window_map_tile_x, window_map_tile_y;
-  uint8_t bg_tile_num, window_tile_num;
+  uint8_t pixel_x, pixel_y, pixel_byte, pixel_color, pixel;
+  uint8_t shift;
+  uint8_t x;
   uint8_t flip;
-  bool in_window;
-  bool priority;
-  bool line_overlap;
-
-  uint8_t i, x;
-  uint8_t sprite_x, sprite_y;
-  uint8_t num_overlapped_sprites;
-  uint8_t overlapped_sprites[40];
-  uint8_t *sprite;
-
+  bool in_window_y;
 
   self->stat &= ~STAT_VBLANK_FLAG; // No longer in VBlank while we draw
   for (self->line_y = 0; self->line_y < self->screen_height; self->line_y++) {
@@ -293,16 +277,8 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       self->line_compare_interrupt_callback(self);
     }
 
-    num_overlapped_sprites = 0;
-    for (i = 0; i < 40 * sprites_enabled; i++) {
-      sprite = &self->oam[i*4];
-      sprite_y = sprite[1] - SPRITE_OFFSET_Y;
-      line_overlap = ((uint8_t)(self->line_y - sprite_y)) < (TILE_HEIGHT << ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0));
-      
-      overlapped_sprites[num_overlapped_sprites] = i * line_overlap;
-      num_overlapped_sprites += line_overlap;
-    }
-    
+    in_window_y = self->line_y >= window_offset_y;
+
     GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, self->line_y + self->screen_y_origin);
     uint8_t min_x = MAX(info.min_x, self->screen_x_origin);
     uint8_t max_x = MIN(info.max_x+1, self->screen_x_origin + self->screen_width);
@@ -310,48 +286,38 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
     self->stat &= ~STAT_HBLANK_FLAG; // No longer in HBlank while we draw the line
     for(x = min_x; x < max_x; x++) {
       // Decide what pixel to draw, first check if we're in the window bounds
-      in_window = self->line_y >= window_offset_y && (x - self->screen_x_origin) >= window_offset_x;
-      
-      
-      bg_map_x = (x - self->screen_x_origin) + self->bg_scroll_x;
-      bg_map_y = self->line_y + self->bg_scroll_y;
+      if (in_window_y && (x - self->screen_x_origin) >= window_offset_x) {
+        map_x = (x - self->screen_x_origin) - self->window_offset_x;
+        map_y = self->line_y - self->window_offset_y;
+        tilemap = self->window_tilemap;
+        attrmap = self->window_attrmap;
+      } else { // Otherwise draw the background
+        map_x = (x - self->screen_x_origin) + self->bg_scroll_x;
+        map_y = self->line_y + self->bg_scroll_y;
+        tilemap = self->bg_tilemap;
+        attrmap = self->bg_attrmap;
+      }
 
       // Find the tile that the pixel is on
-      bg_map_tile_x = bg_map_x >> 3; // map_x / TILE_WIDTH
-      bg_map_tile_y = bg_map_y >> 3; // map_y / TILE_HEIGHT
+      map_tile_x = map_x >> 3; // map_x / TILE_WIDTH
+      map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
 
       // Get the tile and attrs from the map
-      bg_tile_num = self->bg_tilemap[bg_map_tile_x + (bg_map_tile_y << 5)]; // map_tile_y * TILEMAP_WIDTH
-      bg_tile_attr = self->bg_attrmap[bg_map_tile_x + (bg_map_tile_y << 5)];
-
-      window_map_x = (x - self->screen_x_origin) - self->window_offset_x;
-      window_map_y = self->line_y - self->window_offset_y;
-      
-      // Find the tile that the pixel is on
-      window_map_tile_x = window_map_x >> 3; // map_x / TILE_WIDTH
-      window_map_tile_y = window_map_y >> 3; // map_y / TILE_HEIGHT
-
-      // Get the tile and attrs from the map
-      window_tile_num = self->window_tilemap[window_map_tile_x + (window_map_tile_y << 5)]; // map_tile_y * TILEMAP_WIDTH
-      window_tile_attr = self->window_attrmap[window_map_tile_x + (window_map_tile_y << 5)];
-
-      bg_tile_num = ((!in_window * bg_tile_num) * bg_enabled) | ((in_window * window_tile_num) * window_enabled);
-      bg_tile_attr = ((!in_window * bg_tile_attr) * bg_enabled) | ((in_window * window_tile_attr) * window_enabled);
-      map_x = ((!in_window * bg_map_x) * bg_enabled) | ((in_window * window_map_x) * window_enabled);
-      map_y = ((!in_window * bg_map_y) * bg_enabled) | ((in_window * window_map_y) * window_enabled);
+      tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
+      tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
       
       // Get the tile from vram
-      offset = bg_tile_num << 4; // tile_num * TILE_SIZE
-      tile = self->vram + ((((bg_tile_attr & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
+      offset = tile_num << 4; // tile_num * TILE_SIZE
+      tile = self->vram + ((((tile_attr & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
 
       // Next, we extract and return the 2bpp pixel from the tile
       pixel_x = map_x & 7; // map_x % TILE_WIDTH
-      pixel_y = map_y & 7; // map_y % TILE_HEIGHT
+      pixel_y = map_y & 7; // map_x % TILE_HEIGHT
 
       // Apply flip flags if necessary
-      flip = bg_tile_attr & ATTR_FLIP_FLAG_X;
+      flip = tile_attr & ATTR_FLIP_FLAG_X;
       pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7; // flip ? 7 - pixel_x : pixel_x
-      flip = bg_tile_attr & ATTR_FLIP_FLAG_Y;
+      flip = tile_attr & ATTR_FLIP_FLAG_Y;
       pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & 7;
 
       // To get the pixel, we first need to get the corresponding byte the pixel is in
@@ -364,63 +330,10 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
       shift = (3 ^ (pixel_x & 3)) << 1; // (3 - pixel_x % 4) * 2
 
       // We shift the byte and get rid of any unwanted bits
-      bg_pixel = 0b11 & (pixel_byte >> shift);
+      pixel = 0b11 & (pixel_byte >> shift);
 
-      // Now lets get the sprite pixel for comparison
-      sprite_pixel = 0;
-      sprite_tile_attr = 0;
-      for (i = 0; i < num_overlapped_sprites; i++) {
-        sprite = &self->oam[overlapped_sprites[i]*4];
-        sprite_x = sprite[0] - SPRITE_OFFSET_X + self->screen_x_origin;
-        sprite_y = sprite[1] - SPRITE_OFFSET_Y;
-
-        // Clear last bit of offset if we're in 8x16 mode
-        offset = (sprite[2] & (0xFE | (!(self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0))) << 4; // tile_num * TILE_SIZE
-        tile = self->vram + ((((sprite[3] & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
-
-        // Figure out if the background tile will have priority
-        priority = (sprite[3] & ATTR_PRIORITY_FLAG) || (bg_tile_attr & ATTR_PRIORITY_FLAG);
-
-        // Get the position of the pixel within the sprite
-        tile_y = self->line_y - sprite_y;
-        tile_x = x - sprite_x;
-
-        // Now we get the pixel from the sprite tile
-        pixel_x = tile_x & 7; // tile_x % TILE_WIDTH
-        pixel_y = tile_y & (7 + (((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) << 3)); // tile_y % (8x16 sprite ? TILE_HEIGHT : TILE_HEIGHT * 2)
-
-        // Apply flip flags if necessary
-        flip = sprite[3] & ATTR_FLIP_FLAG_X;
-        pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7; // Yeah this is super complex but it works!
-        flip = sprite[3] & ATTR_FLIP_FLAG_Y;
-        pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & (7 + ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) * 8);
-
-        // To get the pixel, we first need to get the corresponding byte the pixel is in
-        // There are 2 bytes per row (y * 2), and 4 pixels per byte (x / 4)
-        offset = (pixel_y << 1) + (pixel_x >> 2); // pixel y * 2 + pixel_x / 4
-        pixel_byte = tile[offset];
-
-        // Once we have the byte, we need to get the 2 bit pixel out of the byte
-        // This is achieved by shifting the byte (3 - x % 4) * (2 bits per pixel)
-        shift = (3 ^ (pixel_x & 3)) << 1; // (3 - pixel_x % 4) * 2
-
-        // We shift the byte and get rid of any unwanted bits
-        new_pixel = 0b11 & (pixel_byte >> shift);
-
-        // Make pixel transparent if it's not on this x position or the bg pixel is nonzero and has priority
-        new_pixel = (new_pixel * ((uint8_t)(tile_x) < TILE_WIDTH)) * (!(priority && bg_pixel > 0));
-        
-        // If the sprite pixel hasn't already been claimed by a higher priority sprite, claim it
-        sprite_tile_attr = ((sprite_pixel != 0) * sprite_tile_attr) | ((sprite_pixel == 0) * sprite[3]);
-        sprite_pixel = sprite_pixel | ((sprite_pixel == 0) * new_pixel);
-      }
-
-      // Get the corresponding colors for each pixel from their palettes
-      bg_pixel_color = self->bg_palette_bank[((bg_tile_attr & ATTR_PALETTE_MASK) << 2) + bg_pixel]; // (tile_attr & ATTR_PALETTE_MASK) * 4
-      sprite_pixel_color = self->sprite_palette_bank[((sprite_tile_attr & ATTR_PALETTE_MASK) << 2) + sprite_pixel];
-
-      // If the sprite pixel is transparent, use bg. Otherwise use sprite pixel
-      pixel_color = ((sprite_pixel == 0) * bg_pixel_color) | ((sprite_pixel > 0) * sprite_pixel_color);
+      // Finally, we get the corresponding color from attribute palette
+      pixel_color = self->bg_palette_bank[((tile_attr & ATTR_PALETTE_MASK) << 2) + pixel]; // (tile_attr & ATTR_PALETTE_MASK) * 4
 
 #if defined(PBL_COLOR)
       memset(&info.data[x], pixel_color, 1);
@@ -449,6 +362,185 @@ static void render_bg_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) 
   }
 }
 
+/**
+ * Renders the sprites, called from an update proc
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param layer A pointer to the layer to modify
+ * @param ctx The graphics context for drawing
+ */
+static void render_sprite_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
+  // Return early if we don't need to draw the sprites
+  if (!(self->lcdc & LCDC_ENABLE_FLAG) || !(self->lcdc & LCDC_SPRITE_ENABLE_FLAG)) {
+    return;
+  }
+  GBitmap *fb = graphics_capture_frame_buffer(ctx);
+
+  // Predefine the variables we're going to use
+  short screen_x, screen_y;
+  uint8_t tile_x, tile_y;
+  uint8_t map_x, map_y, map_tile_x, map_tile_y, bg_tile_num, bg_tile_attr;
+  uint8_t *sprite, *tile, *bg_tile;
+  uint16_t offset;
+  uint8_t pixel_x, pixel_y, pixel, pixel_byte, pixel_color;
+  uint8_t shift;
+  uint8_t flip;
+  uint8_t num_overlapped_sprites;
+  uint8_t overlapped_sprites[40];
+  bool line_overlap;
+  uint8_t i;
+  uint8_t sprite_y;
+  short sprite_id;
+
+  self->stat &= ~STAT_VBLANK_FLAG; // No longer in VBlank while we draw
+  self->stat &= ~STAT_OAM_FLAG; // Drawing sprites, clear OAM flag
+  for (self->line_y = 0; self->line_y < self->screen_height; self->line_y++) {
+    // Check if the current line matches the line compare value, and then do the callback
+    self->stat &= ~STAT_LINE_COMP_FLAG;
+    self->stat |= STAT_LINE_COMP_FLAG * (self->line_y == self->line_y_compare);
+    if ((self->stat & (STAT_LINE_COMP_INT_FLAG | STAT_LINE_COMP_FLAG)) == (STAT_LINE_COMP_INT_FLAG | STAT_LINE_COMP_FLAG)) {
+      self->line_compare_interrupt_callback(self);
+    }
+    GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, self->line_y + self->screen_y_origin);
+
+    num_overlapped_sprites = 0;
+    for (sprite_id = 39; sprite_id >= 0; sprite_id--) {
+      sprite = &self->oam[sprite_id*4];
+      sprite_y = sprite[1] - SPRITE_OFFSET_Y;
+      line_overlap = ((uint8_t)(self->line_y - sprite_y)) < (TILE_HEIGHT << ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0));
+      
+      overlapped_sprites[num_overlapped_sprites] = sprite_id * line_overlap;
+      num_overlapped_sprites += line_overlap;
+    }
+
+    for (i = 0; i < num_overlapped_sprites; i++) {
+      sprite = &self->oam[overlapped_sprites[i]*4];
+      sprite_y = sprite[1] - SPRITE_OFFSET_Y;
+      // Don't draw the sprite if it's offscreen
+      if (sprite[0] == 0 || sprite[1] == 0 || sprite[0] >= self->screen_width + SPRITE_OFFSET_X || sprite[1] >= self->screen_height + SPRITE_OFFSET_Y) {
+        continue;
+      }
+
+      // Get the tile from vram
+      // Clear last bit of offset if we're in 8x16 mode
+      offset = (sprite[2] & (0xFE | (!(self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0))) << 4; // tile_num * TILE_SIZE
+      tile = self->vram + ((((sprite[3] & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
+
+      // Then we draw the tile row by row
+      sprite_y = sprite[1] - SPRITE_OFFSET_Y;
+      tile_y = self->line_y - sprite_y;
+      screen_y = sprite[1] + tile_y - SPRITE_OFFSET_Y; // On second tile, offset by TILE_HEIGHT
+
+      uint8_t min_x = MAX(info.min_x, self->screen_x_origin);
+      uint8_t max_x = MIN(info.max_x, self->screen_x_origin + self->screen_width);
+
+      for (tile_x = 0; tile_x < TILE_WIDTH; tile_x++) {
+        // Check if the pixel is on the screen
+        screen_x = sprite[0] + tile_x - SPRITE_OFFSET_X + self->screen_x_origin;
+        if (screen_x >= max_x) {
+          break;
+        }
+        if (screen_x < min_x) {
+          continue;
+        }
+
+        // Get the tile x and y on the bg map
+        map_x = self->bg_scroll_x + screen_x - self->screen_x_origin;
+        map_y = self->bg_scroll_y + screen_y;
+        map_tile_x = map_x >> 3; // map_x / TILE_WIDTH
+        map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
+
+        // Check if the background pixel has priority
+        bg_tile_attr = self->bg_attrmap[map_tile_x + (map_tile_y << 5)];
+
+        // Now check if the sprite priority bit is set, and if this pixel should be transparent b/c of that
+        if (sprite[3] & ATTR_PRIORITY_FLAG || bg_tile_attr & ATTR_PRIORITY_FLAG) {
+          bg_tile_num = self->bg_tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
+          
+          // Get the tile from vram
+          offset = bg_tile_num << 4; // tile_num * TILE_SIZE
+          bg_tile = self->vram + ((((bg_tile_attr & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
+          
+          // Next, we extract and return the 2bpp pixel from the tile
+          pixel_x = map_x & 7; // map_x % TILE_WIDTH
+          pixel_y = map_y & 7; // map_x % TILE_HEIGHT
+
+          // Apply flip flags if necessary
+          flip = bg_tile_attr & ATTR_FLIP_FLAG_X;
+          pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7; // flip ? 7 - pixel_x : pixel_x
+          flip = bg_tile_attr & ATTR_FLIP_FLAG_Y;
+          pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & (7 + ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) * 8);
+
+          // To get the pixel, we first need to get the corresponding byte the pixel is in
+          // There are 2 bytes per row (y * 2), and 4 pixels per byte (x / 4)
+          offset = (pixel_y << 1) + (pixel_x >> 2); // pixel y * 2 + pixel_x / 4
+          pixel_byte = bg_tile[offset];
+
+          // Once we have the byte, we need to get the 2 bit pixel out of the byte
+          // This is achieved by shifting the byte (3 - x % 4) * (2 bits per pixel)
+          shift = (3 ^ (pixel_x & 3)) << 1; // (3 - pixel_x % 4) * 2
+
+          // We shift the byte and get rid of any unwanted bits
+          pixel = 0b11 & (pixel_byte >> shift);
+
+          // Now, if the bg pixel is non-zero, the sprite pixel is transparent
+          if (pixel) {
+            continue;
+          }
+        }
+        
+        // Now we get the pixel from the sprite tile
+        pixel_x = tile_x & 7; // tile_x % TILE_WIDTH
+        pixel_y = tile_y & (7 + (((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) << 3)); // tile_y % (8x16 sprite ? TILE_HEIGHT : TILE_HEIGHT * 2)
+
+        // Apply flip flags if necessary
+        flip = sprite[3] & ATTR_FLIP_FLAG_X;
+        pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7;
+        flip = sprite[3] & ATTR_FLIP_FLAG_Y;
+        pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & (7 + ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) * 8);
+
+        // To get the pixel, we first need to get the corresponding byte the pixel is in
+        // There are 2 bytes per row (y * 2), and 4 pixels per byte (x / 4)
+        offset = (pixel_y << 1) + (pixel_x >> 2); // pixel y * 2 + pixel_x / 4
+        pixel_byte = tile[offset];
+
+        // Once we have the byte, we need to get the 2 bit pixel out of the byte
+        // This is achieved by shifting the byte (3 - x % 4) * (2 bits per pixel)
+        shift = (3 ^ (pixel_x & 3)) << 1; // (3 - pixel_x % 4) * 2
+
+        // We shift the byte and get rid of any unwanted bits
+        pixel = 0b11 & (pixel_byte >> shift);
+
+        // The 0th palette color is transparency
+        if (pixel == 0) {
+          continue;
+        }
+        
+        pixel_color = self->sprite_palette_bank[((sprite[3] & ATTR_PALETTE_MASK) << 2) + pixel]; // (tile_attr & ATTR_PALETTE_MASK) * PALETTE_SIZE + pixel
+        
+#if defined(PBL_COLOR)
+        memset(&info.data[screen_x], pixel_color, 1);
+        // memset(&fb_data[(screen_x + self->screen_x_origin) + ((screen_y + self->screen_y_origin) << 7) + ((screen_y + self->screen_y_origin) << 4)], pixel_color, 1); // x + self->line_y * row_size
+#else
+        pixel_color = (pixel_color >> 1) & ((pixel_color & 1) | ((screen_x + self->line_y) & 0b11));
+        uint16_t byte = ((screen_x) >> 3);
+        uint8_t bit = screen_x & 7; // x % 8
+        uint8_t *byte_mod = &info.data[byte];
+        *byte_mod ^= (-pixel_color ^ *byte_mod) & (1 << bit);
+#endif
+      }
+    }
+  }
+
+  // Finished drawing sprites, call OAM callback
+  self->stat |= STAT_OAM_FLAG;
+  if (self->stat & STAT_OAM_INT_FLAG) {
+    self->oam_interrupt_callback(self);
+  }
+
+  graphics_release_frame_buffer(ctx, fb);
+}
+
 void GBC_Graphics_render(GBC_Graphics *self) {
   layer_mark_dirty(self->graphics_layer); // All layers will be redrawn, so we don't need to mark the sprite layer dirty
 }
@@ -461,6 +553,7 @@ void GBC_Graphics_render(GBC_Graphics *self) {
  */
 static void graphics_update_proc(Layer *layer, GContext *ctx) {
   render_bg_graphics(*(GBC_Graphics * *)layer_get_data(layer), layer, ctx);
+  render_sprite_graphics(*(GBC_Graphics * *)layer_get_data(layer), layer, ctx);
 }
 
 void GBC_Graphics_lcdc_set(GBC_Graphics *self, uint8_t new_lcdc) {
