@@ -35,7 +35,6 @@ void draw_road(GBC_Graphics *graphics, uint8_t road_vram_offset) {
         switch (tile_odds) {
             case 0:
                 GBC_Graphics_bg_set_tile_and_attrs(graphics, x, TILEMAP_HEIGHT - 5, road_vram_offset + TREE_TOP, ground_attrs);
-                GBC_Graphics_bg_set_tile_priority(graphics, x, TILEMAP_HEIGHT - 5, true);
                 GBC_Graphics_bg_set_tile(graphics, x, TILEMAP_HEIGHT - 4, road_vram_offset + TREE_BOT_SKY);
                 x++;
                 break; 
