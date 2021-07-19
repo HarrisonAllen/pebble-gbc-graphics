@@ -6,6 +6,8 @@
         "main_window.h": "c",
         "cstdlib": "c",
         "pebble-gbc-graphics.h": "c",
-        "util.h": "c"
+        "util.h": "c",
+        "background.h": "c",
+        "items.h": "c"
     }
 }
