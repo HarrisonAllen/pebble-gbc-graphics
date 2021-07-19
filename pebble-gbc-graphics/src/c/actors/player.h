@@ -42,3 +42,4 @@ void player_move_off_screen_left();
 void player_move_on_screen_right();
 void player_move_off_screen_down();
 bool player_moving();
+bool player_on_screen();

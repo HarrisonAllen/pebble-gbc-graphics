@@ -78,8 +78,6 @@ static void draw_player_sprites(GBC_Graphics *graphics) {
     }
     GBC_Graphics_oam_set_sprite(graphics, 2, clamp_int(0, s_player_screen_x + TILE_WIDTH * 2, s_player_screen_x + TILE_WIDTH * 2), player_screen_y, sprites_vram_offset + plane_body_sprite, plane_attrs);
     GBC_Graphics_oam_set_sprite(graphics, 3, clamp_int(0, s_player_screen_x + TILE_WIDTH * 3, s_player_screen_x + TILE_WIDTH * 3), player_screen_y, sprites_vram_offset + s_prop_frames[s_prop_frame], plane_attrs);
-    
-    GBC_Graphics_render(graphics);
 }
 
 void player_init(GBC_Graphics *graphics) {
@@ -182,4 +180,8 @@ void player_move_off_screen_down() {
 
 bool player_moving() {
     return s_player_state == PS_MOVING_OFF_LEFT || s_player_state == PS_MOVING_ON_RIGHT || s_player_state == PS_MOVING_OFF_DOWN;
+}
+
+bool player_on_screen() {
+    return s_player_state == PS_ON_SCREEN;
 }
