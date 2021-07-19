@@ -2,6 +2,74 @@
 
 uint8_t base_vram_offset, cloud_vram_offset, fuel_vram_offset, road_vram_offset, sprites_vram_offset, text_vram_offset;
 
+const uint8_t ease_in_out_percentages[] = {
+  0,
+  2,
+  4,
+  8,
+  16,
+  26,
+  38,
+  50,
+  62,
+  74,
+  84,
+  92,
+  96,
+  98,
+  100
+};
+
+const uint8_t ease_out_percentages[] = {
+  0,
+  2,
+  4,
+  6,
+  8,
+  12,
+  16,
+  24,
+  32,
+  42,
+  52,
+  64,
+  76,
+  88,
+  100
+};
+
+const uint8_t ease_out_slow_percentages[] = {
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  10,
+  12,
+  14,
+  16,
+  20,
+  24,
+  28,
+  32,
+  37,
+  42,
+  47,
+  52,
+  58,
+  64,
+  70,
+  76,
+  82,
+  88,
+  94,
+  100
+};
+
 static int8_t s_dir_to_point[] = {
   // x, y
   0, 0, // D_NONE
