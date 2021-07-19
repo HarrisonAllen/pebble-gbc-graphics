@@ -30,8 +30,6 @@ void generate_new_game_background(GBC_Graphics *graphics) {
   setup_bg_layer(graphics);
 
   s_bg_max_scroll_y = TILEMAP_HEIGHT * TILE_HEIGHT - GBC_Graphics_get_screen_height(graphics);
-
-  GBC_Graphics_render(graphics);
 }
 
 static void handle_scroll_interrupt(GBC_Graphics *graphics) {
@@ -98,8 +96,6 @@ void render_background(GBC_Graphics *graphics, uint player_x, uint8_t player_y) 
   
   GBC_Graphics_set_line_compare_interrupt_callback(graphics, handle_scroll_interrupt);
   GBC_Graphics_stat_set_line_compare_interrupt_enabled(graphics, true);
-
-  GBC_Graphics_render(graphics);
 }
 
 uint8_t get_bg_scroll_x() {
