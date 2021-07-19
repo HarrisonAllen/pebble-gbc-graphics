@@ -24,32 +24,41 @@ void text_init(GBC_Graphics *graphics) {
     clear_top_row(graphics);
 }
 
-void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_t y, uint8_t palette_num) {
+void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_t y, uint8_t palette_num, bool background) {
     uint8_t start_x = x;
     // size_t text_length = strlen(text);
     uint char_index = 0;
     char cur_char = text[char_index];
+    uint8_t tile = 0;
+    uint8_t palette;
     while (cur_char != '\0') {
-        GBC_Graphics_bg_set_tile_palette(graphics, x, y, palette_num);
+        palette = palette_num;
         if (cur_char >= 'A' && cur_char <= 'Z') {
-            GBC_Graphics_bg_set_tile(graphics, x, y, text_vram_offset + (cur_char - 'A'));
+            tile = text_vram_offset + (cur_char - 'A');
         } else if (cur_char >= '0' && cur_char <= '9') {
-            GBC_Graphics_bg_set_tile(graphics, x, y, text_vram_offset + NUMBER_OFFSET + (cur_char - '0'));
+            tile = text_vram_offset + NUMBER_OFFSET + (cur_char - '0');
         } else if (cur_char == ':') {
-            GBC_Graphics_bg_set_tile(graphics, x, y, text_vram_offset + COLON_OFFSET);
+            tile = text_vram_offset + COLON_OFFSET;
         } else if (cur_char == '\n') {
             x = start_x;
             y++;
         } else if (cur_char == 'x') {
-            GBC_Graphics_bg_set_tile(graphics, x, y, text_vram_offset + TIMES_OFFSET);
+            tile = text_vram_offset + TIMES_OFFSET;
         }else if (cur_char == 'b') {
-            GBC_Graphics_bg_set_tile(graphics, x, y, sprites_vram_offset + BALLOON_TILE);
-            GBC_Graphics_bg_set_tile_palette(graphics, x, y, BALLOON_TEXT_PALETTE);
+            tile = sprites_vram_offset + BALLOON_TILE;
+            palette = BALLOON_TEXT_PALETTE;
         }else if (cur_char == 'f') {
-            GBC_Graphics_bg_set_tile(graphics, x, y, sprites_vram_offset + FUEL_TILE);
-            GBC_Graphics_bg_set_tile_palette(graphics, x, y, FUEL_TEXT_PALETTE);
+            tile = sprites_vram_offset + FUEL_TILE;
+            palette = FUEL_TEXT_PALETTE;
         } else {
-            GBC_Graphics_bg_set_tile(graphics, x, y, BLANK_TILE);
+            tile = BLANK_TILE;
+        }
+        if (background) {
+            GBC_Graphics_bg_set_tile_palette(graphics, x, y, palette);
+            GBC_Graphics_bg_set_tile(graphics, x, y, tile);
+        } else {
+            GBC_Graphics_window_set_tile_palette(graphics, x, y, palette);
+            GBC_Graphics_window_set_tile(graphics, x, y, tile);
         }
         x++;
         char_index++;
