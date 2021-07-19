@@ -10,19 +10,21 @@
 static AppTimer *s_frame_timer; // Timer to animate the frames
 static GBC_Graphics *s_graphics; // Need to keep a reference to the graphics object
 static uint16_t s_player_score;
-static uint16_t s_player_fuel = MAX_PLAYER_FUEL;
+static uint16_t s_player_fuel;
+static uint8_t s_game_frame = 0;
+static GameState s_game_state;
+static uint16_t s_high_score = 12;
 
 static void check_collision() {
   for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
     bool item_overlaps_player = grects_overlap(get_player_collision(), get_item_collision(i));
     if (item_overlaps_player) {
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap! Item %d: Player (%d, %d), Item (%d, %d)", i, get_player_collision().origin.x, get_player_collision().origin.y, get_item_collision(i).origin.x, get_item_collision(i).origin.y);
       uint *item = get_item(i);
       switch(item[0]) {
-        case BALLOON_ID:
+        case IT_BALLOON:
           s_player_score++;
           break;
-        case FUEL_ID:
+        case IT_FUEL:
           s_player_fuel += MAX_PLAYER_FUEL / NUM_FUEL_BARS;
           break;
         default:
@@ -40,24 +42,115 @@ static void update_fuel() {
   if (s_player_fuel > MAX_PLAYER_FUEL) {
     s_player_fuel = MAX_PLAYER_FUEL;
   }
-  draw_fuel_bar(s_graphics, s_player_fuel, MAX_PLAYER_FUEL, NUM_FUEL_BARS, SCORE_BAR_OFFSET + 8, 0);
+  draw_fuel_bar(s_graphics, s_player_fuel, MAX_PLAYER_FUEL, NUM_FUEL_BARS, SCORE_BAR_OFFSET + 1, 0);
 }
 
 static void game_step() {
-  player_step(s_graphics);
-  render_background(s_graphics, get_player_x(), get_player_y());
-  items_step(s_graphics);
+  switch (s_game_state) {
+    case GS_LOAD_IN_TRANSITION:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
 
-  check_collision();
+      if (!is_window_animating()) {
+        s_game_state = GS_NEW_GAME;
+      } else {
+        step_window_animation(s_graphics);
+      }
+      break;
+    case GS_NEW_GAME:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
+      break;
+    case GS_NEW_GAME_TRANSITION:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
 
-  char top_banner_text[33];
-  snprintf(top_banner_text, 32, "bx%04d f", s_player_score);
-  draw_text_at_location(s_graphics, top_banner_text, SCORE_BAR_OFFSET, 0, 0, true);
+      if (!is_window_animating()) {
+        s_game_state = GS_PLAYING;
+        items_init(s_graphics);
+      } else {
+        step_window_animation(s_graphics);
+      }
+      break;
+    case GS_PLAYING:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
+      items_step(s_graphics);
 
-  update_fuel();
+      check_collision();
 
-  if (is_window_animating()) {
-    step_window_animation(s_graphics);
+      char top_banner_text[33];
+      snprintf(top_banner_text, 32, "f      bx%d", s_player_score);
+      clear_top_row(s_graphics);
+      draw_text_at_location(s_graphics, top_banner_text, SCORE_BAR_OFFSET, 0, 0, true);
+      
+      update_fuel();
+
+      if (s_player_fuel == 0) {
+        player_set_vertical_direction(D_NONE);
+        player_move_off_screen_down();
+        s_game_state = GS_MOVE_PLAYER_OFF_SCREEN;
+      }
+      break;
+    case GS_MOVE_PLAYER_OFF_SCREEN:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
+      items_step(s_graphics);
+
+      if (!player_moving()) {
+        char new_game_text[70];
+        snprintf(new_game_text, 70, "  OUT OF FUEL\n\nSCORE:   %5d\n\nHI SCORE:%5d\n\n PRESS SELECT", s_player_score, s_high_score);
+        clear_window_layer(s_graphics);
+        set_window_layer_frame(s_graphics, GAME_OVER_WINDOW, GAME_OVER_WINDOW_START);
+        draw_text_at_location(s_graphics, new_game_text, PBL_IF_ROUND_ELSE(4, 2), PBL_IF_ROUND_ELSE(3, 7), WINDOW_PALETTE, false);
+
+        start_window_animation(GAME_OVER_WINDOW_START, GAME_OVER_WINDOW_END);
+
+        clear_top_row(s_graphics);
+        draw_text_at_location(s_graphics, "GAME OVER", PBL_IF_ROUND_ELSE(7, 5), 0, 0, true);
+
+        s_game_state = GS_GAME_OVER_TRANSITION;
+      }
+
+      break;
+    case GS_GAME_OVER_TRANSITION:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
+      items_step(s_graphics);
+
+      if (!is_window_animating()) {
+        items_clear();
+        s_game_state = GS_GAME_OVER;
+      } else {
+        step_window_animation(s_graphics);
+      }
+      break;
+    case GS_GAME_OVER:
+      break;
+    case GS_GAME_OVER_NEW_GAME_TRANSITION:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
+      items_step(s_graphics);
+
+      if (!is_window_animating()) {
+        s_game_state = GS_MOVE_PLAYER_ON_SCREEN;
+        player_move_on_screen_right();
+      } else {
+        step_window_animation(s_graphics);
+      }
+      break;
+    case GS_MOVE_PLAYER_ON_SCREEN:
+      player_step(s_graphics);
+      render_background(s_graphics, get_player_x(), get_player_y());
+      items_step(s_graphics);
+
+      if (!player_moving()) {
+        s_game_state = GS_PLAYING;
+        items_init(s_graphics);
+      }
+      break;
+    default:
+      break;
   }
   // TODO:
   // - End game by having plane slide out to the left, window slide in from the right
@@ -125,17 +218,36 @@ GBC_Graphics *init_gbc_graphics(Window *window) {
   return graphics;
 }
 
+void new_game() {
+  generate_new_game_background(s_graphics);
+  render_background(s_graphics, get_player_x(), get_player_y());
+  player_init(s_graphics);
+  s_player_fuel = MAX_PLAYER_FUEL;
+  s_player_score = 0;
+}
+
 void game_init(Window *window) {
   s_graphics = init_gbc_graphics(window);
+  
   window_init(s_graphics);
-  generate_new_game_background(s_graphics);
+  text_init(s_graphics);
+  new_game();
+  player_move_on_screen_right();
+  
+  s_game_state = GS_LOAD_IN_TRANSITION;
+
+  clear_top_row(s_graphics);
+  draw_text_at_location(s_graphics, "START GAME", PBL_IF_ROUND_ELSE(7, 4), 0, 0, true);
+  
+  char new_game_text[33];
+  snprintf(new_game_text, 32, "HI SCORE:%5d\n\n PRESS SELECT", s_high_score);
+  clear_window_layer(s_graphics);
+  set_window_layer_frame(s_graphics, NEW_GAME_WINDOW, NEW_GAME_WINDOW_START);
+  draw_text_at_location(s_graphics, new_game_text, PBL_IF_ROUND_ELSE(4, 2), 1, WINDOW_PALETTE, false);
+  start_window_animation(NEW_GAME_WINDOW_START, NEW_GAME_WINDOW_END);
+
   s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);
   app_focus_service_subscribe(will_focus_handler);
-
-  player_init(s_graphics);
-  render_background(s_graphics, get_player_x(), get_player_y());
-  items_init(s_graphics);
-  text_init(s_graphics);
 }
 
 void game_deinit() {
@@ -144,27 +256,44 @@ void game_deinit() {
 
 void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Do different things depending on the current state
-  if (!is_window_animating()) {
-    GPoint start_pos = GPoint(GBC_Graphics_get_screen_width(s_graphics) - 8*11, GBC_Graphics_get_screen_height(s_graphics));
-    GPoint end_pos = GPoint(start_pos.x, start_pos.y - 8*11);
-    set_window_layer_frame(s_graphics, GRect(0, 0, 10, 10), start_pos);
-    draw_text_at_location(s_graphics, "TEST TEST", 1, 1, WINDOW_PALETTE, false);
-    start_window_animation(start_pos, end_pos);
+  switch (s_game_state) {
+    case GS_NEW_GAME:
+      clear_top_row(s_graphics);
+      draw_text_at_location(s_graphics, "GET READY", PBL_IF_ROUND_ELSE(7, 5), 0, 0, true);
+      start_window_animation(NEW_GAME_WINDOW_END, NEW_GAME_WINDOW_START);
+      s_game_state = GS_NEW_GAME_TRANSITION;
+      break;
+    case GS_GAME_OVER:
+      new_game();
+      clear_top_row(s_graphics);
+      draw_text_at_location(s_graphics, "FLY AGAIN", PBL_IF_ROUND_ELSE(7, 5), 0, 0, true);
+      start_window_animation(GAME_OVER_WINDOW_END, GAME_OVER_WINDOW_START);
+      s_game_state = GS_GAME_OVER_NEW_GAME_TRANSITION;
+    default:
+      break;
   }
 }
 
 void up_press_handler(ClickRecognizerRef recognizer, void *context) {
-  player_set_vertical_direction(D_UP);
+  if (s_game_state == GS_PLAYING) {
+    player_set_vertical_direction(D_UP);
+  }
 }
 
 void up_release_handler(ClickRecognizerRef recognizer, void *context) {
-  player_set_vertical_direction(D_NONE);
+  if (s_game_state == GS_PLAYING) {
+    player_set_vertical_direction(D_NONE);
+  }
 }
 
 void down_press_handler(ClickRecognizerRef recognizer, void *context) {
-  player_set_vertical_direction(D_DOWN);
+  if (s_game_state == GS_PLAYING) {
+    player_set_vertical_direction(D_DOWN);
+  }
 }
 
 void down_release_handler(ClickRecognizerRef recognizer, void *context) {
-  player_set_vertical_direction(D_NONE);
+  if (s_game_state == GS_PLAYING) {
+    player_set_vertical_direction(D_NONE);
+  }
 }

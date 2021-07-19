@@ -22,10 +22,28 @@
 #define NUM_FUEL_BARS 5
 #define SCORE_BAR_OFFSET PBL_IF_ROUND_ELSE(5, 2)
 
+#define NEW_GAME_WINDOW GRect(PBL_IF_ROUND_ELSE(3, 1), 0, 15, 4)
+#define NEW_GAME_WINDOW_END GPoint(0, GBC_Graphics_get_screen_height(s_graphics) - 48)
+#define NEW_GAME_WINDOW_START GPoint(0, GBC_Graphics_get_screen_height(s_graphics))
+
+#if defined(PBL_ROUND)
+    #define GAME_OVER_WINDOW GRect(3, 2, 15, 8)
+#else
+    #define GAME_OVER_WINDOW GRect(1, 6, 15, 8)
+#endif
+#define GAME_OVER_WINDOW_START GPoint(GBC_Graphics_get_screen_width(s_graphics), 8)
+#define GAME_OVER_WINDOW_END GPoint(0, 8)
+
 typedef enum {
+    GS_LOAD_IN_TRANSITION,
     GS_NEW_GAME,
+    GS_NEW_GAME_TRANSITION,
     GS_PLAYING,
-    GS_GAME_OVER
+    GS_MOVE_PLAYER_OFF_SCREEN,
+    GS_GAME_OVER_TRANSITION,
+    GS_GAME_OVER,
+    GS_GAME_OVER_NEW_GAME_TRANSITION,
+    GS_MOVE_PLAYER_ON_SCREEN,
 } GameState;
 
 void game_init(Window *window);
