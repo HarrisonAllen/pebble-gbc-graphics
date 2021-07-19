@@ -48,8 +48,6 @@
  * 4 bytes per sprite * 40 sprite slots = 160 bytes
  */
 #define OAM_SIZE 160
-// #define SCREEN_WIDTH 144  ///> Width of the screen in pixels
-// #define SCREEN_HEIGHT 144 ///> Height of the screen in pixels
 #define SPRITE_OFFSET_X 8 ///> The x offset to allow for offscreen rendering
 #define SPRITE_OFFSET_Y 16 ///> The y offset to allow for offscreen rendering
 
