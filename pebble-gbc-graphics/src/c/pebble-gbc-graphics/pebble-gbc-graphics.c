@@ -181,7 +181,7 @@ void GBC_Graphics_set_bg_palette_color(GBC_Graphics *self, uint8_t palette_num, 
 }
 
 void GBC_Graphics_set_sprite_palette_color(GBC_Graphics *self, uint8_t palette_num, uint8_t color_num, uint8_t c) {
-  self->bg_palette_bank[palette_num*PALETTE_SIZE+color_num] = c;
+  self->sprite_palette_bank[palette_num*PALETTE_SIZE+color_num] = c;
 }
 
 static void copy_palette_array(uint8_t *palette_bank, uint8_t palette_num, uint8_t *target_array) {
@@ -393,7 +393,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
       for (tile_x = 0; tile_x < TILE_WIDTH; tile_x++) {
         // Check if the pixel is on the screen
         screen_x = sprite[0] + tile_x - SPRITE_OFFSET_X + self->screen_x_origin;
-        if (screen_x >= max_x) {
+        if (screen_x > max_x) {
           break;
         }
         if (screen_x < min_x) {
