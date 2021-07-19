@@ -3,8 +3,8 @@
 #include <pebble.h>  ///> Pebble SDK symbols
 
 /**
- * Version 1.0.0 of pebble-gbc-graphics
- * Created by Harrison Allen
+ * Version 1.1.0 of pebble-gbc-graphics
+ * Created by Harrison Allen (harrisonallen555@gmail.com)
  */
 
 /** Size definitions */
