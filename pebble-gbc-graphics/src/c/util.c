@@ -100,3 +100,7 @@ void load_tilesheets(GBC_Graphics *graphics) {
   GBC_Graphics_load_from_tilesheet_into_vram(graphics, RESOURCE_ID_DATA_TEXT_TILESHEET, tilesheet_start_offset, 
                                              tiles_to_load, vram_start_offset, vram_bank);
 }
+
+int lerp(int start, int end, int percent) {
+  return start + (percent * (end - start) / 100);
+}

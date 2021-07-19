@@ -18,3 +18,4 @@ uint8_t clamp_int8_t(int8_t min, int8_t val, int8_t max);
 int8_t *dir_to_point(Direction dir);
 bool grects_overlap(GRect rect1, GRect rect2);
 void load_tilesheets(GBC_Graphics *graphics);
+int lerp(int start, int end, int percent);
