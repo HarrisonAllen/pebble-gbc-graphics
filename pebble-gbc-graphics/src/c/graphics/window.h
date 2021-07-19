@@ -9,6 +9,7 @@
 
 #define WINDOW_PALETTE 7
 
+void clear_window_layer(GBC_Graphics *graphics);
 void window_init(GBC_Graphics *graphics);
 void set_window_layer_frame(GBC_Graphics *graphics, GRect frame, GPoint origin);
 void start_window_animation(GPoint start, GPoint end);

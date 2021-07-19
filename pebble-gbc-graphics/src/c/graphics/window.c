@@ -8,23 +8,7 @@ static bool s_window_up = false;
 static bool s_window_animating;
 static GPoint s_anim_start_pos, s_anim_end_pos;
 
-static const uint8_t s_ease_in_out_percentages[] = {
-  0,
-  2,
-  4,
-  8,
-  16,
-  26,
-  38,
-  50,
-  62,
-  74,
-  84,
-  92,
-  96,
-  98,
-  100
-};
+extern const uint8_t ease_in_out_percentages[];
 
 // Place the frame on the window layer and make the window layer visible
 static void setup_window_layer(GBC_Graphics *graphics) {
@@ -39,10 +23,10 @@ static void setup_window_layer(GBC_Graphics *graphics) {
 }
 
 
-static void clear_window_layer(GBC_Graphics *graphics) {
+void clear_window_layer(GBC_Graphics *graphics) {
   for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
     for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
-      GBC_Graphics_window_set_tile_and_attrs(graphics, x, y, SOLID_TILE_01, GBC_Graphics_attr_make(WINDOW_PALETTE, 0, false, false, true));
+      GBC_Graphics_window_set_tile_and_attrs(graphics, x, y, SOLID_TILE_01, GBC_Graphics_attr_make(0, 0, false, false, true));
     }
   }
 }
@@ -107,11 +91,10 @@ void start_window_animation(GPoint start, GPoint end) {
 }
 
 void step_window_animation(GBC_Graphics *graphics) {
-  uint8_t animation_percent = s_ease_in_out_percentages[s_window_anim_frame];
+  uint8_t animation_percent = ease_in_out_percentages[s_window_anim_frame];
   GBC_Graphics_window_set_offset_x(graphics, lerp(s_anim_start_pos.x, s_anim_end_pos.x, animation_percent));
   GBC_Graphics_window_set_offset_y(graphics, lerp(s_anim_start_pos.y, s_anim_end_pos.y, animation_percent));
   GBC_Graphics_render(graphics);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Animating on frame %d at %d%% to (%d, %d)", s_window_anim_frame, animation_percent, lerp(s_anim_start_pos.x, s_anim_end_pos.x, animation_percent), lerp(s_anim_start_pos.y, s_anim_end_pos.y, animation_percent));
   s_window_anim_frame++;
   s_window_animating = animation_percent < 100;
 }
