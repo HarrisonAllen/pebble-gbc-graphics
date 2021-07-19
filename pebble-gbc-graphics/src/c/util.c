@@ -167,6 +167,8 @@ void load_tilesheets(GBC_Graphics *graphics) {
   tiles_to_load = res_size / TILE_SIZE;
   GBC_Graphics_load_from_tilesheet_into_vram(graphics, RESOURCE_ID_DATA_TEXT_TILESHEET, tilesheet_start_offset, 
                                              tiles_to_load, vram_start_offset, vram_bank);
+
+  APP_LOG(APP_LOG_LEVEL_INFO, "Using %d/%d tiles in VRAM", vram_start_offset + tiles_to_load, UINT8_MAX+1);
 }
 
 int lerp(int start, int end, int percent) {
