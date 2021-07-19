@@ -43,9 +43,10 @@ void draw_fuel_bar(GBC_Graphics *graphics, uint16_t fuel_amount, uint16_t max_fu
             GBC_Graphics_bg_set_tile_and_attrs(graphics, x+bar_pos, y, fuel_vram_offset + FUEL_BAR_EMPTY - last_bar_len, attrs);
         }
     }
-    bar_pos++;
-    for (; bar_pos < num_fuel_bars; bar_pos++) {
-        GBC_Graphics_bg_set_tile_and_attrs(graphics, x+bar_pos, y, fuel_vram_offset + FUEL_BAR_EMPTY, attrs);
+    if (bar_pos < num_fuel_bars) {
+        for (bar_pos++; bar_pos < num_fuel_bars; bar_pos++) {
+            GBC_Graphics_bg_set_tile_and_attrs(graphics, x+bar_pos, y, fuel_vram_offset + FUEL_BAR_EMPTY, attrs);
+        }
     }
     GBC_Graphics_bg_set_tile_and_attrs(graphics, x+bar_pos, y, fuel_vram_offset + FUEL_BAR_END, attrs);
 }
