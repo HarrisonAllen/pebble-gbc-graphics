@@ -66,7 +66,10 @@ static void draw_item_sprites(GBC_Graphics *graphics) {
             GBC_Graphics_oam_hide_sprite(graphics, ITEM_SPRITE_OFFSET + i);
         } else {
             int item_screen_x = s_items_data[i][1] - get_player_x() + PLAYER_ON_SCREEN_X;
-            if (item_screen_x <= 0 || item_screen_x > (GBC_Graphics_get_screen_width(graphics) + TILE_WIDTH)) {
+            bool item_overlaps_window = (item_screen_x > GBC_Graphics_window_get_offset_x(graphics) + SPRITE_OFFSET_X
+                && item_screen_y > GBC_Graphics_window_get_offset_y(graphics) + SPRITE_OFFSET_Y);
+
+            if (item_screen_x <= 0 || item_screen_x > (GBC_Graphics_get_screen_width(graphics) + TILE_WIDTH) || item_overlaps_window) {
                 GBC_Graphics_oam_hide_sprite(graphics, ITEM_SPRITE_OFFSET + i);
             } else {
                 GBC_Graphics_oam_set_sprite_pos(graphics, ITEM_SPRITE_OFFSET + i, item_screen_x, item_screen_y);
@@ -111,7 +114,7 @@ void items_step(GBC_Graphics *graphics) {
             item[2] -= 1;
         }
         int item_screen_x = item[1] - get_player_x() + get_player_screen_x();
-        if (item_screen_x <= 0) {
+        if (item_screen_x <= 0 && player_on_screen()) {
             set_item(graphics, i);
         }
     }
