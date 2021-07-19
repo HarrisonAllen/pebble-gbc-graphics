@@ -2,6 +2,7 @@
 #include "graphics/background.h"
 #include "graphics/text.h"
 #include "graphics/fuel.h"
+#include "graphics/window.h"
 #include "actors/player.h"
 #include "actors/items.h"
 #include "util.h"
@@ -46,16 +47,18 @@ static void game_step() {
   player_step(s_graphics);
   render_background(s_graphics, get_player_x(), get_player_y());
   items_step(s_graphics);
-  animate_graphics(s_graphics);
 
   check_collision();
 
   char top_banner_text[33];
   snprintf(top_banner_text, 32, "bx%04d f", s_player_score);
-  draw_text_at_location(s_graphics, top_banner_text, SCORE_BAR_OFFSET, 0, 0);
+  draw_text_at_location(s_graphics, top_banner_text, SCORE_BAR_OFFSET, 0, 0, true);
 
   update_fuel();
 
+  if (is_window_animating()) {
+    step_window_animation(s_graphics);
+  }
   // TODO:
   // - End game by having plane slide out to the left, window slide in from the right
   // - On the window, write "GAME OVER\nSCORE: 123\nHIGH SCORE: 1234"
@@ -124,6 +127,7 @@ GBC_Graphics *init_gbc_graphics(Window *window) {
 
 void game_init(Window *window) {
   s_graphics = init_gbc_graphics(window);
+  window_init(s_graphics);
   generate_new_game_background(s_graphics);
   s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);
   app_focus_service_subscribe(will_focus_handler);
@@ -139,7 +143,14 @@ void game_deinit() {
 }
 
 void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  start_window_animation();
+  // Do different things depending on the current state
+  if (!is_window_animating()) {
+    GPoint start_pos = GPoint(GBC_Graphics_get_screen_width(s_graphics) - 8*11, GBC_Graphics_get_screen_height(s_graphics));
+    GPoint end_pos = GPoint(start_pos.x, start_pos.y - 8*11);
+    set_window_layer_frame(s_graphics, GRect(0, 0, 10, 10), start_pos);
+    draw_text_at_location(s_graphics, "TEST TEST", 1, 1, WINDOW_PALETTE, false);
+    start_window_animation(start_pos, end_pos);
+  }
 }
 
 void up_press_handler(ClickRecognizerRef recognizer, void *context) {
