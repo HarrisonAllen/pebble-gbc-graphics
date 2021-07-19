@@ -5,6 +5,7 @@
 #include "graphics/window.h"
 #include "actors/player.h"
 #include "actors/items.h"
+#include "actors/hiscore.h"
 #include "util.h"
 
 static AppTimer *s_frame_timer; // Timer to animate the frames
@@ -13,7 +14,8 @@ static uint16_t s_player_score;
 static uint16_t s_player_fuel;
 static uint8_t s_game_frame = 0;
 static GameState s_game_state;
-static uint16_t s_high_score = 12;
+static uint16_t s_high_score = 0;
+static bool s_new_high_score;
 
 static void check_collision() {
   for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
@@ -90,6 +92,10 @@ static void game_step() {
         player_set_vertical_direction(D_NONE);
         player_move_off_screen_down();
         s_game_state = GS_MOVE_PLAYER_OFF_SCREEN;
+        s_new_high_score = s_player_score > s_high_score;
+        if (s_new_high_score) {
+          s_high_score = s_player_score;
+        }
       }
       break;
     case GS_MOVE_PLAYER_OFF_SCREEN:
@@ -104,6 +110,7 @@ static void game_step() {
         clear_window_layer(s_graphics);
         set_window_layer_frame(s_graphics, GAME_OVER_WINDOW, GAME_OVER_WINDOW_START);
         draw_text_at_location(s_graphics, new_game_text, PBL_IF_ROUND_ELSE(4, 2), PBL_IF_ROUND_ELSE(3, 7), WINDOW_PALETTE, false);
+        set_window_has_priority(s_graphics, false);
 
         start_window_animation(GAME_OVER_WINDOW_START, GAME_OVER_WINDOW_END);
 
@@ -117,18 +124,23 @@ static void game_step() {
     case GS_GAME_OVER_TRANSITION:
       player_step(s_graphics);
       render_background(s_graphics, get_player_x(), get_player_y());
-      items_step(s_graphics);
 
       if (!is_window_animating()) {
         items_clear();
         items_step(s_graphics);
-        set_window_has_priority(s_graphics, false);
         s_game_state = GS_GAME_OVER;
       } else {
         step_window_animation(s_graphics);
       }
+      items_step(s_graphics);
+      if (s_new_high_score) {
+        hiscore_step(s_graphics);
+      }
       break;
     case GS_GAME_OVER:
+      if (s_new_high_score) {
+        hiscore_step(s_graphics);
+      }
       break;
     case GS_GAME_OVER_NEW_GAME_TRANSITION:
       player_step(s_graphics);
@@ -140,6 +152,9 @@ static void game_step() {
         player_move_on_screen_right();
       } else {
         step_window_animation(s_graphics);
+      }
+      if (s_new_high_score) {
+        hiscore_step(s_graphics);
       }
       break;
     case GS_MOVE_PLAYER_ON_SCREEN:
@@ -155,6 +170,8 @@ static void game_step() {
     default:
       break;
   }
+
+  GBC_Graphics_render(s_graphics);
 }
 
 static void frame_timer_handle(void* context) {
@@ -209,8 +226,6 @@ GBC_Graphics *init_gbc_graphics(Window *window) {
 
   load_tilesheets(graphics);
 
-  GBC_Graphics_render(graphics);
-
   return graphics;
 }
 
@@ -234,6 +249,7 @@ void game_init(Window *window) {
   
   window_init(s_graphics);
   text_init(s_graphics);
+  hiscore_init(s_graphics);
   new_game();
   player_move_on_screen_right();
   
@@ -253,6 +269,8 @@ void game_init(Window *window) {
 
   s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);
   app_focus_service_subscribe(will_focus_handler);
+
+  GBC_Graphics_render(s_graphics);
 }
 
 void game_deinit() {
@@ -268,6 +286,7 @@ void select_click_handler(ClickRecognizerRef recognizer, void *context) {
       draw_text_at_location(s_graphics, "GET READY", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
       start_window_animation(NEW_GAME_WINDOW_END, NEW_GAME_WINDOW_START);
       s_game_state = GS_NEW_GAME_TRANSITION;
+      s_new_high_score = false;
       break;
     case GS_GAME_OVER:
       new_game();
@@ -285,6 +304,10 @@ static void end_round() {
   player_set_vertical_direction(D_NONE);
   player_move_off_screen_left();
   s_game_state = GS_MOVE_PLAYER_OFF_SCREEN;
+  s_new_high_score = s_player_score > s_high_score;
+  if (s_new_high_score) {
+    s_high_score = s_player_score;
+  }
 }
 
 void back_click_handler(ClickRecognizerRef recognizer, void *context) {
