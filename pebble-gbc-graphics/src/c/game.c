@@ -99,7 +99,8 @@ static void game_step() {
 
       if (!player_moving()) {
         char new_game_text[70];
-        snprintf(new_game_text, 70, "  OUT OF FUEL\n\nSCORE:   %5d\n\nHI SCORE:%5d\n\n PRESS SELECT", s_player_score, s_high_score);
+        snprintf(new_game_text, 70, "%s\n\nSCORE:   %5d\n\nHI SCORE:%5d\n\n PRESS SELECT",
+                 s_player_fuel == 0 ? " OUT OF FUEL" : " FLIGHT ENDED", s_player_score, s_high_score);
         clear_window_layer(s_graphics);
         set_window_layer_frame(s_graphics, GAME_OVER_WINDOW, GAME_OVER_WINDOW_START);
         draw_text_at_location(s_graphics, new_game_text, PBL_IF_ROUND_ELSE(4, 2), PBL_IF_ROUND_ELSE(3, 7), WINDOW_PALETTE, false);
@@ -107,7 +108,7 @@ static void game_step() {
         start_window_animation(GAME_OVER_WINDOW_START, GAME_OVER_WINDOW_END);
 
         clear_top_row(s_graphics);
-        draw_text_at_location(s_graphics, "GAME OVER", PBL_IF_ROUND_ELSE(7, 5), 0, 0, true);
+        draw_text_at_location(s_graphics, "GAME OVER", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
 
         s_game_state = GS_GAME_OVER_TRANSITION;
       }
@@ -120,6 +121,8 @@ static void game_step() {
 
       if (!is_window_animating()) {
         items_clear();
+        items_step(s_graphics);
+        set_window_has_priority(s_graphics, false);
         s_game_state = GS_GAME_OVER;
       } else {
         step_window_animation(s_graphics);
@@ -152,13 +155,6 @@ static void game_step() {
     default:
       break;
   }
-  // TODO:
-  // - End game by having plane slide out to the left, window slide in from the right
-  // - On the window, write "GAME OVER\nSCORE: 123\nHIGH SCORE: 1234"
-  // - "PRESS SELECT TO START AGAIN"
-  // - Reload the game 
-  // - Have a start to the game, where the window is chilling and it says "PRESS SELECT TO BEGIN\nHIGH SCORE: 1234"
-  // - And the plane is also chilling there, vibing
 }
 
 static void frame_timer_handle(void* context) {
@@ -226,6 +222,13 @@ void new_game() {
   s_player_score = 0;
 }
 
+static void click_config_provider(void *context) {
+  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+  window_single_click_subscribe(BUTTON_ID_BACK, back_click_handler);
+  window_raw_click_subscribe(BUTTON_ID_UP, up_press_handler, up_release_handler, NULL);
+  window_raw_click_subscribe(BUTTON_ID_DOWN, down_press_handler, down_release_handler, NULL);
+}
+
 void game_init(Window *window) {
   s_graphics = init_gbc_graphics(window);
   
@@ -237,7 +240,7 @@ void game_init(Window *window) {
   s_game_state = GS_LOAD_IN_TRANSITION;
 
   clear_top_row(s_graphics);
-  draw_text_at_location(s_graphics, "START GAME", PBL_IF_ROUND_ELSE(7, 4), 0, 0, true);
+  draw_text_at_location(s_graphics, "START GAME", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
   
   char new_game_text[33];
   snprintf(new_game_text, 32, "HI SCORE:%5d\n\n PRESS SELECT", s_high_score);
@@ -245,12 +248,15 @@ void game_init(Window *window) {
   set_window_layer_frame(s_graphics, NEW_GAME_WINDOW, NEW_GAME_WINDOW_START);
   draw_text_at_location(s_graphics, new_game_text, PBL_IF_ROUND_ELSE(4, 2), 1, WINDOW_PALETTE, false);
   start_window_animation(NEW_GAME_WINDOW_START, NEW_GAME_WINDOW_END);
+  
+  window_set_click_config_provider(window, click_config_provider);
 
   s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);
   app_focus_service_subscribe(will_focus_handler);
 }
 
 void game_deinit() {
+  // Be sure to destroy the graphic object when done!
   GBC_Graphics_destroy(s_graphics);
 }
 
@@ -259,18 +265,33 @@ void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   switch (s_game_state) {
     case GS_NEW_GAME:
       clear_top_row(s_graphics);
-      draw_text_at_location(s_graphics, "GET READY", PBL_IF_ROUND_ELSE(7, 5), 0, 0, true);
+      draw_text_at_location(s_graphics, "GET READY", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
       start_window_animation(NEW_GAME_WINDOW_END, NEW_GAME_WINDOW_START);
       s_game_state = GS_NEW_GAME_TRANSITION;
       break;
     case GS_GAME_OVER:
       new_game();
       clear_top_row(s_graphics);
-      draw_text_at_location(s_graphics, "FLY AGAIN", PBL_IF_ROUND_ELSE(7, 5), 0, 0, true);
+      draw_text_at_location(s_graphics, "FLY AGAIN", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
       start_window_animation(GAME_OVER_WINDOW_END, GAME_OVER_WINDOW_START);
       s_game_state = GS_GAME_OVER_NEW_GAME_TRANSITION;
+      break;
     default:
       break;
+  }
+}
+
+static void end_round() {
+  player_set_vertical_direction(D_NONE);
+  player_move_off_screen_left();
+  s_game_state = GS_MOVE_PLAYER_OFF_SCREEN;
+}
+
+void back_click_handler(ClickRecognizerRef recognizer, void *context) {
+  if (s_game_state == GS_PLAYING) {
+    end_round();
+  } else {
+    window_stack_pop(true);
   }
 }
 

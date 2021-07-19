@@ -50,6 +50,7 @@ void game_init(Window *window);
 void game_deinit();
 
 void select_click_handler(ClickRecognizerRef recognizer, void *context);
+void back_click_handler(ClickRecognizerRef recognizer, void *context);
 void up_press_handler(ClickRecognizerRef recognizer, void *context);
 void up_release_handler(ClickRecognizerRef recognizer, void *context);
 void down_press_handler(ClickRecognizerRef recognizer, void *context);
