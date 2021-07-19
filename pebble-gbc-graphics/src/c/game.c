@@ -244,8 +244,27 @@ static void click_config_provider(void *context) {
   window_raw_click_subscribe(BUTTON_ID_DOWN, down_press_handler, down_release_handler, NULL);
 }
 
+static bool load(SaveData *data) {
+  return persist_read_data(SAVE_KEY, data, sizeof(SaveData)) != E_DOES_NOT_EXIST;
+}
+
+static void save() {
+  if (s_player_score > s_high_score) {
+    s_high_score = s_player_score;
+  }
+  SaveData data = (SaveData) {
+    .high_score = s_high_score,
+  };
+  persist_write_data(SAVE_KEY, &data, sizeof(SaveData));
+}
+
 void game_init(Window *window) {
   s_graphics = init_gbc_graphics(window);
+
+  SaveData data;
+  if (load(&data)) {
+    s_high_score = data.high_score;
+  }
   
   window_init(s_graphics);
   text_init(s_graphics);
@@ -274,6 +293,8 @@ void game_init(Window *window) {
 }
 
 void game_deinit() {
+  // Save our high score
+  save();
   // Be sure to destroy the graphic object when done!
   GBC_Graphics_destroy(s_graphics);
 }

@@ -34,6 +34,12 @@
 #define GAME_OVER_WINDOW_START GPoint(GBC_Graphics_get_screen_width(s_graphics), 8)
 #define GAME_OVER_WINDOW_END GPoint(0, 8)
 
+#define SAVE_KEY 0
+
+typedef struct {
+    uint16_t high_score;
+} SaveData;
+
 typedef enum {
     GS_LOAD_IN_TRANSITION,
     GS_NEW_GAME,
