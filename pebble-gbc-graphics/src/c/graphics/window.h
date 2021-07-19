@@ -15,3 +15,4 @@ void set_window_layer_frame(GBC_Graphics *graphics, GRect frame, GPoint origin);
 void start_window_animation(GPoint start, GPoint end);
 void step_window_animation(GBC_Graphics *graphics);
 bool is_window_animating();
+void set_window_has_priority(GBC_Graphics *graphics, bool has_priority);
