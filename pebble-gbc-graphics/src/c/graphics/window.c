@@ -94,11 +94,18 @@ void step_window_animation(GBC_Graphics *graphics) {
   uint8_t animation_percent = ease_in_out_percentages[s_window_anim_frame];
   GBC_Graphics_window_set_offset_x(graphics, lerp(s_anim_start_pos.x, s_anim_end_pos.x, animation_percent));
   GBC_Graphics_window_set_offset_y(graphics, lerp(s_anim_start_pos.y, s_anim_end_pos.y, animation_percent));
-  GBC_Graphics_render(graphics);
   s_window_anim_frame++;
   s_window_animating = animation_percent < 100;
 }
 
 bool is_window_animating() {
   return s_window_animating;
+}
+
+void set_window_has_priority(GBC_Graphics *graphics, bool has_priority) {
+  for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
+    for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
+      GBC_Graphics_window_set_tile_priority(graphics, x, y, has_priority);
+    }
+  }
 }
