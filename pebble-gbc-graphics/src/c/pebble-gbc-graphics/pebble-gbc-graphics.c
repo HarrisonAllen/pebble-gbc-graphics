@@ -399,19 +399,28 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
         if (screen_x < min_x) {
           continue;
         }
+        if (in_window_y && (screen_x - self->screen_x_origin) >= window_offset_x) {
+          map_x = (screen_x - self->screen_x_origin) - self->window_offset_x;
+          map_y = screen_y - self->window_offset_y;
+          tilemap = self->window_tilemap;
+          attrmap = self->window_attrmap;
+        } else { // Otherwise draw the background
+          map_x = (screen_x - self->screen_x_origin) + self->bg_scroll_x;
+          map_y = screen_y + self->bg_scroll_y;
+          tilemap = self->bg_tilemap;
+          attrmap = self->bg_attrmap;
+        }
 
         // Get the tile x and y on the bg map
-        map_x = self->bg_scroll_x + screen_x - self->screen_x_origin;
-        map_y = self->bg_scroll_y + screen_y;
         map_tile_x = map_x >> 3; // map_x / TILE_WIDTH
         map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
 
         // Check if the background pixel has priority
-        bg_tile_attr = self->bg_attrmap[map_tile_x + (map_tile_y << 5)];
+        bg_tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
 
         // Now check if the sprite priority bit is set, and if this pixel should be transparent b/c of that
         if (sprite[3] & ATTR_PRIORITY_FLAG || bg_tile_attr & ATTR_PRIORITY_FLAG) {
-          bg_tile_num = self->bg_tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
+          bg_tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
           
           // Get the tile from vram
           offset = bg_tile_num << 4; // tile_num * TILE_SIZE
