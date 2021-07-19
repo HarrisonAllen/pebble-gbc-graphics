@@ -14,5 +14,6 @@
 #define BALLOON_TEXT_PALETTE 4
 #define FUEL_TEXT_PALETTE 5
 
+void clear_top_row(GBC_Graphics *graphics);
 void text_init(GBC_Graphics *graphics);
 void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_t y, uint8_t palette_num, bool background);

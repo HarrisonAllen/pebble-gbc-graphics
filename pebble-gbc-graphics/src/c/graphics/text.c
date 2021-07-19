@@ -13,7 +13,7 @@ static void setup_text_palettes(GBC_Graphics *graphics) {
 #endif
 }
 
-static void clear_top_row(GBC_Graphics *graphics) {
+void clear_top_row(GBC_Graphics *graphics) {
     for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
         GBC_Graphics_bg_set_tile_and_attrs(graphics, x, 0, BLANK_TILE, GBC_Graphics_attr_make(0, 0, false, false, true));
     }
@@ -39,9 +39,6 @@ void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_
             tile = text_vram_offset + NUMBER_OFFSET + (cur_char - '0');
         } else if (cur_char == ':') {
             tile = text_vram_offset + COLON_OFFSET;
-        } else if (cur_char == '\n') {
-            x = start_x;
-            y++;
         } else if (cur_char == 'x') {
             tile = text_vram_offset + TIMES_OFFSET;
         }else if (cur_char == 'b') {
@@ -53,14 +50,19 @@ void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_
         } else {
             tile = BLANK_TILE;
         }
-        if (background) {
-            GBC_Graphics_bg_set_tile_palette(graphics, x, y, palette);
-            GBC_Graphics_bg_set_tile(graphics, x, y, tile);
+        if (cur_char == '\n') {
+            x = start_x;
+            y++;
         } else {
-            GBC_Graphics_window_set_tile_palette(graphics, x, y, palette);
-            GBC_Graphics_window_set_tile(graphics, x, y, tile);
+            if (background) {
+                GBC_Graphics_bg_set_tile_palette(graphics, x, y, palette);
+                GBC_Graphics_bg_set_tile(graphics, x, y, tile);
+            } else {
+                GBC_Graphics_window_set_tile_palette(graphics, x, y, palette);
+                GBC_Graphics_window_set_tile(graphics, x, y, tile);
+            }
+            x++;
         }
-        x++;
         char_index++;
         cur_char = text[char_index];
     }
