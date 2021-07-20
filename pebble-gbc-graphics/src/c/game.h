@@ -3,6 +3,11 @@
 #include <pebble.h>
 #include "pebble-gbc-graphics/pebble-gbc-graphics.h"
 
+/**
+ * The main game class. This controls the gameplay loop,
+ * the GBC_Graphics object, and all of the other classes
+ */
+
 /*
  * This is the duration of a frame, in milliseconds (more or less)
  * E.g. a FRAME_DURATION of 33ms will give ~30 fps
