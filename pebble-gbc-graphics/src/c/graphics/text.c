@@ -1,9 +1,19 @@
 #include "text.h"
 #include "../util.h"
 
-extern uint8_t text_vram_offset, sprites_vram_offset;
+extern uint8_t text_vram_offset, sprites_vram_offset; // Need to grab the offset of the text and sprites tilesheets
 
+/**
+ * Initializes the background palettes for the balloon and fuel text icons
+ */
 static void setup_text_palettes(GBC_Graphics *graphics) {
+    /**
+     * The colors are:
+     *   1. Sky color
+     *   2. Border color
+     *   3. Primary color
+     *   4. Detail color
+     */
 #if defined(PBL_COLOR)
     GBC_Graphics_set_bg_palette(graphics, BALLOON_TEXT_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
     GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorIslamicGreenARGB8);
@@ -26,12 +36,12 @@ void text_init(GBC_Graphics *graphics) {
 
 void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_t y, uint8_t palette_num, bool background) {
     uint8_t start_x = x;
-    // size_t text_length = strlen(text);
     uint char_index = 0;
     char cur_char = text[char_index];
     uint8_t tile = 0;
     uint8_t palette;
-    while (cur_char != '\0') {
+
+    while (cur_char != '\0') { // Go until we reach the end of the char array
         palette = palette_num;
         if (cur_char >= 'A' && cur_char <= 'Z') {
             tile = text_vram_offset + (cur_char - 'A');
@@ -41,16 +51,17 @@ void draw_text_at_location(GBC_Graphics *graphics, char *text, uint8_t x, uint8_
             tile = text_vram_offset + COLON_OFFSET;
         } else if (cur_char == 'x') {
             tile = text_vram_offset + TIMES_OFFSET;
-        }else if (cur_char == 'b') {
+        }else if (cur_char == 'b') { // For balloon, use diferent palette
             tile = sprites_vram_offset + BALLOON_TILE;
             palette = BALLOON_TEXT_PALETTE;
-        }else if (cur_char == 'f') {
+        }else if (cur_char == 'f') { // For fuel, use different palette
             tile = sprites_vram_offset + FUEL_TILE;
             palette = FUEL_TEXT_PALETTE;
         } else {
             tile = BLANK_TILE;
         }
-        if (cur_char == '\n') {
+
+        if (cur_char == '\n') { // newline, don't render, just move to next line
             x = start_x;
             y++;
         } else {
