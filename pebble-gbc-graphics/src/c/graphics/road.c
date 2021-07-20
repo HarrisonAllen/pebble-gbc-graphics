@@ -1,7 +1,26 @@
 #include "road.h"
 
+/**
+ * Initializes the background palettes for the road tiles
+ */
 static void load_palettes(GBC_Graphics *graphics) {
-    // Here, I explicitly set the values of the palette array
+    /**
+     * For the ground palette, the colors are:
+     *   1. Sky color
+     *   2. Tree trunk color
+     *   3. Tree/horizon edge color
+     *   4. Tree/ground fill color
+     * For the tree road palette, the colors are:
+     *   1. Road color
+     *   2. Road edge color
+     *   3. Tree edge color
+     *   4. Tree fill color
+     * For the road palette, the colors are:
+     *   1. Road color
+     *   2. Road edge color
+     *   3. Car/Sidewalk fill color
+     *   4. Detail color
+     */
 #if defined(PBL_COLOR)
     GBC_Graphics_set_bg_palette(graphics, GROUND_PALETTE, GColorPictonBlueARGB8, GColorWindsorTanARGB8, GColorDarkGreenARGB8, GColorMayGreenARGB8);
     GBC_Graphics_set_bg_palette(graphics, TREE_ROAD_PALETTE, GColorBlackARGB8, GColorDarkGrayARGB8, GColorDarkGreenARGB8, GColorMayGreenARGB8);
@@ -14,12 +33,13 @@ static void load_palettes(GBC_Graphics *graphics) {
 }
 
 void draw_road(GBC_Graphics *graphics, uint8_t road_vram_offset) {
+    // Set each palette individually
     load_palettes(graphics);
 
     uint8_t ground_attrs = GBC_Graphics_attr_make(GROUND_PALETTE, 0, false, false, false);
     uint8_t road_attrs = GBC_Graphics_attr_make(ROAD_PALETTE, 0, false, false, false);
 
-    // Fill in the base for the road
+    // Fill in the base for the road at the bottom of the background tilemap
     for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) { 
         GBC_Graphics_bg_set_tile_and_attrs(graphics, x, GBC_TILEMAP_HEIGHT - 5, SKY_TILE, ground_attrs);
         GBC_Graphics_bg_set_tile_and_attrs(graphics, x, GBC_TILEMAP_HEIGHT - 4, road_vram_offset + HORIZON, ground_attrs);
@@ -28,7 +48,7 @@ void draw_road(GBC_Graphics *graphics, uint8_t road_vram_offset) {
         GBC_Graphics_bg_set_tile_and_attrs(graphics, x, GBC_TILEMAP_HEIGHT - 1, GROUND_TILE, ground_attrs);
     }
 
-    // Place upper trees
+    // Place the upper row of trees
     uint8_t tile_odds;
     for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
         tile_odds = rand()%4;
@@ -47,7 +67,7 @@ void draw_road(GBC_Graphics *graphics, uint8_t road_vram_offset) {
         }
     }
 
-    // Place cars
+    // Place cars on the road
     for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
         tile_odds = rand()%4;
         switch (tile_odds) {
@@ -63,7 +83,7 @@ void draw_road(GBC_Graphics *graphics, uint8_t road_vram_offset) {
         }
     }
 
-    // Place lower trees
+    // Place lower trees below the road
     for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
         tile_odds = rand()%4;
         switch (tile_odds) {
