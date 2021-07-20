@@ -2,16 +2,26 @@
 #include "background.h"
 #include "../util.h"
 
-static uint8_t s_window_anim_frame;
-static bool s_animate_window_tiles = false;
-static bool s_window_up = false;
-static bool s_window_animating;
-static GPoint s_anim_start_pos, s_anim_end_pos;
+static uint8_t s_window_anim_frame; // The current frame of the window animation
+static bool s_window_animating; // The animation status of the window
+static GPoint s_anim_start_pos; // The start position of the animation
+static GPoint s_anim_end_pos; // The end position of the animation
 
-extern const uint8_t ease_in_out_percentages[];
+extern const uint8_t ease_in_out_percentages[]; // Want to grab the ease in, ease out animation sequence
 
-// Place the frame on the window layer and make the window layer visible
+/**
+ * Set the window palette and hide the window
+ * 
+ * @param graphics The GBC_Graphics object for rendering
+ */
 static void setup_window_layer(GBC_Graphics *graphics) {
+  /**
+   * The colors are:
+   *   1. Sky color
+   *   2. Canvas color
+   *   3. Border fill color
+   *   4. Border outline color
+   */
   #if defined(PBL_COLOR)
     GBC_Graphics_set_bg_palette(graphics, WINDOW_PALETTE, GColorPictonBlueARGB8, GColorPastelYellowARGB8, GColorWindsorTanARGB8, GColorBlackARGB8);
   #else
@@ -22,11 +32,10 @@ static void setup_window_layer(GBC_Graphics *graphics) {
   GBC_Graphics_window_set_offset_pos(graphics, GBC_Graphics_get_screen_width(graphics), GBC_Graphics_get_screen_height(graphics));
 }
 
-
 void clear_window_layer(GBC_Graphics *graphics) {
   for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
     for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
-      GBC_Graphics_window_set_tile_and_attrs(graphics, x, y, SOLID_TILE_01, GBC_Graphics_attr_make(0, 0, false, false, true));
+      GBC_Graphics_window_set_tile_and_attrs(graphics, x, y, SOLID_TILE_00, GBC_Graphics_attr_make(WINDOW_PALETTE, 0, false, false, true));
     }
   }
 }
@@ -37,12 +46,12 @@ void window_init(GBC_Graphics *graphics) {
 }
 
 void set_window_layer_frame(GBC_Graphics *graphics, GRect frame, GPoint origin) {
+  // Determine the boundaries for this new frame
   uint8_t left_boundary = frame.origin.x;
   uint8_t right_boundary = frame.origin.x + frame.size.w;
   uint8_t upper_boundary = frame.origin.y;
   uint8_t lower_boundary = frame.origin.y + frame.size.h;
   
-  // These attributes set a tile to palette WINDOW_PALETTE, vram bank 0, no x flip, no y flip, no priority over sprite
   uint8_t window_attrs = GBC_Graphics_attr_make(WINDOW_PALETTE, 0, false, false, true);
 
   // Draw the corners
@@ -58,12 +67,14 @@ void set_window_layer_frame(GBC_Graphics *graphics, GRect frame, GPoint origin) 
   GBC_Graphics_window_set_tile_y_flip(graphics, right_boundary, lower_boundary, true); // flip the bottom right corner
   GBC_Graphics_window_set_tile_x_flip(graphics, right_boundary, lower_boundary, true); // flip the bottom right corner
 
-  // Draw the edges
+  // Draw the top and bottom edges
   for (uint8_t x = left_boundary+1; x < right_boundary; x++) {
     GBC_Graphics_window_set_tile_and_attrs(graphics, x, upper_boundary, WINDOW_FRAME_HORIZONTAL, window_attrs);
     GBC_Graphics_window_set_tile_and_attrs(graphics, x, lower_boundary, WINDOW_FRAME_HORIZONTAL, window_attrs);
     GBC_Graphics_window_set_tile_y_flip(graphics, x, lower_boundary, true); // flip the bottom edge
   }
+
+  // Draw the left and right edges
   for (uint8_t y = upper_boundary+1; y < lower_boundary; y++) {
     GBC_Graphics_window_set_tile_and_attrs(graphics, left_boundary, y, WINDOW_FRAME_VERTICAL, window_attrs);
     
