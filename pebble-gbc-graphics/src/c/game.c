@@ -8,14 +8,13 @@
 #include "actors/hiscore.h"
 #include "util.h"
 
-static AppTimer *s_frame_timer; // Timer to animate the frames
-static GBC_Graphics *s_graphics; // Need to keep a reference to the graphics object
-static uint16_t s_player_score;
-static uint16_t s_player_fuel;
-static uint8_t s_game_frame = 0;
-static GameState s_game_state;
-static uint16_t s_high_score = 0;
-static bool s_new_high_score;
+static AppTimer *s_frame_timer;   // The timer used to setup the game step callback
+static GBC_Graphics *s_graphics;  // The GBC_Graphics object used for rendering
+static uint16_t s_player_score;   // The player's score
+static uint16_t s_player_fuel;    // The player's fuel amount
+static GameState s_game_state;    // The state of the game
+static uint16_t s_high_score;     // The current high score
+static bool s_new_high_score;     // Has a new high score been achieved this round?
 
 /**
  * Checks if the player is overlapping any items, and handles the interactions
@@ -55,6 +54,7 @@ static void update_fuel() {
   if (s_player_fuel > MAX_PLAYER_FUEL) {
     s_player_fuel = MAX_PLAYER_FUEL;
   }
+  // Slow down the engine as the player runs out of fuel
   float fuel_percentage = (float)s_player_fuel / MAX_PLAYER_FUEL;
   if (s_player_fuel == 0) {
     player_set_engine_speed(s_graphics, ES_STOPPED);
@@ -240,7 +240,7 @@ GBC_Graphics *init_gbc_graphics(Window *window) {
   // Plus Aplite can only really support 1 bank
   GBC_Graphics *graphics = GBC_Graphics_ctor(window, 1);
 
-  // I have predefined some common screen sizes, prefixed by SCREEN_BOUNDS_,
+  // I have predefined some common screen sizes, prefixed by GBC_SCREEN_BOUNDS_,
   // but you can create your own with any resolution!
   // Keep in mind that drawing fewer pixels (i.e. smaller resolutions) will
   // lead to some serious performance gains
@@ -249,13 +249,13 @@ GBC_Graphics *init_gbc_graphics(Window *window) {
   // the wide screen bounds and move it down. In main.c, I set the
   // window color to the same blue as the sky, in order to give the
   // illusion of a fullscreen application
-  GRect round_bounds = SCREEN_BOUNDS_WIDE;
+  GRect round_bounds = GBC_SCREEN_BOUNDS_WIDE;
   round_bounds.origin.y += 18;
   GBC_Graphics_set_screen_bounds(graphics, round_bounds);
 #else
   // For rectangle watches, we can use fullscreen bounds since
   // no readability is lost
-  GBC_Graphics_set_screen_bounds(graphics, SCREEN_BOUNDS_FULL);
+  GBC_Graphics_set_screen_bounds(graphics, GBC_SCREEN_BOUNDS_FULL);
 #endif
   
   // This means one sprite uses two tiles, stacked vertically
