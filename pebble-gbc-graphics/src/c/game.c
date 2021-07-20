@@ -25,7 +25,7 @@ static void check_collision() {
     if (item_overlaps_player) {
       uint32_t *item = get_item(i);
       switch(item[0]) {
-        // Overlap a balloon, that's a point
+        // Overlap a balloon, that's one point
         case IT_BALLOON:
           s_player_score++;
           break;
