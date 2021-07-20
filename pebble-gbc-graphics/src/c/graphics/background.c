@@ -87,7 +87,7 @@ static void handle_scroll_interrupt(GBC_Graphics *graphics) {
   } 
 }
 
-void render_background(GBC_Graphics *graphics, uint player_x, uint8_t player_y) {
+void render_background(GBC_Graphics *graphics, uint32_t player_x, uint8_t player_y) {
   // Here, I explicity set the scroll pos based on the player pos.
   // However, you could use GBC_Graphics_bg_move() to move the background, like I do with the window
   s_bg_scroll_y = clamp_int(0, player_y - (GBC_Graphics_get_screen_height(graphics) / 2), s_bg_max_scroll_y);
