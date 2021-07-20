@@ -41,7 +41,7 @@ void generate_new_game_background(GBC_Graphics *graphics) {
 
 /**
  * Scroll interrupt handler
- * By triggering a scroll interrupt, we're able to achieve cool effects
+ * @note By triggering a scroll interrupt, we're able to achieve cool effects
  * 
  * The first is rendering the score bar. The score bar is drawn on the top
  * left of the background tilemap. To show it, we move the background scroll
