@@ -56,7 +56,9 @@ uint8_t clamp_int8_t(int8_t min, int8_t val, int8_t max);
  * @param min The lower bound of the clamp
  * @param val The value to clamp
  * @param max The upper bound of the clamp
- * @return A pointer to an array with the shape of {x, y}
+ * @return A pointer to an array containing the vector:
+ *  [0] The normalized x vector
+ *  [1] The normalized y vector
  */
 int8_t *dir_to_point(Direction dir);
 
