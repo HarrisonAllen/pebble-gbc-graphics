@@ -80,7 +80,7 @@ static void draw_hiscore(GBC_Graphics *graphics) {
         uint8_t screen_y = GBC_Graphics_window_get_offset_y(graphics) + HI_SCORE_Y_POS + s_offset_y;
         GBC_Graphics_oam_set_sprite_pos(graphics, HI_SCORE_OAM_OFFSET, screen_x, screen_y);
         GBC_Graphics_oam_set_sprite_pos(graphics, HI_SCORE_OAM_OFFSET + 1, screen_x + GBC_TILE_WIDTH, screen_y);
-        GBC_Graphics_oam_set_sprite_pos(graphics, HI_SCORE_OAM_OFFSET + 2, screen_x + GBC_TILE_WIDTH, screen_y);
+        GBC_Graphics_oam_set_sprite_pos(graphics, HI_SCORE_OAM_OFFSET + 2, screen_x + GBC_TILE_WIDTH * 2, screen_y);
     }
 }
 
