@@ -2,7 +2,7 @@
 #include "player.h"
 #include "../graphics/background.h"
 
-static uint s_items_data[NUMBER_OF_ITEMS][3]; // Each index contains an item's type, x position, and y position
+static uint32_t s_items_data[NUMBER_OF_ITEMS][3]; // Each index contains an item's type, x position, and y position
 
 extern uint8_t sprites_vram_offset; // Need to grab the offset of the sprites tilesheet
 
@@ -37,7 +37,7 @@ static uint8_t s_item_palettes[] = {
  */
 static void set_item(GBC_Graphics *graphics, uint8_t item_index) {
     uint8_t item_odds = (rand() % NUMBER_OF_ITEMS);
-    uint* item = s_items_data[item_index];
+    uint32_t* item = s_items_data[item_index];
     item[0] = (item_odds < NUMBER_OF_BALLOONS) ? IT_BALLOON : IT_FUEL;
     item[1] = get_player_x() + GBC_Graphics_get_screen_width(graphics) + rand() % (GBC_Graphics_get_screen_width(graphics) * 3);
     item[2] = MIN_PLAYER_Y + rand() % (MAX_PLAYER_Y - MIN_PLAYER_Y);
@@ -90,7 +90,7 @@ static void draw_item_sprites(GBC_Graphics *graphics) {
         if (item_screen_y <= 0 || item_screen_y > (GBC_Graphics_get_screen_height(graphics) + GBC_TILE_HEIGHT * 2)) {
             GBC_Graphics_oam_hide_sprite(graphics, ITEM_OAM_OFFSET + i);
         } else {
-            int item_screen_x = s_items_data[i][1] - get_player_x() + PLAYER_ON_SCREEN_X;
+            int32_t item_screen_x = s_items_data[i][1] - get_player_x() + PLAYER_ON_SCREEN_X;
             bool item_overlaps_window = (item_screen_x > GBC_Graphics_window_get_offset_x(graphics) + GBC_SPRITE_OFFSET_X
                 && item_screen_y > GBC_Graphics_window_get_offset_y(graphics) + GBC_SPRITE_OFFSET_Y);
 
@@ -105,16 +105,16 @@ static void draw_item_sprites(GBC_Graphics *graphics) {
 }
 
 GRect get_item_collision(uint8_t item_id) {
-    uint *item = s_items_data[item_id];
+    uint32_t *item = s_items_data[item_id];
     return GRect(item[1], item[2], GBC_TILE_WIDTH, GBC_TILE_HEIGHT * 2); // All items have a 1x2 tile collision
 }
 
-uint *get_item(uint8_t item_id) {
+uint32_t *get_item(uint8_t item_id) {
     return s_items_data[item_id];
 }
 
 void handle_collision(GBC_Graphics *graphics, uint8_t item_id) {
-    uint *item = s_items_data[item_id];
+    uint32_t *item = s_items_data[item_id];
     switch (item[0]) {
         case IT_BALLOON: // For balloon, replace with plus one
             item[0] = IT_PLUS_ONE;
@@ -131,7 +131,7 @@ void handle_collision(GBC_Graphics *graphics, uint8_t item_id) {
 
 void items_step(GBC_Graphics *graphics) {
     for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
-        uint *item = s_items_data[i];
+        uint32_t *item = s_items_data[i];
         // Do nothing for none type items
         if (item[0] == IT_NONE) {
             continue;
@@ -147,7 +147,7 @@ void items_step(GBC_Graphics *graphics) {
 
         // If the item goes off-screen, re-roll it into a new item
         int item_screen_x = item[1] - get_player_x() + get_player_screen_x();
-        if (item_screen_x <= 0 && player_on_screen()) {
+        if (item_screen_x <= 0 && is_player_on_screen()) {
             set_item(graphics, i);
         }
     }

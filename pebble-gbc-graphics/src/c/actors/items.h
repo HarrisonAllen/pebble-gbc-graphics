@@ -38,7 +38,7 @@ typedef enum {
 void items_init(GBC_Graphics *graphics);
 
 /**
- * Gets the collision bounding rectangle for an item
+ * Gets the bounding rectangle that defines collision for an item
  * 
  * @param item_id The item to get the collision of
  * @return The GRect that defines the collision for this item
@@ -51,10 +51,10 @@ GRect get_item_collision(uint8_t item_id);
  * @param item_id The item to get the data of
  * @return A pointer to a list containing:
  *  [0] (ItemType) The type of the item
- *  [1] (uint) The item's x position
- *  [2] (uint) The item's y position
+ *  [1] (uint32_t) The item's x position
+ *  [2] (uint32_t) The item's y position
  */
-uint *get_item(uint8_t item_id);
+uint32_t *get_item(uint8_t item_id);
 
 /**
  * Handles collision for the given item

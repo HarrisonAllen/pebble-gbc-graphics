@@ -23,7 +23,7 @@ static void check_collision() {
   for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
     bool item_overlaps_player = grects_overlap(get_player_collision(), get_item_collision(i));
     if (item_overlaps_player) {
-      uint *item = get_item(i);
+      uint32_t *item = get_item(i);
       switch(item[0]) {
         // Overlap a balloon, that's a point
         case IT_BALLOON:
@@ -132,7 +132,7 @@ static void game_step() {
       items_step(s_graphics);
 
       // Once the player is off, slide the game over screen from the left
-      if (!player_moving()) {
+      if (!is_player_moving()) {
         char new_game_text[70];
         // Display a different message if player lost (fuel out) or quit (back button)
         snprintf(new_game_text, 70, "%s\n\nSCORE:   %5d\n\nHI SCORE:%5d\n\n PRESS SELECT",
@@ -179,7 +179,7 @@ static void game_step() {
     case GS_GAME_OVER_NEW_GAME_TRANSITION:
       if (!is_window_animating()) {
         s_game_state = GS_MOVE_PLAYER_ON_SCREEN;
-        player_move_on_screen_right();
+        player_move_on_screen_left();
       } else {
         step_window_animation(s_graphics);
       }
@@ -191,7 +191,7 @@ static void game_step() {
 
     // Move player onto the screen 
     case GS_MOVE_PLAYER_ON_SCREEN:
-      if (!player_moving()) {
+      if (!is_player_moving()) {
         s_game_state = GS_PLAYING;
         items_init(s_graphics); // Reset the items here
       }
@@ -441,7 +441,7 @@ void game_init(Window *window) {
 
 
   // Move the player on from the left, and move the window on from the bottom
-  player_move_on_screen_right();
+  player_move_on_screen_left();
   start_window_animation(NEW_GAME_WINDOW_START, NEW_GAME_WINDOW_END);
   s_game_state = GS_LOAD_IN_TRANSITION;
   
