@@ -55,6 +55,16 @@ static void update_fuel() {
   if (s_player_fuel > MAX_PLAYER_FUEL) {
     s_player_fuel = MAX_PLAYER_FUEL;
   }
+  float fuel_percentage = (float)s_player_fuel / MAX_PLAYER_FUEL;
+  if (s_player_fuel == 0) {
+    player_set_engine_speed(s_graphics, ES_STOPPED);
+  } else if (fuel_percentage <= 0.1) {
+    player_set_engine_speed(s_graphics, ES_SLOW);
+  } else if (fuel_percentage <= 0.3) {
+    player_set_engine_speed(s_graphics, ES_MEDIUM);
+  } else {
+    player_set_engine_speed(s_graphics, ES_FAST);
+  }
   draw_fuel_bar(s_graphics, s_player_fuel, MAX_PLAYER_FUEL, NUM_FUEL_BARS, SCORE_BAR_OFFSET + 1, 0);
 }
 
@@ -106,7 +116,6 @@ static void game_step() {
 
       // Once the player runs out of fuel, the game is over
       if (s_player_fuel == 0) { 
-        player_set_vertical_direction(D_NONE);
         player_move_off_screen_down(); // Fall off the screen
         s_game_state = GS_MOVE_PLAYER_OFF_SCREEN;
 
@@ -237,10 +246,10 @@ GBC_Graphics *init_gbc_graphics(Window *window) {
   // lead to some serious performance gains
 #if defined(PBL_ROUND)
   // For round, I want to make sure the score bar is visible, so I use
-  // the large screen bounds and move it down. In main.c, I set the
+  // the wide screen bounds and move it down. In main.c, I set the
   // window color to the same blue as the sky, in order to give the
   // illusion of a fullscreen application
-  GRect round_bounds = SCREEN_BOUNDS_LARGE;
+  GRect round_bounds = SCREEN_BOUNDS_WIDE;
   round_bounds.origin.y += 18;
   GBC_Graphics_set_screen_bounds(graphics, round_bounds);
 #else
