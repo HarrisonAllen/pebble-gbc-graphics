@@ -4,6 +4,10 @@
 #include "pebble-gbc-graphics/pebble-gbc-graphics.h"
 
 /**
+ * Various utility functions that are non-class specific
+ */
+
+/**
  * Various directions used for movement
  */
 typedef enum {
