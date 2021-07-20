@@ -75,19 +75,19 @@ static void set_player_sprite_palette(GBC_Graphics *graphics) {
 #if defined(PBL_COLOR)
     GBC_Graphics_set_sprite_palette(graphics, PLAYER_SPRITE_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
 #else
-    GBC_Graphics_set_sprite_palette(graphics, PLAYER_SPRITE_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
+    GBC_Graphics_set_sprite_palette(graphics, PLAYER_SPRITE_PALETTE, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_WHITE);
 #endif
 }
 
 static void draw_player_sprites(GBC_Graphics *graphics) {
     uint8_t plane_attrs = GBC_Graphics_attr_make(PLAYER_SPRITE_PALETTE, 0, false, false, false);
-    uint8_t player_screen_y = clamp_int(0, s_player_y - GBC_Graphics_bg_get_scroll_y(graphics) + SPRITE_OFFSET_Y + s_player_screen_y_offset, UINT8_MAX);
+    uint8_t player_screen_y = clamp_int(0, s_player_y - GBC_Graphics_bg_get_scroll_y(graphics) + GBC_SPRITE_OFFSET_Y + s_player_screen_y_offset, UINT8_MAX);
     
     player_screen_y += s_bob_offsets[s_bob_frame / (s_engine_speed + 1)];
 
     GBC_Graphics_oam_set_sprite(graphics, 0, clamp_int(0, s_player_screen_x, s_player_screen_x), player_screen_y, sprites_vram_offset + PLANE_RUDDER, plane_attrs);
 
-    GBC_Graphics_oam_set_sprite(graphics, 1, clamp_int(0, s_player_screen_x + TILE_WIDTH, s_player_screen_x + TILE_WIDTH), player_screen_y, sprites_vram_offset + PLANE_TAIL, plane_attrs);
+    GBC_Graphics_oam_set_sprite(graphics, 1, clamp_int(0, s_player_screen_x + GBC_TILE_WIDTH, s_player_screen_x + GBC_TILE_WIDTH), player_screen_y, sprites_vram_offset + PLANE_TAIL, plane_attrs);
 
     uint8_t plane_body_sprite;
     switch (s_player_y_direction) {
@@ -101,10 +101,10 @@ static void draw_player_sprites(GBC_Graphics *graphics) {
             plane_body_sprite = PLANE_BODY;
             break;
     }
-    GBC_Graphics_oam_set_sprite(graphics, 2, clamp_int(0, s_player_screen_x + TILE_WIDTH * 2, s_player_screen_x + TILE_WIDTH * 2), player_screen_y, sprites_vram_offset + plane_body_sprite, plane_attrs);
+    GBC_Graphics_oam_set_sprite(graphics, 2, clamp_int(0, s_player_screen_x + GBC_TILE_WIDTH * 2, s_player_screen_x + GBC_TILE_WIDTH * 2), player_screen_y, sprites_vram_offset + plane_body_sprite, plane_attrs);
 
     uint8_t plane_engine_sprite = s_engine_speed_to_prop_frames[s_engine_speed][s_prop_frame];
-    GBC_Graphics_oam_set_sprite(graphics, 3, clamp_int(0, s_player_screen_x + TILE_WIDTH * 3, s_player_screen_x + TILE_WIDTH * 3), player_screen_y, sprites_vram_offset + plane_engine_sprite, plane_attrs);
+    GBC_Graphics_oam_set_sprite(graphics, 3, clamp_int(0, s_player_screen_x + GBC_TILE_WIDTH * 3, s_player_screen_x + GBC_TILE_WIDTH * 3), player_screen_y, sprites_vram_offset + plane_engine_sprite, plane_attrs);
 }
 
 void player_init(GBC_Graphics *graphics) {
@@ -183,7 +183,7 @@ uint8_t get_player_screen_x() {
 }
 
 uint8_t get_player_screen_y(GBC_Graphics *graphics) {
-    uint8_t player_screen_y = s_player_y - GBC_Graphics_bg_get_scroll_y(graphics) + SPRITE_OFFSET_Y;
+    uint8_t player_screen_y = s_player_y - GBC_Graphics_bg_get_scroll_y(graphics) + GBC_SPRITE_OFFSET_Y;
     player_screen_y += s_bob_offsets[s_bob_frame / (s_engine_speed + 1)];
     return player_screen_y;
 }

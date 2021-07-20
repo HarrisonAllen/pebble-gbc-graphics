@@ -127,7 +127,7 @@ void load_tilesheets(GBC_Graphics *graphics) {
   // Calculate how many tiles are on a tilesheet
   ResHandle handle = resource_get_handle(RESOURCE_ID_DATA_BASE_TILESHEET);
   size_t res_size = resource_size(handle);
-  uint16_t tiles_to_load = res_size / TILE_SIZE;
+  uint16_t tiles_to_load = res_size / GBC_TILE_NUM_BYTES;
 
   uint8_t tilesheet_start_offset = 0; // This is the tile on the tilesheet we want to start loading from
   uint8_t vram_start_offset = 0; // This is the tile in the VRAM we want to start loading into
@@ -141,7 +141,7 @@ void load_tilesheets(GBC_Graphics *graphics) {
   // And repeat the process for the cloud tilesheet
   handle = resource_get_handle(RESOURCE_ID_DATA_CLOUD_TILESHEET);
   res_size = resource_size(handle);
-  tiles_to_load = res_size / TILE_SIZE;
+  tiles_to_load = res_size / GBC_TILE_NUM_BYTES;
   GBC_Graphics_load_from_tilesheet_into_vram(graphics, RESOURCE_ID_DATA_CLOUD_TILESHEET, tilesheet_start_offset, 
                                              tiles_to_load, vram_start_offset, vram_bank);
 
@@ -150,7 +150,7 @@ void load_tilesheets(GBC_Graphics *graphics) {
   fuel_vram_offset = vram_start_offset;
   handle = resource_get_handle(RESOURCE_ID_DATA_FUEL_BAR_TILESHEET);
   res_size = resource_size(handle);
-  tiles_to_load = res_size / TILE_SIZE;
+  tiles_to_load = res_size / GBC_TILE_NUM_BYTES;
   GBC_Graphics_load_from_tilesheet_into_vram(graphics, RESOURCE_ID_DATA_FUEL_BAR_TILESHEET, tilesheet_start_offset, 
                                              tiles_to_load, vram_start_offset, vram_bank);
 
@@ -159,7 +159,7 @@ void load_tilesheets(GBC_Graphics *graphics) {
   road_vram_offset = vram_start_offset;
   handle = resource_get_handle(RESOURCE_ID_DATA_ROAD_TILESHEET);
   res_size = resource_size(handle);
-  tiles_to_load = res_size / TILE_SIZE;
+  tiles_to_load = res_size / GBC_TILE_NUM_BYTES;
   GBC_Graphics_load_from_tilesheet_into_vram(graphics, RESOURCE_ID_DATA_ROAD_TILESHEET, tilesheet_start_offset, 
                                              tiles_to_load, vram_start_offset, vram_bank);
 
@@ -168,7 +168,7 @@ void load_tilesheets(GBC_Graphics *graphics) {
   sprites_vram_offset = vram_start_offset;
   handle = resource_get_handle(RESOURCE_ID_DATA_SPRITES_TILESHEET);
   res_size = resource_size(handle);
-  tiles_to_load = res_size / TILE_SIZE;
+  tiles_to_load = res_size / GBC_TILE_NUM_BYTES;
   GBC_Graphics_load_from_tilesheet_into_vram(graphics, RESOURCE_ID_DATA_SPRITES_TILESHEET, tilesheet_start_offset, 
                                              tiles_to_load, vram_start_offset, vram_bank);
 
@@ -177,12 +177,12 @@ void load_tilesheets(GBC_Graphics *graphics) {
   text_vram_offset = vram_start_offset;
   handle = resource_get_handle(RESOURCE_ID_DATA_TEXT_TILESHEET);
   res_size = resource_size(handle);
-  tiles_to_load = res_size / TILE_SIZE;
+  tiles_to_load = res_size / GBC_TILE_NUM_BYTES;
   GBC_Graphics_load_from_tilesheet_into_vram(graphics, RESOURCE_ID_DATA_TEXT_TILESHEET, tilesheet_start_offset, 
                                              tiles_to_load, vram_start_offset, vram_bank);
 
   // In case you're curious how many tiles were loaded, out of the max available
-  APP_LOG(APP_LOG_LEVEL_INFO, "Using %d/%d tiles in VRAM", vram_start_offset + tiles_to_load, VRAM_BANK_SIZE / TILE_SIZE);
+  APP_LOG(APP_LOG_LEVEL_INFO, "Using %d/%d tiles in VRAM", vram_start_offset + tiles_to_load, GBC_VRAM_BANK_NUM_BYTES / GBC_TILE_NUM_BYTES);
 }
 
 int lerp(int start, int end, int percent) {

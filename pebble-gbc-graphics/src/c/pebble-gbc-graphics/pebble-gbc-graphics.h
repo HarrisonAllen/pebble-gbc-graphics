@@ -9,109 +9,109 @@
  */
 
 /** Size definitions */
-#define TILE_WIDTH 8  ///> Width of a tile in pixels
-#define TILE_HEIGHT 8 ///> Height of a tile in pixels
+#define GBC_TILE_WIDTH 8  ///> Width of a tile in pixels
+#define GBC_TILE_HEIGHT 8 ///> Height of a tile in pixels
 /**
  * Number of bytes that one tile takes up, calculated by:
  * 2 bits per pixel * 8 pixels wide * 8 pixels tall = 128 bits
  * 128 bits / 8 bits per byte = 16 bytes
  */
-#define TILE_SIZE 16
+#define GBC_TILE_NUM_BYTES 16
 /**
  * Number of bytes per VRAM bank, calculated by:
  * 256 tiles per bank * 16 bytes per tile = 4096 bytes
  */
-#define VRAM_BANK_SIZE 4096
-#define TILEMAP_WIDTH 32  ///> Width of the background and window layers in tiles
-#define TILEMAP_HEIGHT 32 ///> Height of the background and window layers in tiles
+#define GBC_VRAM_BANK_NUM_BYTES 4096
+#define GBC_TILEMAP_WIDTH 32  ///> Width of the background and window layers in tiles
+#define GBC_TILEMAP_HEIGHT 32 ///> Height of the background and window layers in tiles
 /**
  * Size of the tilemap in bytes, calculated by:
  * 1 byte per tile location * 32 tiles wide * 32 tiles tall = 1024 bytes
  */
-#define TILEMAP_SIZE 1024
+#define GBC_TILEMAP_NUM_BYTES 1024
 /**
  * Size of the attributemap in bytes, calculated by:
  * 1 byte per attribute * 32 tiles wide * 32 tiles tall = 1024 bytes
  */
-#define ATTRMAP_SIZE 1024
+#define GBC_ATTRMAP_NUM_BYTES 1024
 /**
  * The size of one palette, calculated by:
  * 1 byte per color * 4 colors per palette = 4 bytes
  */
-#define PALETTE_SIZE 4
+#define GBC_PALETTE_NUM_BYTES 4
 /**
  * The size of one palette bank, calculated by:
  * 4 bytes per palette * 8 palettes = 32 bytes
  */
-#define PALETTE_BANK_SIZE 32
+#define GBC_PALETTE_BANK_NUM_BYTES 32
 /**
  * The size of the OAM, calculated by:
  * 4 bytes per sprite * 40 sprite slots = 160 bytes
  */
-#define OAM_SIZE 160
-#define SPRITE_OFFSET_X 8 ///> The x offset to allow for offscreen rendering
-#define SPRITE_OFFSET_Y 16 ///> The y offset to allow for offscreen rendering
+#define GBC_OAM_NUM_BYTES 160
+#define GBC_SPRITE_OFFSET_X 8 ///> The x offset to allow for offscreen rendering
+#define GBC_SPRITE_OFFSET_Y 16 ///> The y offset to allow for offscreen rendering
 
 /** Attribute flags */
-#define ATTR_PALETTE_MASK 0x07      ///> Mask for the palette number
-#define ATTR_PALETTE_START 0x01     ///> LSB of the palette mask
-#define ATTR_VRAM_BANK_MASK 0X18    ///> Mask for the VRAM bank number
-#define ATTR_VRAM_BANK_START 0X08   ///> LSB of the VRAM bank mask
-#define ATTR_VRAM_BANK_00_FLAG 0X00 ///> Convenience flag for bank 0
-#define ATTR_VRAM_BANK_01_FLAG 0x08 ///> Convenience flag for bank 1
-#define ATTR_VRAM_BANK_02_FLAG 0x10 ///> Convenience flag for bank 2
-#define ATTR_VRAM_BANK_03_FLAG 0X18 ///> Convenience flag for bank 3
-#define ATTR_FLIP_FLAG_X 0x20       ///> Flag for horizontal flip
-#define ATTR_FLIP_FLAG_Y 0x40       ///> Flag for vertical flip
-#define ATTR_PRIORITY_FLAG 0X80     ///> Flag for priority bit
+#define GBC_ATTR_PALETTE_MASK 0x07      ///> Mask for the palette number
+#define GBC_ATTR_PALETTE_START 0x01     ///> LSB of the palette mask
+#define GBC_ATTR_VRAM_BANK_MASK 0X18    ///> Mask for the VRAM bank number
+#define GBC_ATTR_VRAM_BANK_START 0X08   ///> LSB of the VRAM bank mask
+#define GBC_ATTR_VRAM_BANK_00_FLAG 0X00 ///> Convenience flag for bank 0
+#define GBC_ATTR_VRAM_BANK_01_FLAG 0x08 ///> Convenience flag for bank 1
+#define GBC_ATTR_VRAM_BANK_02_FLAG 0x10 ///> Convenience flag for bank 2
+#define GBC_ATTR_VRAM_BANK_03_FLAG 0X18 ///> Convenience flag for bank 3
+#define GBC_ATTR_FLIP_FLAG_X 0x20       ///> Flag for horizontal flip
+#define GBC_ATTR_FLIP_FLAG_Y 0x40       ///> Flag for vertical flip
+#define GBC_ATTR_PRIORITY_FLAG 0X80     ///> Flag for priority bit
 
 /** LCDC flags*/
-#define LCDC_ENABLE_FLAG 0x01        ///> Flag for LCDC enable bit
-#define LCDC_BCKGND_ENABLE_FLAG 0X02 ///> Flag for LCDC background enable bit
-#define LCDC_WINDOW_ENABLE_FLAG 0x04 ///> Flag for LCDC window enable bit
-#define LCDC_SPRITE_ENABLE_FLAG 0X08 ///> Flag for LCDC sprite enable bit
-#define LCDC_SPRITE_SIZE_FLAG 0x10   ///> Flag for LCDC sprite size bit
+#define GBC_LCDC_ENABLE_FLAG 0x01        ///> Flag for LCDC enable bit
+#define GBC_LCDC_BCKGND_ENABLE_FLAG 0X02 ///> Flag for LCDC background enable bit
+#define GBC_LCDC_WINDOW_ENABLE_FLAG 0x04 ///> Flag for LCDC window enable bit
+#define GBC_LCDC_SPRITE_ENABLE_FLAG 0X08 ///> Flag for LCDC sprite enable bit
+#define GBC_LCDC_SPRITE_SIZE_FLAG 0x10   ///> Flag for LCDC sprite size bit
 
 /** STAT flags*/
-#define STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
-#define STAT_VBLANK_FLAG 0X02        ///> Flag for STAT VBlank flag bit
-#define STAT_LINE_COMP_FLAG 0X04     ///> Flag for STAT line compare flag bit
-#define STAT_OAM_FLAG 0X08           ///> Flag for STAT OAM flag bit
-#define STAT_HBLANK_INT_FLAG 0X10    ///> Flag for STAT HBlank interrupt bit
-#define STAT_VBLANK_INT_FLAG 0X20    ///> Flag for STAT VBlank interrupt bit
-#define STAT_LINE_COMP_INT_FLAG 0X40 ///> Flag for STAT line compare interrupt bit
-#define STAT_OAM_INT_FLAG 0X80       ///> Flag for STAT OAM interrupt bit
-#define STAT_READ_ONLY_MASK 0x0F     ///> Mask for the read only bits of STAT
-#define STAT_WRITEABLE_MASK 0xF0     ///> Mask for the writeable bits of STAT
+#define GBC_STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
+#define GBC_STAT_VBLANK_FLAG 0X02        ///> Flag for STAT VBlank flag bit
+#define GBC_STAT_LINE_COMP_FLAG 0X04     ///> Flag for STAT line compare flag bit
+#define GBC_STAT_OAM_FLAG 0X08           ///> Flag for STAT OAM flag bit
+#define GBC_STAT_HBLANK_INT_FLAG 0X10    ///> Flag for STAT HBlank interrupt bit
+#define GBC_STAT_VBLANK_INT_FLAG 0X20    ///> Flag for STAT VBlank interrupt bit
+#define GBC_STAT_LINE_COMP_INT_FLAG 0X40 ///> Flag for STAT line compare interrupt bit
+#define GBC_STAT_OAM_INT_FLAG 0X80       ///> Flag for STAT OAM interrupt bit
+#define GBC_STAT_READ_ONLY_MASK 0x0F     ///> Mask for the read only bits of STAT
+#define GBC_STAT_WRITEABLE_MASK 0xF0     ///> Mask for the writeable bits of STAT
 
 /** Helpful macros */
-#define MIN(x, y) (y) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the minimum of two values
-#define MAX(x, y) (x) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the maximum of two values
-#define POINT_TO_OFFSET(x, y) ((x) & (TILEMAP_WIDTH - 1)) + ((y) & (TILEMAP_HEIGHT - 1)) * TILEMAP_WIDTH ///> Converts an x, y point on a bg/window map to the tile/attrmap offset
+#define GBC_MIN(x, y) (y) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the minimum of two values
+#define GBC_MAX(x, y) (x) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the maximum of two values
+#define GBC_POINT_TO_OFFSET(x, y) ((x) & (GBC_TILEMAP_WIDTH - 1)) + ((y) & (GBC_TILEMAP_HEIGHT - 1)) * GBC_TILEMAP_WIDTH ///> Converts an x, y point on a bg/window map to the tile/attrmap offset
 
 /** Predefined Screen boundaries for convenience*/
 #if defined(PBL_ROUND)
-    #define SCREEN_BOUNDS_FULL GRect(0, 0, 180, 180)     ///> Fullscreen
-    #define SCREEN_BOUNDS_LARGE GRect(2, 2, 176, 176)    ///> Largest size that maintains even number of tiles vertically and horizontally
-    #define SCREEN_BOUNDS_RECT GRect(18, 6, 144, 168)    ///> Dimensions of a rectangular Pebble
-    #define SCREEN_BOUNDS_SQUARE GRect(18, 18, 144, 144) ///> Square, equal number of tiles horizontal and vertical. Best fit for consistent viewing across all Pebbles.
-    #define SCREEN_BOUNDS_WIDE GRect(2, 18, 176, 144)    ///> Widescreen, square stretched horizontally to max even horizontal tiles
-    #define SCREEN_BOUNDS_TALL GRect(18, 2, 144, 176)    ///> Tallscreen, square stretched vertically to max even vertical tiles
-    #define SCREEN_BOUNDS_SMALL GRect(26, 26, 128, 128)  ///> Smaller square
+    #define GBC_SCREEN_BOUNDS_FULL GRect(0, 0, 180, 180)     ///> Fullscreen
+    #define GBC_SCREEN_BOUNDS_LARGE GRect(2, 2, 176, 176)    ///> Largest size that maintains even number of tiles vertically and horizontally
+    #define GBC_SCREEN_BOUNDS_RECT GRect(18, 6, 144, 168)    ///> Dimensions of a rectangular Pebble
+    #define GBC_SCREEN_BOUNDS_SQUARE GRect(18, 18, 144, 144) ///> Square, equal number of tiles horizontal and vertical. Best fit for consistent viewing across all Pebbles.
+    #define GBC_SCREEN_BOUNDS_WIDE GRect(2, 18, 176, 144)    ///> Widescreen, square stretched horizontally to max even horizontal tiles
+    #define GBC_SCREEN_BOUNDS_TALL GRect(18, 2, 144, 176)    ///> Tallscreen, square stretched vertically to max even vertical tiles
+    #define GBC_SCREEN_BOUNDS_SMALL GRect(26, 26, 128, 128)  ///> Smaller square
 #else
-    #define SCREEN_BOUNDS_FULL GRect(0, 0, 144, 168)    ///> Fullscreen
-    #define SCREEN_BOUNDS_LARGE GRect(0, 4, 144, 160)   ///> Largest size that maintains even number of tiles vertically and horizontally
-    #define SCREEN_BOUNDS_RECT GRect(0, 0, 144, 168)    ///> Dimensions of a rectangular Pebble
-    #define SCREEN_BOUNDS_SQUARE GRect(0, 12, 144, 144) ///> Square, equal number of tiles horizontal and vertical. Best fit for consistent viewing across all Pebbles.
-    #define SCREEN_BOUNDS_WIDE GRect(0, 12, 144, 144)   ///> Widescreen, square stretched horizontally to max even horizontal tiles
-    #define SCREEN_BOUNDS_TALL GRect(0, 0, 144, 160)    ///> Tallscreen, square stretched vertically to max even vertical tiles
-    #define SCREEN_BOUNDS_SMALL GRect(8, 16, 128, 128)  ///> Smaller square
+    #define GBC_SCREEN_BOUNDS_FULL GRect(0, 0, 144, 168)    ///> Fullscreen
+    #define GBC_SCREEN_BOUNDS_LARGE GRect(0, 4, 144, 160)   ///> Largest size that maintains even number of tiles vertically and horizontally
+    #define GBC_SCREEN_BOUNDS_RECT GRect(0, 0, 144, 168)    ///> Dimensions of a rectangular Pebble
+    #define GBC_SCREEN_BOUNDS_SQUARE GRect(0, 12, 144, 144) ///> Square, equal number of tiles horizontal and vertical. Best fit for consistent viewing across all Pebbles.
+    #define GBC_SCREEN_BOUNDS_WIDE GRect(0, 12, 144, 144)   ///> Widescreen, square stretched horizontally to max even horizontal tiles
+    #define GBC_SCREEN_BOUNDS_TALL GRect(0, 0, 144, 160)    ///> Tallscreen, square stretched vertically to max even vertical tiles
+    #define GBC_SCREEN_BOUNDS_SMALL GRect(8, 16, 128, 128)  ///> Smaller square
 #endif
 
 /** Colors for black and white palettes */
-#define GBC_BLACK 0b00
-#define GBC_GRAY 0b10
-#define GBC_WHITE 0b11
+#define GBC_COLOR_BLACK 0b00
+#define GBC_COLOR_GRAY 0b10
+#define GBC_COLOR_WHITE 0b11
 
 /** The GBC Graphics "class" struct */
 typedef struct _gbc_graphics GBC_Graphics;
@@ -753,7 +753,7 @@ uint8_t GBC_Graphics_bg_get_attr(GBC_Graphics *self, uint8_t x, uint8_t y);
 
 /**
  * Moves the background scroll by dx and dy
- * X and Y will wrap around if they become < 0 or > MAP_SIZE * TILE_SIZE
+ * X and Y will wrap around if they become < 0 or > MAP_SIZE * GBC_TILE_NUM_BYTES
  * 
  * @param self A pointer to the target GBC Graphics object
  * @param dx The delta x to move the scroll x by

@@ -8,13 +8,13 @@ static void setup_text_palettes(GBC_Graphics *graphics) {
     GBC_Graphics_set_bg_palette(graphics, BALLOON_TEXT_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
     GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorIslamicGreenARGB8);
 #else
-    GBC_Graphics_set_bg_palette(graphics, BALLOON_TEXT_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
-    GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
+    GBC_Graphics_set_bg_palette(graphics, BALLOON_TEXT_PALETTE, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_WHITE);
+    GBC_Graphics_set_bg_palette(graphics, FUEL_TEXT_PALETTE, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_WHITE);
 #endif
 }
 
 void clear_top_row(GBC_Graphics *graphics) {
-    for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
+    for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
         GBC_Graphics_bg_set_tile_and_attrs(graphics, x, 0, BLANK_TILE, GBC_Graphics_attr_make(0, 0, false, false, true));
     }
 }

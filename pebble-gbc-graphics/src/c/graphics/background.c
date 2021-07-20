@@ -13,8 +13,8 @@ extern uint8_t base_vram_offset, cloud_vram_offset, fuel_vram_offset, road_vram_
 
 
 static void clear_background_layer(GBC_Graphics *graphics) {
-  for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
-    for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
+  for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
+    for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
       GBC_Graphics_bg_set_tile_and_attrs(graphics, x, y, SOLID_TILE_11, GBC_Graphics_attr_make(0, 0, false, false, false));
     }
   }
@@ -29,13 +29,13 @@ void generate_new_game_background(GBC_Graphics *graphics) {
   clear_background_layer(graphics);
   setup_bg_layer(graphics);
 
-  s_bg_max_scroll_y = TILEMAP_HEIGHT * TILE_HEIGHT - GBC_Graphics_get_screen_height(graphics);
+  s_bg_max_scroll_y = GBC_TILEMAP_HEIGHT * GBC_TILE_HEIGHT - GBC_Graphics_get_screen_height(graphics);
 }
 
 static void handle_scroll_interrupt(GBC_Graphics *graphics) {
-  int8_t tree_position = s_bg_scroll_y - (s_bg_max_scroll_y - TILE_HEIGHT * 5);   // The position of the trees on top of the road
-  int8_t road_position = s_bg_scroll_y - (s_bg_max_scroll_y - TILE_HEIGHT * 3);   // The position of the top of the road
-  int8_t bottom_position = s_bg_scroll_y - (s_bg_max_scroll_y - TILE_HEIGHT * 1); // The position of the trees below the road
+  int8_t tree_position = s_bg_scroll_y - (s_bg_max_scroll_y - GBC_TILE_HEIGHT * 5);   // The position of the trees on top of the road
+  int8_t road_position = s_bg_scroll_y - (s_bg_max_scroll_y - GBC_TILE_HEIGHT * 3);   // The position of the top of the road
+  int8_t bottom_position = s_bg_scroll_y - (s_bg_max_scroll_y - GBC_TILE_HEIGHT * 1); // The position of the trees below the road
   if (GBC_Graphics_stat_get_line_y_compare(graphics) == 0) {
     // Move to top left of background where the score bar resides
     GBC_Graphics_bg_set_scroll_pos(graphics, 0, 0);

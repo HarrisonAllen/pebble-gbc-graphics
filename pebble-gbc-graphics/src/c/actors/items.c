@@ -37,8 +37,8 @@ static void setup_item_palettes(GBC_Graphics *graphics) {
     GBC_Graphics_set_sprite_palette(graphics, BALLOON_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorRedARGB8, GColorWhiteARGB8);
     GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GColorPictonBlueARGB8, GColorBlackARGB8, GColorIslamicGreenARGB8, GColorIslamicGreenARGB8);
 #else
-    GBC_Graphics_set_sprite_palette(graphics, BALLOON_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
-    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GBC_WHITE, GBC_BLACK, GBC_GRAY, GBC_WHITE);
+    GBC_Graphics_set_sprite_palette(graphics, BALLOON_PALETTE, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_WHITE);
+    GBC_Graphics_set_sprite_palette(graphics, FUEL_PALETTE, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_WHITE);
 #endif
 }
 
@@ -61,15 +61,15 @@ static void draw_item_sprites(GBC_Graphics *graphics) {
             GBC_Graphics_oam_hide_sprite(graphics, ITEM_SPRITE_OFFSET + i);
             continue;
         }
-        int item_screen_y = s_items_data[i][2] - get_bg_scroll_y(graphics) + SPRITE_OFFSET_Y;
-        if (item_screen_y <= 0 || item_screen_y > (GBC_Graphics_get_screen_height(graphics) + TILE_HEIGHT * 2)) {
+        int item_screen_y = s_items_data[i][2] - get_bg_scroll_y(graphics) + GBC_SPRITE_OFFSET_Y;
+        if (item_screen_y <= 0 || item_screen_y > (GBC_Graphics_get_screen_height(graphics) + GBC_TILE_HEIGHT * 2)) {
             GBC_Graphics_oam_hide_sprite(graphics, ITEM_SPRITE_OFFSET + i);
         } else {
             int item_screen_x = s_items_data[i][1] - get_player_x() + PLAYER_ON_SCREEN_X;
-            bool item_overlaps_window = (item_screen_x > GBC_Graphics_window_get_offset_x(graphics) + SPRITE_OFFSET_X
-                && item_screen_y > GBC_Graphics_window_get_offset_y(graphics) + SPRITE_OFFSET_Y);
+            bool item_overlaps_window = (item_screen_x > GBC_Graphics_window_get_offset_x(graphics) + GBC_SPRITE_OFFSET_X
+                && item_screen_y > GBC_Graphics_window_get_offset_y(graphics) + GBC_SPRITE_OFFSET_Y);
 
-            if (item_screen_x <= 0 || item_screen_x > (GBC_Graphics_get_screen_width(graphics) + TILE_WIDTH) || item_overlaps_window) {
+            if (item_screen_x <= 0 || item_screen_x > (GBC_Graphics_get_screen_width(graphics) + GBC_TILE_WIDTH) || item_overlaps_window) {
                 GBC_Graphics_oam_hide_sprite(graphics, ITEM_SPRITE_OFFSET + i);
             } else {
                 GBC_Graphics_oam_set_sprite_pos(graphics, ITEM_SPRITE_OFFSET + i, item_screen_x, item_screen_y);
@@ -80,7 +80,7 @@ static void draw_item_sprites(GBC_Graphics *graphics) {
 
 GRect get_item_collision(uint8_t item_id) {
     uint *item = s_items_data[item_id];
-    return GRect(item[1], item[2], TILE_WIDTH, TILE_HEIGHT * 2);
+    return GRect(item[1], item[2], GBC_TILE_WIDTH, GBC_TILE_HEIGHT * 2);
 }
 
 uint *get_item(uint8_t item_id) {

@@ -20,9 +20,9 @@ void draw_fuel_bar(GBC_Graphics *graphics, uint16_t fuel_amount, uint16_t max_fu
     float fuel_percentage = (float)fuel_amount / max_fuel;
     uint8_t color;
     if (fuel_percentage <= 0.3) {
-        color = GBC_GRAY;
+        color = GBC_COLOR_GRAY;
     } else {
-        color = GBC_BLACK;
+        color = GBC_COLOR_BLACK;
     }
     GBC_Graphics_set_bg_palette_color(graphics, FUEL_BAR_PALETTE, 2, color);
 #endif

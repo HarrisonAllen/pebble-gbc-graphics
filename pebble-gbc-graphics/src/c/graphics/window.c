@@ -15,7 +15,7 @@ static void setup_window_layer(GBC_Graphics *graphics) {
   #if defined(PBL_COLOR)
     GBC_Graphics_set_bg_palette(graphics, WINDOW_PALETTE, GColorPictonBlueARGB8, GColorPastelYellowARGB8, GColorWindsorTanARGB8, GColorBlackARGB8);
   #else
-    GBC_Graphics_set_bg_palette(graphics, WINDOW_PALETTE, GBC_WHITE, GBC_WHITE, GBC_GRAY, GBC_BLACK);
+    GBC_Graphics_set_bg_palette(graphics, WINDOW_PALETTE, GBC_COLOR_WHITE, GBC_COLOR_WHITE, GBC_COLOR_GRAY, GBC_COLOR_BLACK);
   #endif
 
   // Hide the window layer
@@ -24,8 +24,8 @@ static void setup_window_layer(GBC_Graphics *graphics) {
 
 
 void clear_window_layer(GBC_Graphics *graphics) {
-  for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
-    for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
+  for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
+    for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
       GBC_Graphics_window_set_tile_and_attrs(graphics, x, y, SOLID_TILE_01, GBC_Graphics_attr_make(0, 0, false, false, true));
     }
   }
@@ -103,8 +103,8 @@ bool is_window_animating() {
 }
 
 void set_window_has_priority(GBC_Graphics *graphics, bool has_priority) {
-  for (uint8_t x = 0; x < TILEMAP_WIDTH; x++) {
-    for (uint8_t y = 0; y < TILEMAP_HEIGHT; y++) {
+  for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
+    for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
       GBC_Graphics_window_set_tile_priority(graphics, x, y, has_priority);
     }
   }

@@ -24,20 +24,20 @@ GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks) {
   self->screen_height = bounds.size.h;
 
   // Allocate 4 banks of VRAM space
-  self->vram = (uint8_t*)malloc(VRAM_BANK_SIZE * num_vram_banks);
+  self->vram = (uint8_t*)malloc(GBC_VRAM_BANK_NUM_BYTES * num_vram_banks);
 
   // Allocate space for the tilemaps and attributemaps
-  self->bg_tilemap = (uint8_t*)malloc(TILEMAP_SIZE);
-  self->bg_attrmap = (uint8_t*)malloc(ATTRMAP_SIZE);
-  self->window_tilemap = (uint8_t*)malloc(TILEMAP_SIZE);
-  self->window_attrmap = (uint8_t*)malloc(ATTRMAP_SIZE);
+  self->bg_tilemap = (uint8_t*)malloc(GBC_TILEMAP_NUM_BYTES);
+  self->bg_attrmap = (uint8_t*)malloc(GBC_ATTRMAP_NUM_BYTES);
+  self->window_tilemap = (uint8_t*)malloc(GBC_TILEMAP_NUM_BYTES);
+  self->window_attrmap = (uint8_t*)malloc(GBC_ATTRMAP_NUM_BYTES);
 
   // Allocate space for the palette banks
-  self->bg_palette_bank = (uint8_t*)malloc(PALETTE_BANK_SIZE);
-  self->sprite_palette_bank = (uint8_t*)malloc(PALETTE_BANK_SIZE);
+  self->bg_palette_bank = (uint8_t*)malloc(GBC_PALETTE_BANK_NUM_BYTES);
+  self->sprite_palette_bank = (uint8_t*)malloc(GBC_PALETTE_BANK_NUM_BYTES);
 
   // Allocate space for the OAM
-  self->oam = (uint8_t*)malloc(OAM_SIZE);
+  self->oam = (uint8_t*)malloc(GBC_OAM_NUM_BYTES);
 
   self->lcdc = 0xFF; // Start LCDC with everything enable (render everything)
   self->stat = 0x00; // Start STAT empty
@@ -107,9 +107,9 @@ uint8_t GBC_Graphics_get_screen_height(GBC_Graphics *self) {
 
 void GBC_Graphics_vram_move_tiles(GBC_Graphics *self, uint8_t src_vram_bank, uint8_t src_tile_offset, 
                              uint8_t dest_vram_bank, uint8_t dest_tile_offset, uint8_t num_tiles_to_move, bool swap) {
-  uint8_t *src_vram_offset = self->vram + VRAM_BANK_SIZE * src_vram_bank + src_tile_offset * TILE_SIZE;
-  uint8_t *dest_vram_offset = self->vram + VRAM_BANK_SIZE * dest_vram_bank + dest_tile_offset * TILE_SIZE;
-  size_t data_size = num_tiles_to_move * TILE_SIZE;
+  uint8_t *src_vram_offset = self->vram + GBC_VRAM_BANK_NUM_BYTES * src_vram_bank + src_tile_offset * GBC_TILE_NUM_BYTES;
+  uint8_t *dest_vram_offset = self->vram + GBC_VRAM_BANK_NUM_BYTES * dest_vram_bank + dest_tile_offset * GBC_TILE_NUM_BYTES;
+  size_t data_size = num_tiles_to_move * GBC_TILE_NUM_BYTES;
   if (swap) {
     uint8_t temp[data_size];
     memcpy(temp, dest_vram_offset, data_size);
@@ -123,13 +123,13 @@ void GBC_Graphics_vram_move_tiles(GBC_Graphics *self, uint8_t src_vram_bank, uin
 void GBC_Graphics_load_from_tilesheet_into_vram(GBC_Graphics *self, uint32_t tilesheet_resource, uint16_t tilesheet_tile_offset, 
                                             uint16_t tiles_to_load, uint16_t vram_tile_offset, uint8_t vram_bank_number) {
   ResHandle tilesheet_handle = resource_get_handle(tilesheet_resource);
-  uint8_t *vram_offset = self->vram + VRAM_BANK_SIZE * vram_bank_number + vram_tile_offset * TILE_SIZE;
+  uint8_t *vram_offset = self->vram + GBC_VRAM_BANK_NUM_BYTES * vram_bank_number + vram_tile_offset * GBC_TILE_NUM_BYTES;
   
-  resource_load_byte_range(tilesheet_handle, tilesheet_tile_offset * TILE_SIZE, vram_offset, tiles_to_load * TILE_SIZE);
+  resource_load_byte_range(tilesheet_handle, tilesheet_tile_offset * GBC_TILE_NUM_BYTES, vram_offset, tiles_to_load * GBC_TILE_NUM_BYTES);
 }
 
 uint8_t *GBC_Graphics_get_vram_bank(GBC_Graphics *self, uint8_t vram_bank_number) {
-  return &self->vram[vram_bank_number * VRAM_BANK_SIZE];
+  return &self->vram[vram_bank_number * GBC_VRAM_BANK_NUM_BYTES];
 }
 
 /**
@@ -143,10 +143,10 @@ uint8_t *GBC_Graphics_get_vram_bank(GBC_Graphics *self, uint8_t vram_bank_number
  * @param c3 Color 3 of the new palette
  */
 static void set_palette(uint8_t *palette_bank, uint8_t palette_num, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3) {
-  palette_bank[palette_num*PALETTE_SIZE+0] = c0;
-  palette_bank[palette_num*PALETTE_SIZE+1] = c1;
-  palette_bank[palette_num*PALETTE_SIZE+2] = c2;
-  palette_bank[palette_num*PALETTE_SIZE+3] = c3;
+  palette_bank[palette_num*GBC_PALETTE_NUM_BYTES+0] = c0;
+  palette_bank[palette_num*GBC_PALETTE_NUM_BYTES+1] = c1;
+  palette_bank[palette_num*GBC_PALETTE_NUM_BYTES+2] = c2;
+  palette_bank[palette_num*GBC_PALETTE_NUM_BYTES+3] = c3;
 }
 
 void GBC_Graphics_set_bg_palette(GBC_Graphics *self, uint8_t palette_num, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3) {
@@ -165,7 +165,7 @@ void GBC_Graphics_set_sprite_palette(GBC_Graphics *self, uint8_t palette_num, ui
  * @param palette_array A pointer to a 4-byte array containing the palette colors
  */
 static void set_palette_array(uint8_t *palette_bank, uint8_t palette_num, uint8_t *palette_array) {
-  memcpy(&palette_bank[palette_num*PALETTE_SIZE], palette_array, PALETTE_SIZE);
+  memcpy(&palette_bank[palette_num*GBC_PALETTE_NUM_BYTES], palette_array, GBC_PALETTE_NUM_BYTES);
 }
 
 void GBC_Graphics_set_bg_palette_array(GBC_Graphics *self, uint8_t palette_num, uint8_t *palette_array) {
@@ -177,15 +177,15 @@ void GBC_Graphics_set_sprite_palette_array(GBC_Graphics *self, uint8_t palette_n
 }
 
 void GBC_Graphics_set_bg_palette_color(GBC_Graphics *self, uint8_t palette_num, uint8_t color_num, uint8_t c) {
-  self->bg_palette_bank[palette_num*PALETTE_SIZE+color_num] = c;
+  self->bg_palette_bank[palette_num*GBC_PALETTE_NUM_BYTES+color_num] = c;
 }
 
 void GBC_Graphics_set_sprite_palette_color(GBC_Graphics *self, uint8_t palette_num, uint8_t color_num, uint8_t c) {
-  self->sprite_palette_bank[palette_num*PALETTE_SIZE+color_num] = c;
+  self->sprite_palette_bank[palette_num*GBC_PALETTE_NUM_BYTES+color_num] = c;
 }
 
 static void copy_palette_array(uint8_t *palette_bank, uint8_t palette_num, uint8_t *target_array) {
-  memcpy(target_array, &palette_bank[palette_num*PALETTE_SIZE], PALETTE_SIZE);
+  memcpy(target_array, &palette_bank[palette_num*GBC_PALETTE_NUM_BYTES], GBC_PALETTE_NUM_BYTES);
 }
 
 void GBC_Graphics_copy_one_bg_palette(GBC_Graphics *self, uint8_t palette_num, uint8_t *target_array) {
@@ -197,7 +197,7 @@ void GBC_Graphics_copy_one_sprite_palette(GBC_Graphics *self, uint8_t palette_nu
 }
 
 static void copy_palette_bank(uint8_t *palette_bank, uint8_t *target_array) {
-  memcpy(target_array, palette_bank, PALETTE_BANK_SIZE);
+  memcpy(target_array, palette_bank, GBC_PALETTE_BANK_NUM_BYTES);
 }
 
 void GBC_Graphics_copy_all_bg_palettes(GBC_Graphics *self, uint8_t *target_array) {
@@ -249,7 +249,7 @@ static void modify_byte(uint8_t *byte, uint8_t mask, uint8_t new_value, uint8_t 
  */
 static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
   // Return early if we don't need to render the background or window
-  if (!(self->lcdc & LCDC_ENABLE_FLAG) || (!(self->lcdc & LCDC_BCKGND_ENABLE_FLAG) && !(self->lcdc & LCDC_WINDOW_ENABLE_FLAG) && !(self->lcdc & LCDC_SPRITE_ENABLE_FLAG))) {
+  if (!(self->lcdc & GBC_LCDC_ENABLE_FLAG) || (!(self->lcdc & GBC_LCDC_BCKGND_ENABLE_FLAG) && !(self->lcdc & GBC_LCDC_WINDOW_ENABLE_FLAG) && !(self->lcdc & GBC_LCDC_SPRITE_ENABLE_FLAG))) {
     return;
   }
   GBitmap *fb = graphics_capture_frame_buffer(ctx);
@@ -279,22 +279,22 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
   uint8_t sprite_y;
   short sprite_id;
 
-  self->stat &= ~STAT_VBLANK_FLAG; // No longer in VBlank while we draw
+  self->stat &= ~GBC_STAT_VBLANK_FLAG; // No longer in VBlank while we draw
   for (self->line_y = 0; self->line_y < self->screen_height; self->line_y++) {
     // Check if the current line matches the line compare value, and then do the callback
-    self->stat &= ~STAT_LINE_COMP_FLAG;
-    self->stat |= STAT_LINE_COMP_FLAG * (self->line_y == self->line_y_compare);
-    if ((self->stat & (STAT_LINE_COMP_INT_FLAG | STAT_LINE_COMP_FLAG)) == (STAT_LINE_COMP_INT_FLAG | STAT_LINE_COMP_FLAG)) {
+    self->stat &= ~GBC_STAT_LINE_COMP_FLAG;
+    self->stat |= GBC_STAT_LINE_COMP_FLAG * (self->line_y == self->line_y_compare);
+    if ((self->stat & (GBC_STAT_LINE_COMP_INT_FLAG | GBC_STAT_LINE_COMP_FLAG)) == (GBC_STAT_LINE_COMP_INT_FLAG | GBC_STAT_LINE_COMP_FLAG)) {
       self->line_compare_interrupt_callback(self);
     }
 
-    in_window_y = self->line_y >= window_offset_y && (self->lcdc & LCDC_WINDOW_ENABLE_FLAG);
+    in_window_y = self->line_y >= window_offset_y && (self->lcdc & GBC_LCDC_WINDOW_ENABLE_FLAG);
 
     GBitmapDataRowInfo info = gbitmap_get_data_row_info(fb, self->line_y + self->screen_y_origin);
-    uint8_t min_x = MAX(info.min_x, self->screen_x_origin);
-    uint8_t max_x = MIN(info.max_x+1, self->screen_x_origin + self->screen_width);
+    uint8_t min_x = GBC_MAX(info.min_x, self->screen_x_origin);
+    uint8_t max_x = GBC_MIN(info.max_x+1, self->screen_x_origin + self->screen_width);
 
-    self->stat &= ~STAT_HBLANK_FLAG; // No longer in HBlank while we draw the line
+    self->stat &= ~GBC_STAT_HBLANK_FLAG; // No longer in HBlank while we draw the line
     // First, draw the background / window
     for(x = min_x; x < max_x; x++) {
       // Decide what pixel to draw, first check if we're in the window bounds
@@ -311,26 +311,26 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
       }
 
       // Find the tile that the pixel is on
-      map_tile_x = map_x >> 3; // map_x / TILE_WIDTH
-      map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
+      map_tile_x = map_x >> 3; // map_x / GBC_TILE_WIDTH
+      map_tile_y = map_y >> 3; // map_y / GBC_TILE_HEIGHT
 
       // Get the tile and attrs from the map
       tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
       tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
       
       // Get the tile from vram
-      offset = tile_num << 4; // tile_num * TILE_SIZE
-      tile = self->vram + ((((tile_attr & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
+      offset = tile_num << 4; // tile_num * GBC_TILE_NUM_BYTES
+      tile = self->vram + ((((tile_attr & GBC_ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset
 
       // Next, we extract and return the 2bpp pixel from the tile
-      pixel_x = map_x & 7; // map_x % TILE_WIDTH
-      pixel_y = map_y & 7; // map_x % TILE_HEIGHT
+      pixel_x = map_x & 7; // map_x % GBC_TILE_WIDTH
+      pixel_y = map_y & 7; // map_x % GBC_TILE_HEIGHT
 
       // Apply flip flags if necessary
-      flip = tile_attr & ATTR_FLIP_FLAG_X;
-      pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7; // flip ? 7 - pixel_x : pixel_x
-      flip = tile_attr & ATTR_FLIP_FLAG_Y;
-      pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & 7;
+      flip = tile_attr & GBC_ATTR_FLIP_FLAG_X;
+      pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((GBC_ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7; // flip ? 7 - pixel_x : pixel_x
+      flip = tile_attr & GBC_ATTR_FLIP_FLAG_Y;
+      pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((GBC_ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & 7;
 
       // To get the pixel, we first need to get the corresponding byte the pixel is in
       // There are 2 bytes per row (y * 2), and 4 pixels per byte (x / 4)
@@ -345,7 +345,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
       pixel = 0b11 & (pixel_byte >> shift);
 
       // Finally, we get the corresponding color from attribute palette
-      pixel_color = self->bg_palette_bank[((tile_attr & ATTR_PALETTE_MASK) << 2) + pixel]; // (tile_attr & ATTR_PALETTE_MASK) * 4
+      pixel_color = self->bg_palette_bank[((tile_attr & GBC_ATTR_PALETTE_MASK) << 2) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * 4
 
 #if defined(PBL_COLOR)
       memset(&info.data[x], pixel_color, 1);
@@ -361,10 +361,10 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
 
     // Next, draw any sprites that happen to be on this line
     num_overlapped_sprites = 0;
-    for (sprite_id = 39 * ((self->lcdc & LCDC_SPRITE_ENABLE_FLAG) > 0); sprite_id >= 0; sprite_id--) {
+    for (sprite_id = 39 * ((self->lcdc & GBC_LCDC_SPRITE_ENABLE_FLAG) > 0); sprite_id >= 0; sprite_id--) {
       sprite = &self->oam[sprite_id*4];
-      sprite_y = sprite[1] - SPRITE_OFFSET_Y;
-      line_overlap = ((uint8_t)(self->line_y - sprite_y)) < (TILE_HEIGHT << ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0));
+      sprite_y = sprite[1] - GBC_SPRITE_OFFSET_Y;
+      line_overlap = ((uint8_t)(self->line_y - sprite_y)) < (GBC_TILE_HEIGHT << ((self->lcdc & GBC_LCDC_SPRITE_SIZE_FLAG) > 0));
       
       overlapped_sprites[num_overlapped_sprites] = sprite_id * line_overlap;
       num_overlapped_sprites += line_overlap;
@@ -372,27 +372,27 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
 
     for (i = 0; i < num_overlapped_sprites; i++) {
       sprite = &self->oam[overlapped_sprites[i]*4];
-      sprite_y = sprite[1] - SPRITE_OFFSET_Y;
+      sprite_y = sprite[1] - GBC_SPRITE_OFFSET_Y;
       // Don't draw the sprite if it's offscreen
-      if (sprite[0] == 0 || sprite[1] == 0 || sprite[0] >= self->screen_width + SPRITE_OFFSET_X || sprite[1] >= self->screen_height + SPRITE_OFFSET_Y) {
+      if (sprite[0] == 0 || sprite[1] == 0 || sprite[0] >= self->screen_width + GBC_SPRITE_OFFSET_X || sprite[1] >= self->screen_height + GBC_SPRITE_OFFSET_Y) {
         continue;
       }
 
       // Get the tile from vram
-      offset = sprite[2] << 4; // tile_num * TILE_SIZE
-      tile = self->vram + ((((sprite[3] & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
+      offset = sprite[2] << 4; // tile_num * GBC_TILE_NUM_BYTES
+      tile = self->vram + ((((sprite[3] & GBC_ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset
 
       // Then we draw the tile row by row
-      sprite_y = sprite[1] - SPRITE_OFFSET_Y;
+      sprite_y = sprite[1] - GBC_SPRITE_OFFSET_Y;
       tile_y = self->line_y - sprite_y;
-      screen_y = sprite[1] + tile_y - SPRITE_OFFSET_Y; // On second tile, offset by TILE_HEIGHT
+      screen_y = sprite[1] + tile_y - GBC_SPRITE_OFFSET_Y; // On second tile, offset by GBC_TILE_HEIGHT
 
-      uint8_t min_x = MAX(info.min_x, self->screen_x_origin);
-      uint8_t max_x = MIN(info.max_x, self->screen_x_origin + self->screen_width);
+      uint8_t min_x = GBC_MAX(info.min_x, self->screen_x_origin);
+      uint8_t max_x = GBC_MIN(info.max_x, self->screen_x_origin + self->screen_width);
 
-      for (tile_x = 0; tile_x < TILE_WIDTH; tile_x++) {
+      for (tile_x = 0; tile_x < GBC_TILE_WIDTH; tile_x++) {
         // Check if the pixel is on the screen
-        screen_x = sprite[0] + tile_x - SPRITE_OFFSET_X + self->screen_x_origin;
+        screen_x = sprite[0] + tile_x - GBC_SPRITE_OFFSET_X + self->screen_x_origin;
         if (screen_x > max_x) {
           break;
         }
@@ -412,29 +412,29 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
         }
 
         // Get the tile x and y on the bg map
-        map_tile_x = map_x >> 3; // map_x / TILE_WIDTH
-        map_tile_y = map_y >> 3; // map_y / TILE_HEIGHT
+        map_tile_x = map_x >> 3; // map_x / GBC_TILE_WIDTH
+        map_tile_y = map_y >> 3; // map_y / GBC_TILE_HEIGHT
 
         // Check if the background pixel has priority
         bg_tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
 
         // Now check if the sprite priority bit is set, and if this pixel should be transparent b/c of that
-        if (sprite[3] & ATTR_PRIORITY_FLAG || bg_tile_attr & ATTR_PRIORITY_FLAG) {
+        if (sprite[3] & GBC_ATTR_PRIORITY_FLAG || bg_tile_attr & GBC_ATTR_PRIORITY_FLAG) {
           bg_tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH
           
           // Get the tile from vram
-          offset = bg_tile_num << 4; // tile_num * TILE_SIZE
-          bg_tile = self->vram + ((((bg_tile_attr & ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * VRAM_BANK_SIZE + offset
+          offset = bg_tile_num << 4; // tile_num * GBC_TILE_NUM_BYTES
+          bg_tile = self->vram + ((((bg_tile_attr & GBC_ATTR_VRAM_BANK_MASK) >> 3)) << 12) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset
           
           // Next, we extract and return the 2bpp pixel from the tile
-          pixel_x = map_x & 7; // map_x % TILE_WIDTH
-          pixel_y = map_y & 7; // map_x % TILE_HEIGHT
+          pixel_x = map_x & 7; // map_x % GBC_TILE_WIDTH
+          pixel_y = map_y & 7; // map_x % GBC_TILE_HEIGHT
 
           // Apply flip flags if necessary
-          flip = bg_tile_attr & ATTR_FLIP_FLAG_X;
-          pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7; // flip ? 7 - pixel_x : pixel_x
-          flip = bg_tile_attr & ATTR_FLIP_FLAG_Y;
-          pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & (7 + ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) * 8);
+          flip = bg_tile_attr & GBC_ATTR_FLIP_FLAG_X;
+          pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((GBC_ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7; // flip ? 7 - pixel_x : pixel_x
+          flip = bg_tile_attr & GBC_ATTR_FLIP_FLAG_Y;
+          pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((GBC_ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & (7 + ((self->lcdc & GBC_LCDC_SPRITE_SIZE_FLAG) > 0) * 8);
 
           // To get the pixel, we first need to get the corresponding byte the pixel is in
           // There are 2 bytes per row (y * 2), and 4 pixels per byte (x / 4)
@@ -455,14 +455,14 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
         }
         
         // Now we get the pixel from the sprite tile
-        pixel_x = tile_x & 7; // tile_x % TILE_WIDTH
-        pixel_y = tile_y & (7 + (((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) << 3)); // tile_y % (8x16 sprite ? TILE_HEIGHT : TILE_HEIGHT * 2)
+        pixel_x = tile_x & 7; // tile_x % GBC_TILE_WIDTH
+        pixel_y = tile_y & (7 + (((self->lcdc & GBC_LCDC_SPRITE_SIZE_FLAG) > 0) << 3)); // tile_y % (8x16 sprite ? GBC_TILE_HEIGHT : GBC_TILE_HEIGHT * 2)
 
         // Apply flip flags if necessary
-        flip = sprite[3] & ATTR_FLIP_FLAG_X;
-        pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7;
-        flip = sprite[3] & ATTR_FLIP_FLAG_Y;
-        pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & (7 + ((self->lcdc & LCDC_SPRITE_SIZE_FLAG) > 0) * 8);
+        flip = sprite[3] & GBC_ATTR_FLIP_FLAG_X;
+        pixel_x = ((pixel_x >> (flip >> 3)) - ((pixel_x + 1) >> ((GBC_ATTR_FLIP_FLAG_X ^ flip) >> 3))) & 7;
+        flip = sprite[3] & GBC_ATTR_FLIP_FLAG_Y;
+        pixel_y = ((pixel_y >> (flip >> 3)) - ((pixel_y + 1) >> ((GBC_ATTR_FLIP_FLAG_Y ^ flip) >> 3))) & (7 + ((self->lcdc & GBC_LCDC_SPRITE_SIZE_FLAG) > 0) * 8);
 
         // To get the pixel, we first need to get the corresponding byte the pixel is in
         // There are 2 bytes per row (y * 2), and 4 pixels per byte (x / 4)
@@ -481,7 +481,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
           continue;
         }
         
-        pixel_color = self->sprite_palette_bank[((sprite[3] & ATTR_PALETTE_MASK) << 2) + pixel]; // (tile_attr & ATTR_PALETTE_MASK) * PALETTE_SIZE + pixel
+        pixel_color = self->sprite_palette_bank[((sprite[3] & GBC_ATTR_PALETTE_MASK) << 2) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
         
 #if defined(PBL_COLOR)
         memset(&info.data[screen_x], pixel_color, 1);
@@ -496,24 +496,24 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
       }
     }
     // Now we're in the HBlank state, run the callback
-    self->stat |= STAT_HBLANK_FLAG;
-    if (self->stat & STAT_HBLANK_INT_FLAG) {
+    self->stat |= GBC_STAT_HBLANK_FLAG;
+    if (self->stat & GBC_STAT_HBLANK_INT_FLAG) {
       self->hblank_interrupt_callback(self);
     }
   }
-  self->stat &= ~STAT_LINE_COMP_FLAG; // Clear line compare flag
+  self->stat &= ~GBC_STAT_LINE_COMP_FLAG; // Clear line compare flag
 
   graphics_release_frame_buffer(ctx, fb);
 
   // Finished drawing sprites, call OAM callback
-  self->stat |= STAT_OAM_FLAG;
-  if (self->stat & STAT_OAM_INT_FLAG) {
+  self->stat |= GBC_STAT_OAM_FLAG;
+  if (self->stat & GBC_STAT_OAM_INT_FLAG) {
     self->oam_interrupt_callback(self);
   }
 
   // Done drawing, now we're in VBlank, run the callback
-  self->stat |= STAT_VBLANK_FLAG;
-  if (self->stat & STAT_VBLANK_INT_FLAG) {
+  self->stat |= GBC_STAT_VBLANK_FLAG;
+  if (self->stat & GBC_STAT_VBLANK_INT_FLAG) {
     self->vblank_interrupt_callback(self);
   }
 }
@@ -537,23 +537,23 @@ void GBC_Graphics_lcdc_set(GBC_Graphics *self, uint8_t new_lcdc) {
 }
 
 void GBC_Graphics_lcdc_set_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->lcdc, LCDC_ENABLE_FLAG, enabled, LCDC_ENABLE_FLAG);
+  modify_byte(&self->lcdc, GBC_LCDC_ENABLE_FLAG, enabled, GBC_LCDC_ENABLE_FLAG);
 }
 
 void GBC_Graphics_lcdc_set_graphics_layer_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->lcdc, LCDC_BCKGND_ENABLE_FLAG, enabled, LCDC_BCKGND_ENABLE_FLAG);
+  modify_byte(&self->lcdc, GBC_LCDC_BCKGND_ENABLE_FLAG, enabled, GBC_LCDC_BCKGND_ENABLE_FLAG);
 }
 
 void GBC_Graphics_lcdc_set_window_layer_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->lcdc, LCDC_WINDOW_ENABLE_FLAG, enabled, LCDC_WINDOW_ENABLE_FLAG);
+  modify_byte(&self->lcdc, GBC_LCDC_WINDOW_ENABLE_FLAG, enabled, GBC_LCDC_WINDOW_ENABLE_FLAG);
 }
 
 void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->lcdc, LCDC_SPRITE_ENABLE_FLAG, enabled, LCDC_SPRITE_ENABLE_FLAG);
+  modify_byte(&self->lcdc, GBC_LCDC_SPRITE_ENABLE_FLAG, enabled, GBC_LCDC_SPRITE_ENABLE_FLAG);
 }
 
 void GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(GBC_Graphics *self, bool use_8x16_sprites) {
-  modify_byte(&self->lcdc, LCDC_SPRITE_SIZE_FLAG, use_8x16_sprites, LCDC_SPRITE_SIZE_FLAG);
+  modify_byte(&self->lcdc, GBC_LCDC_SPRITE_SIZE_FLAG, use_8x16_sprites, GBC_LCDC_SPRITE_SIZE_FLAG);
 }
 
 uint8_t GBC_Graphics_stat_get_current_line(GBC_Graphics *self) {
@@ -565,39 +565,39 @@ uint8_t GBC_Graphics_stat_get_line_y_compare(GBC_Graphics *self) {
 }
 
 bool GBC_Graphics_stat_check_hblank_flag(GBC_Graphics *self) {
-  return self->stat & STAT_HBLANK_FLAG;
+  return self->stat & GBC_STAT_HBLANK_FLAG;
 }
 
 bool GBC_Graphics_stat_check_vblank_flag(GBC_Graphics *self) {
-  return self->stat & STAT_VBLANK_FLAG;
+  return self->stat & GBC_STAT_VBLANK_FLAG;
 }
 
 bool GBC_Graphics_stat_check_line_comp_flag(GBC_Graphics *self) {
-  return self->stat & STAT_LINE_COMP_FLAG;
+  return self->stat & GBC_STAT_LINE_COMP_FLAG;
 }
 
 bool GBC_Graphics_stat_check_oam_flag(GBC_Graphics *self) {
-  return self->stat & STAT_OAM_FLAG;
+  return self->stat & GBC_STAT_OAM_FLAG;
 }
 
 void GBC_Graphics_stat_set(GBC_Graphics *self, uint8_t new_stat) {
-  modify_byte(&self->stat, STAT_WRITEABLE_MASK, new_stat & STAT_WRITEABLE_MASK, 1);
+  modify_byte(&self->stat, GBC_STAT_WRITEABLE_MASK, new_stat & GBC_STAT_WRITEABLE_MASK, 1);
 }
 
 void GBC_Graphics_stat_set_hblank_interrupt_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->stat, STAT_HBLANK_INT_FLAG, enabled, STAT_HBLANK_INT_FLAG);
+  modify_byte(&self->stat, GBC_STAT_HBLANK_INT_FLAG, enabled, GBC_STAT_HBLANK_INT_FLAG);
 }
 
 void GBC_Graphics_stat_set_vblank_interrupt_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->stat, STAT_VBLANK_INT_FLAG, enabled, STAT_VBLANK_INT_FLAG);
+  modify_byte(&self->stat, GBC_STAT_VBLANK_INT_FLAG, enabled, GBC_STAT_VBLANK_INT_FLAG);
 }
 
 void GBC_Graphics_stat_set_line_compare_interrupt_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->stat, STAT_LINE_COMP_INT_FLAG, enabled, STAT_LINE_COMP_INT_FLAG);
+  modify_byte(&self->stat, GBC_STAT_LINE_COMP_INT_FLAG, enabled, GBC_STAT_LINE_COMP_INT_FLAG);
 }
 
 void GBC_Graphics_stat_set_oam_interrupt_enabled(GBC_Graphics *self, bool enabled) {
-  modify_byte(&self->stat, STAT_OAM_INT_FLAG, enabled, STAT_OAM_INT_FLAG);
+  modify_byte(&self->stat, GBC_STAT_OAM_INT_FLAG, enabled, GBC_STAT_OAM_INT_FLAG);
 }
 
 void GBC_Graphics_stat_set_line_y_compare(GBC_Graphics *self, uint8_t new_line_y_comp) {
@@ -621,23 +621,23 @@ void GBC_Graphics_set_oam_interrupt_callback(GBC_Graphics *self, void (*callback
 }
 
 uint8_t GBC_Graphics_attr_make(uint8_t palette, uint8_t vram_bank, bool is_x_flipped, bool is_y_flipped, bool bg_has_priority) {
-  return (palette) | (vram_bank * ATTR_VRAM_BANK_START) | (is_x_flipped * ATTR_FLIP_FLAG_X) | (is_y_flipped * ATTR_FLIP_FLAG_Y) | (bg_has_priority * ATTR_PRIORITY_FLAG);
+  return (palette) | (vram_bank * GBC_ATTR_VRAM_BANK_START) | (is_x_flipped * GBC_ATTR_FLIP_FLAG_X) | (is_y_flipped * GBC_ATTR_FLIP_FLAG_Y) | (bg_has_priority * GBC_ATTR_PRIORITY_FLAG);
 }
 
 uint8_t GBC_Graphics_attr_get_palette_num(uint8_t attributes) {
-  return attributes & ATTR_PALETTE_MASK;
+  return attributes & GBC_ATTR_PALETTE_MASK;
 }
 
 uint8_t GBC_Graphics_attr_get_vram_bank(uint8_t attributes) {
-  return (attributes & ATTR_VRAM_BANK_MASK) / ATTR_VRAM_BANK_START;
+  return (attributes & GBC_ATTR_VRAM_BANK_MASK) / GBC_ATTR_VRAM_BANK_START;
 }
 
 bool GBC_Graphics_attr_is_x_flipped(uint8_t attributes) {
-  return (bool)(attributes & ATTR_FLIP_FLAG_X);
+  return (bool)(attributes & GBC_ATTR_FLIP_FLAG_X);
 }
 
 bool GBC_Graphics_attr_is_y_flipped(uint8_t attributes) {
-  return (bool)(attributes & ATTR_FLIP_FLAG_Y);
+  return (bool)(attributes & GBC_ATTR_FLIP_FLAG_Y);
 }
 
 uint8_t GBC_Graphics_bg_get_scroll_x(GBC_Graphics *self) {
@@ -649,11 +649,11 @@ uint8_t GBC_Graphics_bg_get_scroll_y(GBC_Graphics *self) {
 }
 
 uint8_t GBC_Graphics_bg_get_tile(GBC_Graphics *self, uint8_t x, uint8_t y) {
-  return self->bg_tilemap[POINT_TO_OFFSET(x, y)];
+  return self->bg_tilemap[GBC_POINT_TO_OFFSET(x, y)];
 }
 
 uint8_t GBC_Graphics_bg_get_attr(GBC_Graphics *self, uint8_t x, uint8_t y) {
-  return self->bg_attrmap[POINT_TO_OFFSET(x, y)];
+  return self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)];
 }
 
 void GBC_Graphics_bg_move(GBC_Graphics *self, short dx, short dy) {
@@ -661,15 +661,15 @@ void GBC_Graphics_bg_move(GBC_Graphics *self, short dx, short dy) {
   short new_y = self->bg_scroll_y + dy;
 
   if (new_x < 0) { // Wrap x 
-    new_x = TILEMAP_WIDTH * TILE_WIDTH + new_x;
+    new_x = GBC_TILEMAP_WIDTH * GBC_TILE_WIDTH + new_x;
   } else {
-    new_x = new_x % (TILEMAP_WIDTH * TILE_WIDTH);
+    new_x = new_x % (GBC_TILEMAP_WIDTH * GBC_TILE_WIDTH);
   }
 
   if (new_y < 0) { // Wrap y
-    new_y = TILEMAP_HEIGHT * TILE_HEIGHT + new_y;
+    new_y = GBC_TILEMAP_HEIGHT * GBC_TILE_HEIGHT + new_y;
   } else {
-    new_y = new_y % (TILEMAP_HEIGHT * TILE_HEIGHT);
+    new_y = new_y % (GBC_TILEMAP_HEIGHT * GBC_TILE_HEIGHT);
   }
 
   self->bg_scroll_x = new_x;
@@ -690,49 +690,49 @@ void GBC_Graphics_bg_set_scroll_pos(GBC_Graphics *self, uint8_t x, uint8_t y) {
 }
 
 void GBC_Graphics_bg_set_tile(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number) {
-  self->bg_tilemap[POINT_TO_OFFSET(x, y)] = tile_number;
+  self->bg_tilemap[GBC_POINT_TO_OFFSET(x, y)] = tile_number;
 }
 
 void GBC_Graphics_bg_set_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t attributes) {
-  self->bg_attrmap[POINT_TO_OFFSET(x, y)] = attributes;
+  self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)] = attributes;
 }
 
 void GBC_Graphics_bg_set_tile_and_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number, uint8_t attributes) {
-  self->bg_tilemap[POINT_TO_OFFSET(x, y)] = tile_number;
-  self->bg_attrmap[POINT_TO_OFFSET(x, y)] = attributes;
+  self->bg_tilemap[GBC_POINT_TO_OFFSET(x, y)] = tile_number;
+  self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)] = attributes;
 }
 
 void GBC_Graphics_bg_set_tile_palette(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t palette) {
-  modify_byte(&self->bg_attrmap[POINT_TO_OFFSET(x, y)], ATTR_PALETTE_MASK, palette, ATTR_PALETTE_START);
+  modify_byte(&self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_PALETTE_MASK, palette, GBC_ATTR_PALETTE_START);
 }
 
 void GBC_Graphics_bg_set_tile_vram_bank(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t vram_bank) {
-  modify_byte(&self->bg_attrmap[POINT_TO_OFFSET(x, y)], ATTR_VRAM_BANK_MASK, vram_bank, ATTR_VRAM_BANK_START);
+  modify_byte(&self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_VRAM_BANK_MASK, vram_bank, GBC_ATTR_VRAM_BANK_START);
 }
 
 void GBC_Graphics_bg_set_tile_x_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped) {
-  modify_byte(&self->bg_attrmap[POINT_TO_OFFSET(x, y)], ATTR_FLIP_FLAG_X, flipped, ATTR_FLIP_FLAG_X);
+  modify_byte(&self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_FLIP_FLAG_X, flipped, GBC_ATTR_FLIP_FLAG_X);
 }
 
 void GBC_Graphics_bg_set_tile_y_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped) {
-  modify_byte(&self->bg_attrmap[POINT_TO_OFFSET(x, y)], ATTR_FLIP_FLAG_Y, flipped, ATTR_FLIP_FLAG_Y);
+  modify_byte(&self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_FLIP_FLAG_Y, flipped, GBC_ATTR_FLIP_FLAG_Y);
 }
 
 void GBC_Graphics_bg_set_tile_priority(GBC_Graphics *self, uint8_t x, uint8_t y, bool has_priority) {
-  modify_byte(&self->bg_attrmap[POINT_TO_OFFSET(x, y)], ATTR_PRIORITY_FLAG, has_priority, ATTR_PRIORITY_FLAG);
+  modify_byte(&self->bg_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_PRIORITY_FLAG, has_priority, GBC_ATTR_PRIORITY_FLAG);
 }
 
 void GBC_Graphics_bg_move_tile(GBC_Graphics *self, uint8_t src_x, uint8_t src_y, uint8_t dest_x, uint8_t dest_y, bool swap) {
-  uint8_t src_tile = self->bg_tilemap[POINT_TO_OFFSET(src_x, src_y)];
-  uint8_t src_attr = self->bg_attrmap[POINT_TO_OFFSET(src_x, src_y)];
-  uint8_t dest_tile = self->bg_tilemap[POINT_TO_OFFSET(dest_x, dest_y)];
-  uint8_t dest_attr = self->bg_attrmap[POINT_TO_OFFSET(dest_x, dest_y)];
-  self->bg_tilemap[POINT_TO_OFFSET(dest_x, dest_y)] = src_tile;
-  self->bg_attrmap[POINT_TO_OFFSET(dest_x, dest_y)] = src_attr;
+  uint8_t src_tile = self->bg_tilemap[GBC_POINT_TO_OFFSET(src_x, src_y)];
+  uint8_t src_attr = self->bg_attrmap[GBC_POINT_TO_OFFSET(src_x, src_y)];
+  uint8_t dest_tile = self->bg_tilemap[GBC_POINT_TO_OFFSET(dest_x, dest_y)];
+  uint8_t dest_attr = self->bg_attrmap[GBC_POINT_TO_OFFSET(dest_x, dest_y)];
+  self->bg_tilemap[GBC_POINT_TO_OFFSET(dest_x, dest_y)] = src_tile;
+  self->bg_attrmap[GBC_POINT_TO_OFFSET(dest_x, dest_y)] = src_attr;
 
   if (swap) {
-    self->bg_tilemap[POINT_TO_OFFSET(src_x, src_y)] = dest_tile;
-    self->bg_attrmap[POINT_TO_OFFSET(src_x, src_y)] = dest_attr;
+    self->bg_tilemap[GBC_POINT_TO_OFFSET(src_x, src_y)] = dest_tile;
+    self->bg_attrmap[GBC_POINT_TO_OFFSET(src_x, src_y)] = dest_attr;
   }
 }
 
@@ -745,11 +745,11 @@ uint8_t GBC_Graphics_window_get_offset_y(GBC_Graphics *self) {
 }
 
 uint8_t GBC_Graphics_window_get_tile(GBC_Graphics *self, uint8_t x, uint8_t y) {
-  return self->window_tilemap[POINT_TO_OFFSET(x, y)];
+  return self->window_tilemap[GBC_POINT_TO_OFFSET(x, y)];
 }
 
 uint8_t GBC_Graphics_window_get_attr(GBC_Graphics *self, uint8_t x, uint8_t y) {
-  return self->window_attrmap[POINT_TO_OFFSET(x, y)];
+  return self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)];
 }
 
 void GBC_Graphics_window_move(GBC_Graphics *self, short dx, short dy) {
@@ -774,50 +774,50 @@ void GBC_Graphics_window_set_offset_pos(GBC_Graphics *self, uint8_t x, uint8_t y
 }
 
 void GBC_Graphics_window_set_tile(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number) {
-  self->window_tilemap[POINT_TO_OFFSET(x, y)] = tile_number;
+  self->window_tilemap[GBC_POINT_TO_OFFSET(x, y)] = tile_number;
 }
 
 void GBC_Graphics_window_set_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t attributes) {
-  self->window_attrmap[POINT_TO_OFFSET(x, y)] = attributes;
+  self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)] = attributes;
 }
 
 void GBC_Graphics_window_set_tile_and_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number, uint8_t attributes) {
-  self->window_tilemap[POINT_TO_OFFSET(x, y)] = tile_number;
-  self->window_attrmap[POINT_TO_OFFSET(x, y)] = attributes;
+  self->window_tilemap[GBC_POINT_TO_OFFSET(x, y)] = tile_number;
+  self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)] = attributes;
 }
 
 void GBC_Graphics_window_set_tile_palette(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t palette) {
-  modify_byte(&self->window_attrmap[POINT_TO_OFFSET(x, y)], ATTR_PALETTE_MASK, palette, ATTR_PALETTE_START);
+  modify_byte(&self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_PALETTE_MASK, palette, GBC_ATTR_PALETTE_START);
 }
 
 void GBC_Graphics_window_set_tile_vram_bank(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t vram_bank) {
-  modify_byte(&self->window_attrmap[POINT_TO_OFFSET(x, y)], ATTR_VRAM_BANK_MASK, vram_bank, ATTR_VRAM_BANK_START);
+  modify_byte(&self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_VRAM_BANK_MASK, vram_bank, GBC_ATTR_VRAM_BANK_START);
 }
 
 void GBC_Graphics_window_set_tile_x_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped) {
-  modify_byte(&self->window_attrmap[POINT_TO_OFFSET(x, y)], ATTR_FLIP_FLAG_X, flipped, ATTR_FLIP_FLAG_X);
+  modify_byte(&self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_FLIP_FLAG_X, flipped, GBC_ATTR_FLIP_FLAG_X);
 }
 
 void GBC_Graphics_window_set_tile_y_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped) {
-  modify_byte(&self->window_attrmap[POINT_TO_OFFSET(x, y)], ATTR_FLIP_FLAG_Y, flipped, ATTR_FLIP_FLAG_Y);
+  modify_byte(&self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_FLIP_FLAG_Y, flipped, GBC_ATTR_FLIP_FLAG_Y);
 }
 
 void GBC_Graphics_window_set_tile_priority(GBC_Graphics *self, uint8_t x, uint8_t y, bool has_priority) {
-  modify_byte(&self->window_attrmap[POINT_TO_OFFSET(x, y)], ATTR_PRIORITY_FLAG, has_priority, ATTR_PRIORITY_FLAG);
+  modify_byte(&self->window_attrmap[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_PRIORITY_FLAG, has_priority, GBC_ATTR_PRIORITY_FLAG);
 }
 
 
 void GBC_Graphics_window_move_tile(GBC_Graphics *self, uint8_t src_x, uint8_t src_y, uint8_t dest_x, uint8_t dest_y, bool swap) {
-  uint8_t src_tile = self->window_tilemap[POINT_TO_OFFSET(src_x, src_y)];
-  uint8_t src_attr = self->window_attrmap[POINT_TO_OFFSET(src_x, src_y)];
-  uint8_t dest_tile = self->window_tilemap[POINT_TO_OFFSET(dest_x, dest_y)];
-  uint8_t dest_attr = self->window_attrmap[POINT_TO_OFFSET(dest_x, dest_y)];
-  self->window_tilemap[POINT_TO_OFFSET(dest_x, dest_y)] = src_tile;
-  self->window_attrmap[POINT_TO_OFFSET(dest_x, dest_y)] = src_attr;
+  uint8_t src_tile = self->window_tilemap[GBC_POINT_TO_OFFSET(src_x, src_y)];
+  uint8_t src_attr = self->window_attrmap[GBC_POINT_TO_OFFSET(src_x, src_y)];
+  uint8_t dest_tile = self->window_tilemap[GBC_POINT_TO_OFFSET(dest_x, dest_y)];
+  uint8_t dest_attr = self->window_attrmap[GBC_POINT_TO_OFFSET(dest_x, dest_y)];
+  self->window_tilemap[GBC_POINT_TO_OFFSET(dest_x, dest_y)] = src_tile;
+  self->window_attrmap[GBC_POINT_TO_OFFSET(dest_x, dest_y)] = src_attr;
 
   if (swap) {
-    self->window_tilemap[POINT_TO_OFFSET(src_x, src_y)] = dest_tile;
-    self->window_attrmap[POINT_TO_OFFSET(src_x, src_y)] = dest_attr;
+    self->window_tilemap[GBC_POINT_TO_OFFSET(src_x, src_y)] = dest_tile;
+    self->window_attrmap[GBC_POINT_TO_OFFSET(src_x, src_y)] = dest_attr;
   }
 }
 
@@ -879,23 +879,23 @@ void GBC_Graphics_oam_set_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num, u
 }
 
 void GBC_Graphics_oam_set_sprite_palette(GBC_Graphics *self, uint8_t sprite_num, uint8_t palette) {
-  modify_byte(&self->oam[sprite_num * 4 + 3], ATTR_PALETTE_MASK, palette, ATTR_PALETTE_START);
+  modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_PALETTE_MASK, palette, GBC_ATTR_PALETTE_START);
 }
 
 void GBC_Graphics_oam_set_sprite_vram_bank(GBC_Graphics *self, uint8_t sprite_num, uint8_t vram_bank) {
-  modify_byte(&self->oam[sprite_num * 4 + 3], ATTR_VRAM_BANK_MASK, vram_bank, ATTR_VRAM_BANK_START);
+  modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_VRAM_BANK_MASK, vram_bank, GBC_ATTR_VRAM_BANK_START);
 }
 
 void GBC_Graphics_oam_set_sprite_x_flip(GBC_Graphics *self, uint8_t sprite_num, bool flipped) {
-  modify_byte(&self->oam[sprite_num * 4 + 3], ATTR_FLIP_FLAG_X, flipped, ATTR_FLIP_FLAG_X);
+  modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_FLIP_FLAG_X, flipped, GBC_ATTR_FLIP_FLAG_X);
 }
 
 void GBC_Graphics_oam_set_sprite_y_flip(GBC_Graphics *self, uint8_t sprite_num, bool flipped) {
-  modify_byte(&self->oam[sprite_num * 4 + 3], ATTR_FLIP_FLAG_Y, flipped, ATTR_FLIP_FLAG_Y);
+  modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_FLIP_FLAG_Y, flipped, GBC_ATTR_FLIP_FLAG_Y);
 }
 
 void GBC_Graphics_oam_set_sprite_priority(GBC_Graphics *self, uint8_t sprite_num, bool bg_has_priority) {
-  modify_byte(&self->oam[sprite_num * 4 + 3], ATTR_PRIORITY_FLAG, bg_has_priority, ATTR_PRIORITY_FLAG);
+  modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_PRIORITY_FLAG, bg_has_priority, GBC_ATTR_PRIORITY_FLAG);
 }
 
 void GBC_Graphics_oam_change_sprite_num(GBC_Graphics *self, uint8_t source_sprite_num, uint8_t target_sprite_num, bool copy) {
@@ -952,11 +952,11 @@ void GBC_Graphics_oam_swap_sprite_tiles_and_attrs(GBC_Graphics *self, uint8_t sp
 }
 
 void GBC_Graphics_copy_background_to_window(GBC_Graphics *self) {
-  memcpy(self->window_tilemap, self->bg_tilemap, TILEMAP_SIZE);
-  memcpy(self->window_attrmap, self->bg_attrmap, ATTRMAP_SIZE);
+  memcpy(self->window_tilemap, self->bg_tilemap, GBC_TILEMAP_NUM_BYTES);
+  memcpy(self->window_attrmap, self->bg_attrmap, GBC_ATTRMAP_NUM_BYTES);
 }
 
 void GBC_Graphics_copy_window_to_background(GBC_Graphics *self) {
-  memcpy(self->bg_tilemap, self->window_tilemap, TILEMAP_SIZE);
-  memcpy(self->bg_attrmap, self->window_attrmap, ATTRMAP_SIZE);
+  memcpy(self->bg_tilemap, self->window_tilemap, GBC_TILEMAP_NUM_BYTES);
+  memcpy(self->bg_attrmap, self->window_attrmap, GBC_ATTRMAP_NUM_BYTES);
 }
