@@ -4,7 +4,8 @@
 
 /**
  * Version 1.1.0 of pebble-gbc-graphics
- * Created by Harrison Allen (harrisonallen555@gmail.com)
+ * Created by Harrison Allen 
+ * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
 
 /** Size definitions */
@@ -90,15 +91,21 @@
 
 /** Predefined Screen boundaries for convenience*/
 #if defined(PBL_ROUND)
-    #define SCREEN_BOUNDS_FULL GRect(0, 0, 180, 180)     ///> Fullscreen, okay FPS.
-    #define SCREEN_BOUNDS_LARGE GRect(0, 18, 180, 144)   ///> Widescreen, good FPS.
-    #define SCREEN_BOUNDS_SQUARE GRect(18, 18, 144, 144) ///> Best fit, great FPS. Consistent viewing across all Pebbles.
-    #define SCREEN_BOUNDS_SMALL GRect(26, 26, 128, 128)  ///> Small, great FPS.
+    #define SCREEN_BOUNDS_FULL GRect(0, 0, 180, 180)     ///> Fullscreen
+    #define SCREEN_BOUNDS_LARGE GRect(2, 2, 176, 176)    ///> Largest size that maintains even number of tiles vertically and horizontally
+    #define SCREEN_BOUNDS_RECT GRect(18, 6, 144, 168)    ///> Dimensions of a rectangular Pebble
+    #define SCREEN_BOUNDS_SQUARE GRect(18, 18, 144, 144) ///> Square, equal number of tiles horizontal and vertical. Best fit for consistent viewing across all Pebbles.
+    #define SCREEN_BOUNDS_WIDE GRect(2, 18, 176, 144)    ///> Widescreen, square stretched horizontally to max even horizontal tiles
+    #define SCREEN_BOUNDS_TALL GRect(18, 2, 144, 176)    ///> Tallscreen, square stretched vertically to max even vertical tiles
+    #define SCREEN_BOUNDS_SMALL GRect(26, 26, 128, 128)  ///> Smaller square
 #else
-    #define SCREEN_BOUNDS_FULL GRect(0, 0, 144, 168)    ///> Fullscreen, okay FPS.
-    #define SCREEN_BOUNDS_LARGE GRect(0, 4, 144, 160)   ///> Widescreen, good FPS.
-    #define SCREEN_BOUNDS_SQUARE GRect(0, 12, 144, 144) ///> Best fit, great FPS. Consistent viewing across all Pebbles.
-    #define SCREEN_BOUNDS_SMALL GRect(8, 16, 128, 128)  ///> Small, great FPS.
+    #define SCREEN_BOUNDS_FULL GRect(0, 0, 144, 168)    ///> Fullscreen
+    #define SCREEN_BOUNDS_LARGE GRect(0, 4, 144, 160)   ///> Largest size that maintains even number of tiles vertically and horizontally
+    #define SCREEN_BOUNDS_RECT GRect(0, 0, 144, 168)    ///> Dimensions of a rectangular Pebble
+    #define SCREEN_BOUNDS_SQUARE GRect(0, 12, 144, 144) ///> Square, equal number of tiles horizontal and vertical. Best fit for consistent viewing across all Pebbles.
+    #define SCREEN_BOUNDS_WIDE GRect(0, 12, 144, 144)   ///> Widescreen, square stretched horizontally to max even horizontal tiles
+    #define SCREEN_BOUNDS_TALL GRect(0, 0, 144, 160)    ///> Tallscreen, square stretched vertically to max even vertical tiles
+    #define SCREEN_BOUNDS_SMALL GRect(8, 16, 128, 128)  ///> Smaller square
 #endif
 
 /** Colors for black and white palettes */
