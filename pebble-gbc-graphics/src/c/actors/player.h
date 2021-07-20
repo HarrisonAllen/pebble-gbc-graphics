@@ -30,6 +30,13 @@ typedef enum {
     PS_MOVING_OFF_DOWN
 } PlayerState;
 
+typedef enum {
+    ES_FAST,
+    ES_MEDIUM,
+    ES_SLOW,
+    ES_STOPPED,
+} EngineSpeed;
+
 void player_init(GBC_Graphics *graphics);
 void player_step(GBC_Graphics *graphics);
 uint get_player_x();
@@ -43,3 +50,4 @@ void player_move_on_screen_right();
 void player_move_off_screen_down();
 bool player_moving();
 bool player_on_screen();
+void player_set_engine_speed(GBC_Graphics *graphics, EngineSpeed new_speed);
