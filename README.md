@@ -16,8 +16,11 @@ In this repo:
 
 Some other projects using this library:
 * [Pebblemon](https://github.com/HarrisonAllen/pebble-gbc-graphics-demo/tree/master/pebblemon) - App - pebble-gbc-graphics v1.0.0
+
 ![Pebblemon](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon.png)
+
 * [Pebblemon Time](https://github.com/HarrisonAllen/pebblemon-watchface) - Watchface - pebble-gbc-graphics v1.1.0
+
 ![Pebblemon Time](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime.png)
 
 The complexities of rendering are abstracted away for the user. For example, the viewport over the background can be moved simply by using the function [`GBC_Graphics_bg_move`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L766).
