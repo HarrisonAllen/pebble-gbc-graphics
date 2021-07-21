@@ -8,6 +8,7 @@
         "pebble-gbc-graphics.h": "c",
         "util.h": "c",
         "background.h": "c",
-        "items.h": "c"
+        "items.h": "c",
+        "hiscore.h": "c"
     }
 }
