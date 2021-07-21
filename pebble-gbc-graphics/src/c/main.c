@@ -5,9 +5,6 @@
 static Window *s_window;
 
 static void window_load(Window *window) {
-    Layer *window_layer = window_get_root_layer(window);
-    GRect bounds = layer_get_bounds(window_layer);
-
     window_set_background_color(window, GColorPictonBlue); // This is the color of the sky in-game
 }
 
@@ -17,6 +14,7 @@ static void window_unload(Window *window) {
 
 static void init(void) {
     s_window = window_create();
+    
     // Start the game
     game_init(s_window);
 
