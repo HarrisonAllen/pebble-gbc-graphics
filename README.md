@@ -57,7 +57,7 @@ The process for creating tilesheets from an image has a few specific steps, I pe
     * I prefer to create my tilesheets in a ribbon, but they can be in any shape. Just keep in mind that the conversion script will scan your tilesheet from left to right, top to bottom, one tile at a time.
 2. Export the tilesheet as a `.png` file
     * ![SampleTilesheet.png](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/tilesheets/SampleTilesheet.png)
-3. From the command line, run the (`convert_tilesheet.py`)[https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/assets/helper-scripts/convert_tilesheet.py] script with your filename as arguments
+3. From the command line, run the [`convert_tilesheet.py`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/assets/helper-scripts/convert_tilesheet.py) script with your filename as arguments
     * For the Sample Tilesheet:
         1. `cd` to the `assets/helper-scripts/` directory
         2. Run `python convert_tilesheet.py ../tilesheets/SampleTilesheet.png`
