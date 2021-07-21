@@ -23,7 +23,7 @@ GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks) {
     self->screen_width = bounds.size.w;
     self->screen_height = bounds.size.h;
 
-    // Allocate 4 banks of VRAM space
+    // Allocate banks of VRAM space
     self->vram = (uint8_t*)malloc(GBC_VRAM_BANK_NUM_BYTES * num_vram_banks);
 
     // Allocate space for the tilemaps and attributemaps

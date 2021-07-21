@@ -240,7 +240,7 @@ struct _gbc_graphics {
  * Creates a GBC Graphics object
  * 
  * @param window The window in which to display the GBC Graphics object
- * @param num_vram_banks The number of vram banks to generate
+ * @param num_vram_banks The number of vram banks to generate, up to 4
  * 
  * @return a pointer to the created GBC Graphics object
  * @note I recommend creating the GBC Graphics object in window_load or an equivalent function

@@ -137,7 +137,7 @@ struct _gbc_graphics {
     /**
      * VRAM Buffer - Stores the tiles for the background, window, and sprites in a 2bpp format
      * Originally, the VRAM contained 4 banks of 4096 bytes, for a total of 16384 bytes
-     * Now, the number of banks is set in the 
+     * Now, the number of banks is set in the constructor
      * Each bank holds up to 256 tiles in 2bpp format of 16 bytes each
      */
     uint8_t *vram;
@@ -240,7 +240,7 @@ struct _gbc_graphics {
  * Creates a GBC Graphics object
  * 
  * @param window The window in which to display the GBC Graphics object
- * @param num_vram_banks The number of vram banks to generate
+ * @param num_vram_banks The number of vram banks to generate, up to 4
  * 
  * @return a pointer to the created GBC Graphics object
  * @note I recommend creating the GBC Graphics object in window_load or an equivalent function
