@@ -3,6 +3,12 @@
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 
+/**
+ * @file road.h
+ * 
+ * Handles drawing the road (trees, road, cars) onto the background layer
+ */
+
 #define SKY_TILE 0    // The tile to use for the sky
 #define GROUND_TILE 3 // The tile to use for the ground
 

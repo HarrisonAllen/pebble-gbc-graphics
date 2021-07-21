@@ -3,6 +3,12 @@
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 
+/**
+ * @file backgound.h
+ * 
+ * Handles the rendering and motion of the background layer
+ */
+
 #define SOLID_TILE_00 0 // A solid tile using palette color 0
 #define SOLID_TILE_01 1 // A solid tile using palette color 1
 #define SOLID_TILE_10 2 // A solid tile using palette color 2

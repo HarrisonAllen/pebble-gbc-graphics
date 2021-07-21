@@ -4,7 +4,9 @@
 #include "pebble-gbc-graphics/pebble-gbc-graphics.h"
 
 /**
- * Various utility functions that are non-class specific
+ * @file util.h
+ * 
+ * Provides various utility functions that are non-class specific
  */
 
 /**

@@ -3,6 +3,12 @@
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 
+/**
+ * @file text.h
+ * 
+ * Draw text onto either the background or window layers
+ */
+
 #define BLANK_TILE 1           // The tile for a blank space
 #define BALLOON_TILE 18        // The tile for the balloon icon
 #define FUEL_TILE 23           // The tile for the fuel icon

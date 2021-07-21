@@ -3,6 +3,12 @@
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 
+/**
+ * @file clouds.h
+ * 
+ * Handles drawing clouds onto the background layer
+ */
+
 #define CLOUD_SKY_TILE 0 // The tile of the blank sky
 #define CLOUD_PALETTE 0  // The palette of the clouds
 

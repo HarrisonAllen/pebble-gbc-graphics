@@ -4,8 +4,9 @@
 #include "pebble-gbc-graphics/pebble-gbc-graphics.h"
 
 /**
- * The main game class. This controls the gameplay loop,
- * the GBC_Graphics object, and all of the other classes
+ * @file game.h
+ * 
+ * Controls the gameplay loop, the GBC_Graphics object, and all of the other classes
  */
 
 /*

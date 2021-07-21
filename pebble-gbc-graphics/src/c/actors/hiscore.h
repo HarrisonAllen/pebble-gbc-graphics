@@ -5,8 +5,10 @@
 #include "../util.h"
 
 /**
- * This object shows up as "NEW" when a new high score
- * is achieved for the player
+ * @file hiscore.h
+ * 
+ * Draws a floating, color-changing text that says "NEW" when
+ * the player gets a new high score
  */
 
 #define HI_SCORE_OAM_OFFSET 30 // The OAM offset for the sprites

@@ -4,6 +4,12 @@
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 #include "../util.h"
 
+/**
+ * @file player.h
+ * 
+ * Handles the game logic of the player
+ */
+
 #define MIN_PLAYER_Y 8       // The highest position that the player can go
 #define MAX_PLAYER_Y 208     // The lowest position that the player can go
 #define MAX_PLAYER_Y_SPEED 6 // The fastest that the player can move vertically

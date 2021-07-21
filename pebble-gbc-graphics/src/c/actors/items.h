@@ -5,7 +5,9 @@
 #include "../util.h"
 
 /**
- * This class handles the items in the game
+ * @file items.h
+ * 
+ * Handles the game logic of the items
  */
 
 #define NUMBER_OF_ITEMS 6    // The number of items to render at once

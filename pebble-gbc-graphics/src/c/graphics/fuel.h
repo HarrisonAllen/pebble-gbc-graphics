@@ -3,6 +3,12 @@
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 
+/**
+ * @file fuel.h
+ * 
+ * Handles drawing the fuel bar
+ */
+
 #define FUEL_BAR_FULL 0    // The tile for a full fuel bar
 #define FUEL_BAR_EMPTY 8   // The tile for an empty fuel bar
 #define FUEL_BAR_END 9     // The tile for the end of the fuel bar
