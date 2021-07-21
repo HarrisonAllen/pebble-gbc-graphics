@@ -25,6 +25,12 @@
     "resources": {
       "media": [
         {
+          "menuIcon": true,
+          "type": "png",
+          "name": "IMAGE_MENU_ICON",
+          "file": "AppIcon.png"
+        },
+        {
           "type": "raw",
           "name": "DATA_BASE_TILESHEET",
           "file": "data/BaseTilesheet.bin"
