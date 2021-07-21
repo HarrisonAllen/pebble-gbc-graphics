@@ -259,7 +259,7 @@ void GBC_Graphics_destroy(GBC_Graphics *self);
 
 /**
  * Sets the boundaries of the screen to render
- * @note Decreasing the size of the screen will greatly increase FPS, try GRect(0, 12, 144, 144)
+ * @note Decreasing the size of the screen will greatly increase FPS
  *
  * @param self A pointer to the target GBC Graphics object
  * @param bounds The boundaries of the screen, GRect(screen x origin, screen y origin, screen width, screen height)
