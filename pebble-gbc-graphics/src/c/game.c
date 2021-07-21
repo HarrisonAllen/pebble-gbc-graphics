@@ -145,7 +145,7 @@ static void game_step() {
                 start_window_animation(GAME_OVER_WINDOW_START, GAME_OVER_WINDOW_END);
 
                 clear_top_row(s_graphics);
-                draw_text_at_location(s_graphics, "GAME OVER", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
+                draw_text_at_location(s_graphics, "GAME  OVER", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
 
                 s_game_state = GS_GAME_OVER_TRANSITION;
             }
@@ -292,7 +292,7 @@ void select_click_handler(ClickRecognizerRef recognizer, void *context) {
         // Exit new game menu, start the game
         case GS_NEW_GAME:
             clear_top_row(s_graphics);
-            draw_text_at_location(s_graphics, "GET READY", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
+            draw_text_at_location(s_graphics, "GET  READY", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
             start_window_animation(NEW_GAME_WINDOW_END, NEW_GAME_WINDOW_START);
             s_game_state = GS_NEW_GAME_TRANSITION;
             s_new_high_score = false;
@@ -302,7 +302,7 @@ void select_click_handler(ClickRecognizerRef recognizer, void *context) {
         case GS_GAME_OVER:
             new_game();
             clear_top_row(s_graphics);
-            draw_text_at_location(s_graphics, "FLY AGAIN", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
+            draw_text_at_location(s_graphics, "FLY  AGAIN", PBL_IF_ROUND_ELSE(6, 4), 0, 0, true);
             start_window_animation(GAME_OVER_WINDOW_END, GAME_OVER_WINDOW_START);
             s_game_state = GS_GAME_OVER_NEW_GAME_TRANSITION;
             break;
