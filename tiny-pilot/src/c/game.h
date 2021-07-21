@@ -15,14 +15,18 @@
  * For "as fast as possible" (i.e. render as soon as the
  * graphics engine has completed its last draw cycle),
  * use a FRAME_DURATION of 2. 
- * Black and white Pebbles tend to behave differently than color
- * Pebbles, so you may have to play around with these values to 
- * find one that works best for your application
+ * Aplite has a slower CPU than the rest, so it will get worse frame 
+ * rate no matter what
+ * Basalt and Chalk are very similar, Chalk is just barely slower
+ * Diorite has similar performance to Basalt and Chalk, but may
+ * need to be tweaked to get the same performance
  */
 #if defined(PBL_COLOR)
 #define FRAME_DURATION 50
-#else
+#elif defined(PBL_PLATFORM_DIORITE)
 #define FRAME_DURATION 20
+#elif defined(PBL_PLATFORM_APLITE)
+#define FRAME_DURATION 2
 #endif
 
 #define MAX_PLAYER_FUEL 500 // The amount of fuel the player has
