@@ -1,23 +1,23 @@
 #include "player.h"
 #include "../util.h"
 
-static uint32_t s_player_x; // The player's x position in the world
-static uint8_t s_player_y; // The player's y position in the world
-static uint8_t s_player_x_speed; // The player's horizontal speed
-static int8_t s_player_y_speed; // The player's vertical velocity
-static int s_player_screen_x; // The player's x position on the screen, for animations
-static int s_player_screen_y_offset; // The player's y position offset from the screen position, for animations
+static uint32_t s_player_x;            // The player's x position in the world
+static uint8_t s_player_y;             // The player's y position in the world
+static uint8_t s_player_x_speed;       // The player's horizontal speed
+static int8_t s_player_y_speed;        // The player's vertical velocity
+static int s_player_screen_x;          // The player's x position on the screen, for animations
+static int s_player_screen_y_offset;   // The player's y position offset from the screen position, for animations
 static Direction s_player_y_direction; // The player's vertical direction
 
-static uint8_t s_prop_frame; // The animation frame for the propellor
-static uint8_t s_bob_frame; // The animation frame for the up and down bobbing
+static uint8_t s_prop_frame;  // The animation frame for the propellor
+static uint8_t s_bob_frame;   // The animation frame for the up and down bobbing
 static uint8_t s_slide_frame; // The animation frame for sliding in and out
 
 static PlayerState s_player_state; // The player's state
 static EngineSpeed s_engine_speed; // The speed of the engine
 
-extern uint8_t sprites_vram_offset; // Need to grab the offset of the sprites tilesheet
-extern const uint8_t ease_in_out_percentages[]; // Want to grab the ease in, ease out animation sequence
+extern uint8_t sprites_vram_offset;                 // Need to grab the offset of the sprites tilesheet
+extern const uint8_t ease_in_out_percentages[];     // Want to grab the ease in, ease out animation sequence
 extern const uint8_t accelerate_slow_percentages[]; // Also want the slow acceleration animation sequence
 
 /**

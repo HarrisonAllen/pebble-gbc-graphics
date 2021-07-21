@@ -10,22 +10,22 @@ extern uint8_t sprites_vram_offset; // Need to grab the offset of the sprites ti
  * The sprites for the item types
  */
 static uint8_t s_item_sprites[] = {
-    0,                  // IT_NONE: Doesn't render, no sprite
-    BALLOON_SPRITE,     // IT_BALLOON: A balloon with a string
-    PLUS_ONE_SPRITE,    // IT_PLUS_ONE: A '+1'
-    FUEL_SPRITE,        // IT_FUEL: A fuel canister on a parachute
-    PLUS_FUEL_SPRITE    // IT_PLUS_FUEL: A '+F'
+    0,               // IT_NONE: Doesn't render, no sprite
+    BALLOON_SPRITE,  // IT_BALLOON: A balloon with a string
+    PLUS_ONE_SPRITE, // IT_PLUS_ONE: A '+1'
+    FUEL_SPRITE,     // IT_FUEL: A fuel canister on a parachute
+    PLUS_FUEL_SPRITE // IT_PLUS_FUEL: A '+F'
 };
 
 /**
  * The sprite palettes for the item types
  */
 static uint8_t s_item_palettes[] = {
-    0,                  // IT_NONE: Doesn't render, no palette
-    BALLOON_PALETTE,    // IT_BALLOON: Primary color is Red
-    BALLOON_PALETTE,    // IT_PLUS_ONE: Primary color is Red (unused)
-    FUEL_PALETTE,       // IT_FUEL: Primary color is Islamic Green
-    FUEL_PALETTE        // IT_PLUS_FUEL: Primary color is Islamic Green (unused)
+    0,               // IT_NONE: Doesn't render, no palette
+    BALLOON_PALETTE, // IT_BALLOON: Primary color is Red
+    BALLOON_PALETTE, // IT_PLUS_ONE: Primary color is Red (unused)
+    FUEL_PALETTE,    // IT_FUEL: Primary color is Islamic Green
+    FUEL_PALETTE     // IT_PLUS_FUEL: Primary color is Islamic Green (unused)
 };
 
 /**

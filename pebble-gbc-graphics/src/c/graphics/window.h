@@ -3,10 +3,10 @@
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 
-#define WINDOW_FRAME_CORNER 4 // The tile for a corner of the window frame
+#define WINDOW_FRAME_CORNER 4     // The tile for a corner of the window frame
 #define WINDOW_FRAME_HORIZONTAL 5 // The tile for the horizontal bar of the window frame
-#define WINDOW_FRAME_VERTICAL 6 // The tile for the vertical bar of the window frame
-#define WINDOW_PALETTE 7 // The background palette number for the window frame
+#define WINDOW_FRAME_VERTICAL 6   // The tile for the vertical bar of the window frame
+#define WINDOW_PALETTE 7          // The background palette number for the window frame
 
 /**
  * Clears the tiles on the window layer

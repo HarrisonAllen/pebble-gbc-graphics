@@ -3,15 +3,15 @@
 #include <pebble.h>
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 
-#define BLANK_TILE 1 // The tile for a blank space
-#define BALLOON_TILE 18 // The tile for the balloon icon
-#define FUEL_TILE 23 // The tile for the fuel icon
-#define BALLOON_TEXT_PALETTE 4 // The palette for the balloon icon 
-#define FUEL_TEXT_PALETTE 5 // The palette for the fuel icon, shared with FUEL_BAR_PALETTE
+#define BLANK_TILE 1           // The tile for a blank space
+#define BALLOON_TILE 18        // The tile for the balloon icon
+#define FUEL_TILE 23           // The tile for the fuel icon
+#define BALLOON_TEXT_PALETTE 4 // The palette for the balloon icon
+#define FUEL_TEXT_PALETTE 5    // The palette for the fuel icon, shared with FUEL_BAR_PALETTE
 
 #define NUMBER_OFFSET 26 // The offset on the text tilesheet where the numbers start
-#define COLON_OFFSET 36 // The offset on the text tilesheet for the colon
-#define TIMES_OFFSET 37 // The offset on the text tilesheet for the times symbol
+#define COLON_OFFSET 36  // The offset on the text tilesheet for the colon
+#define TIMES_OFFSET 37  // The offset on the text tilesheet for the times symbol
 
 /**
  * Clears the top row of the background tilemap to prep for the score bar

@@ -11,12 +11,12 @@
  * Various directions used for movement
  */
 typedef enum {
-    D_NONE,     // No direction
-    D_UP,       // Upwards direction
-    D_LEFT,     // Leftwards direction
-    D_DOWN,     // Downwards direction
-    D_RIGHT,    // Rightwards direction
-    D_END       // Can use for looping through directions, e.g. (direction + 1) % D_END
+    D_NONE,  // No direction
+    D_UP,    // Upwards direction
+    D_LEFT,  // Leftwards direction
+    D_DOWN,  // Downwards direction
+    D_RIGHT, // Rightwards direction
+    D_END    // Can use for looping through directions, e.g. (direction + 1) % D_END
 } Direction;
 
 /**

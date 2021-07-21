@@ -4,26 +4,26 @@
 #include "../pebble-gbc-graphics/pebble-gbc-graphics.h"
 #include "../util.h"
 
-#define MIN_PLAYER_Y 8 // The highest position that the player can go
-#define MAX_PLAYER_Y 208 // The lowest position that the player can go
+#define MIN_PLAYER_Y 8       // The highest position that the player can go
+#define MAX_PLAYER_Y 208     // The lowest position that the player can go
 #define MAX_PLAYER_Y_SPEED 6 // The fastest that the player can move vertically
-#define PLAYER_START_Y 80 // The starting y position for the player
-#define PLAYER_X_SPEED 4 // The player's horizontal speed
+#define PLAYER_START_Y 80    // The starting y position for the player
+#define PLAYER_X_SPEED 4     // The player's horizontal speed
 
-#define PLAYER_ON_SCREEN_X PBL_IF_ROUND_ELSE(32, 16) // The x position of the player when on scren
-#define PLAYER_OFF_SCREEN_X -32 // The x position of the player when off screen left
+#define PLAYER_ON_SCREEN_X PBL_IF_ROUND_ELSE(32, 16)                 // The x position of the player when on scren
+#define PLAYER_OFF_SCREEN_X -32                                      // The x position of the player when off screen left
 #define PLAYER_OFF_SCREEN_Y GBC_Graphics_get_screen_height(graphics) // The y position of the player when off screen down
 
-#define PLANE_RUDDER_SPRITE 0 // The tilesheet offset for the rudder (1st sprite)
-#define PLANE_TAIL_SPRITE 2 // The tilesheet offset for the tail (2nd sprite)
-#define PLANE_BODY_SPRITE 4 // The tilesheet offset for the body when going straight (3rd sprite)
-#define PLANE_BODY_UP_SPRITE 6 // The tilesheet offset for the body when going up (3rd sprite)
+#define PLANE_RUDDER_SPRITE 0    // The tilesheet offset for the rudder (1st sprite)
+#define PLANE_TAIL_SPRITE 2      // The tilesheet offset for the tail (2nd sprite)
+#define PLANE_BODY_SPRITE 4      // The tilesheet offset for the body when going straight (3rd sprite)
+#define PLANE_BODY_UP_SPRITE 6   // The tilesheet offset for the body when going up (3rd sprite)
 #define PLANE_BODY_DOWN_SPRITE 8 // The tilesheet offset for the body when going down (3rd sprite)
-#define PLANE_NOSE_0_SPRITE 10 // The tilesheet offset for nose, propellor vertical (4th sprite)
-#define PLANE_NOSE_1_SPRITE 12 // The tilesheet offset for nose, propellor mostly vertical (4th sprite)
-#define PLANE_NOSE_2_SPRITE 14 // The tilesheet offset for nose, propellor mostly horizontal (4th sprite)
-#define PLANE_NOSE_3_SPRITE 16 // The tilesheet offset for nose, propellor horizontal (4th sprite)
-#define PLAYER_SPRITE_PALETTE 0 // The sprite palette number for the plane sprites
+#define PLANE_NOSE_0_SPRITE 10   // The tilesheet offset for nose, propellor vertical (4th sprite)
+#define PLANE_NOSE_1_SPRITE 12   // The tilesheet offset for nose, propellor mostly vertical (4th sprite)
+#define PLANE_NOSE_2_SPRITE 14   // The tilesheet offset for nose, propellor mostly horizontal (4th sprite)
+#define PLANE_NOSE_3_SPRITE 16   // The tilesheet offset for nose, propellor horizontal (4th sprite)
+#define PLAYER_SPRITE_PALETTE 0  // The sprite palette number for the plane sprites
 
 /**
  * The state of the player

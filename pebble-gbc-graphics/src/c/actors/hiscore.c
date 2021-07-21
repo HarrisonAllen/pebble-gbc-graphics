@@ -10,24 +10,24 @@ static Direction s_bob_direction;   // The direction the bob is currenly moving
  * The colors that the sprites will shift through during animation
  */
 const uint8_t rainbow_palette_colors[] = {
-  GColorRedARGB8,
-  GColorOrangeARGB8,
-  GColorChromeYellowARGB8,
-  GColorYellowARGB8,
-  GColorSpringBudARGB8,
-  GColorBrightGreenARGB8,
-  GColorGreenARGB8,
-  GColorMalachiteARGB8,
-  GColorMediumSpringGreenARGB8,
-  GColorCyanARGB8,
-  GColorVividCeruleanARGB8,
-  GColorBlueMoonARGB8,
-  GColorBlueARGB8,
-  GColorElectricUltramarineARGB8,
-  GColorVividVioletARGB8,
-  GColorMagentaARGB8,
-  GColorFashionMagentaARGB8,
-  GColorFollyARGB8
+    GColorRedARGB8,
+    GColorOrangeARGB8,
+    GColorChromeYellowARGB8,
+    GColorYellowARGB8,
+    GColorSpringBudARGB8,
+    GColorBrightGreenARGB8,
+    GColorGreenARGB8,
+    GColorMalachiteARGB8,
+    GColorMediumSpringGreenARGB8,
+    GColorCyanARGB8,
+    GColorVividCeruleanARGB8,
+    GColorBlueMoonARGB8,
+    GColorBlueARGB8,
+    GColorElectricUltramarineARGB8,
+    GColorVividVioletARGB8,
+    GColorMagentaARGB8,
+    GColorFashionMagentaARGB8,
+    GColorFollyARGB8
 };
 
 extern uint8_t sprites_vram_offset; // Need to grab the offset of the sprites tilesheet

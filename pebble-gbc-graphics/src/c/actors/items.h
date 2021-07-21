@@ -8,26 +8,26 @@
  * This class handles the items in the game
  */
 
-#define NUMBER_OF_ITEMS 6 // The number of items to render at once
-#define NUMBER_OF_BALLOONS 5 // On average, how many of the items should be balloons? The rest will be fuel 
+#define NUMBER_OF_ITEMS 6    // The number of items to render at once
+#define NUMBER_OF_BALLOONS 5 // On average, how many of the items should be balloons? The rest will be fuel
 
-#define ITEM_OAM_OFFSET 4 // The OAM offset for the sprites
-#define BALLOON_SPRITE 18 // The tilesheet offset for the balloon sprite
-#define PLUS_ONE_SPRITE 20 // The tilesheet offset for the +1 sprite
-#define FUEL_SPRITE 22 // The tilesheet offset for the fuel sprite
+#define ITEM_OAM_OFFSET 4   // The OAM offset for the sprites
+#define BALLOON_SPRITE 18   // The tilesheet offset for the balloon sprite
+#define PLUS_ONE_SPRITE 20  // The tilesheet offset for the +1 sprite
+#define FUEL_SPRITE 22      // The tilesheet offset for the fuel sprite
 #define PLUS_FUEL_SPRITE 24 // The tilesheet offset for the +F sprite
-#define BALLOON_PALETTE 1 // The sprite palette number for the balloon sprites
-#define FUEL_PALETTE 2 // The sprite palette number for the fuel sprites
+#define BALLOON_PALETTE 1   // The sprite palette number for the balloon sprites
+#define FUEL_PALETTE 2      // The sprite palette number for the fuel sprites
 
 /**
  * The different types of items
  */
 typedef enum {
-    IT_NONE,        // An empty item, no collision, invisible
-    IT_BALLOON,     // The balloon item, player collects for points, has collision
-    IT_PLUS_ONE,    // The +1 item, appears when balloon is collected, no collision
-    IT_FUEL,        // The fuel item, player collects to replenish fuel, has collision
-    IT_PLUS_FUEL,   // The +F item, appears when fuel is collected, no collision
+    IT_NONE,      // An empty item, no collision, invisible
+    IT_BALLOON,   // The balloon item, player collects for points, has collision
+    IT_PLUS_ONE,  // The +1 item, appears when balloon is collected, no collision
+    IT_FUEL,      // The fuel item, player collects to replenish fuel, has collision
+    IT_PLUS_FUEL, // The +F item, appears when fuel is collected, no collision
 } ItemTypes;
 
 /**
