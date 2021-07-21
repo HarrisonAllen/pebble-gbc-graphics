@@ -52,9 +52,7 @@ The process for creating tilesheets from an image has a few specific steps, I pe
 1. Create the spritesheet using the [2bpp palette](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/2bpp.gpl)
     * For the easiest setup, just modify [SampleTilesheet.xcf](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SampleTilesheet.xcf). The image should already be in an indexed color mode, and the palette should already exist as `Colormap of image #xx` in the Palettes window (`Windows`->`Dockable Dialogs`->`Palettes`).
     * Here is an example of what a tile will look like on a tilesheet (left), the palette that will be applied to the tile in-game (middle), and the resulting paletted tile that will be rendered in-game
-
-![Palette Example](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PaletteExample.png)
-
+    * ![Palette Example](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PaletteExample.png)
     * To convert a preexisting image to a 2bpp palette, you can change the image color mode by going to `image`->`mode`->`indexed`->`Use custom palette`->Select `2bpp` from the list. [This guide](https://daviesmediadesign.com/how-to-install-custom-palettes-in-gimp/) may or may not do the trick if you want to add the palette to your installation
     * I prefer to create my tilesheets in a ribbon, but they can be in any shape. Just keep in mind that the conversion script will scan your tilesheet from left to right, top to bottom, one tile at a time.
 2. Export the tilesheet as a `.png` file
