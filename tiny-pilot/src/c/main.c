@@ -1,5 +1,4 @@
 #include <pebble.h>
-#include "pebble-gbc-graphics/pebble-gbc-graphics.h"
 #include "game.h"
 
 static Window *s_window;
