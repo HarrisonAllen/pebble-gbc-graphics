@@ -74,21 +74,22 @@ static void hide_window_layer() {
  * Execute all of the graphics functions
  */
 static void window_load(Window *window) {
-  load_tilesheet();
-  create_palettes();
-  generate_background();
-  hide_window_layer();
+    // Create the GBC_Graphics object
+    s_gbc_graphics = GBC_Graphics_ctor(s_window, NUMBER_OF_VRAM_BANKS_TO_GENERATE);
+    
+    load_tilesheet();
+    create_palettes();
+    generate_background();
+    hide_window_layer();
 }
 
 static void window_unload(Window *window) {
-
+    // Destroy the GBC_Graphics object
+    GBC_Graphics_destroy(s_gbc_graphics);
 }
 
 static void init(void) {
     s_window = window_create();
-    
-    // Create the GBC_Graphics object
-    s_gbc_graphics = GBC_Graphics_ctor(s_window, NUMBER_OF_VRAM_BANKS_TO_GENERATE);
 
     window_set_window_handlers(s_window, (WindowHandlers) {
         .load = window_load,
@@ -99,9 +100,6 @@ static void init(void) {
 }
 
 static void deinit(void) {
-    // Destroy the GBC_Graphics object
-    GBC_Graphics_destroy(s_gbc_graphics);
-
     window_destroy(s_window);
 }
 
