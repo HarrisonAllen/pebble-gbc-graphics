@@ -2,7 +2,7 @@ GIMP Palette
 Name: 2bpp
 Columns: 0
 #
-  0   0   0	Untitled
- 85  85  85	Untitled
-170 170 170	Untitled
-255 255 255	Untitled
+  0   0   0	Black - 00
+ 85  85  85	Dark Gray - 01
+170 170 170	Light Gray - 10
+255 255 255	White - 11
