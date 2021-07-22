@@ -63,6 +63,11 @@ Some key differences between the Game Boy Color and this graphics engine:
 # The Tutorial
 Let's get started! This tutorial will take a look at code from both the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) and [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot).
 
+## Understanding Layers
+The Game Boy Color (and this library) use 3 layers for rendering. The background layer, the window layer, and the sprite layer.
+
+![Layers](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/Layers.png)
+
 ## Quick Start
 The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer.
 
@@ -87,7 +92,7 @@ The process for creating tilesheets from an image has a few specific steps, I pe
 4. Now, take the `.bin` file from `assets/helper-scripts/Output` and place it into your project resources
     * [SampleTilesheet.bin](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/helper-scripts/Output/SampleTilesheet.bin)
     * I like to place the tilesheets under `[project name]/resources/data`, but you can place it anywhere in the `resources` folder
-5. To load in the tilesheet, you can follow the process in the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c)
+5. To load in the tilesheet, [see below](https://github.com/HarrisonAllen/pebble-gbc-graphics#loading-tilesheets)
 
 As long as you create a binary file in a 2bpp format, where each tile is 16 bytes (2 bits per pixel * 8 pixels wide * 8 pixels tall), then you can come up with your own methods to do so.
 
@@ -110,9 +115,62 @@ These are the tilesheets I designed and generate for Tiny Pilot. All of these ca
     * ![Road Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/RoadTilesheet.png)
 * **Sprites Tilesheet**
     * Contains the tiles for the plane, balloon, +1, fuel, +F, and new high score sprites
+    * Tiny Pilot uses the 8x16 sprite mode, so each sprite uses 2 tiles
     * ![Sprites Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SpritesTilesheet.png)
 * **Text Tilesheet**
     * Contains the tiles for text
     * ![Text Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/TextTilesheet.png)
 
-##
+## Using The Library
+Here, I'm going to go through various functions, how they are implemented in Tiny Pilot and the Starter Project, and various tips or notes. All functions (except for `GBC_Graphics_ctor`) require you to pass in the `GBC_Graphics` object, so be sure to keep track of it!
+
+### Creating a GBC_Graphics Object
+* Function: [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L251)
+* To use, pass in the window you want to render the graphics into (generated from `window_create`, part of the standard app/watchface setup), and the number of VRAM banks you wish to use (each VRAM bank holds 256 tiles and takes up 4kB).
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L241) creates and keeps a reference to the GBC_Graphics object in a separate file
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L78) creates and keeps a reference to the GBC_Graphics object in a window_load function
+* Create the `GBC_Graphics` object *after* creating the app/watchface window, such as in a window_load function
+
+### Destroying a GBC_Graphics Object
+* Function: [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L258)
+* *Always* call the destroy function when the app is closed, such as in a window_unload function. Otherwise you've got kilobytes of leftover allocated RAM.
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L462) destroys the object in a different file
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L88) destroys the object in a window_unload function
+
+### Changing the Boundaries of the Screen/Viewport
+* Function: [`GBC_Graphics_set_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L267)
+* I have defined some useful screen boundaries for your convenience [here](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L96), but you can define your own boundaries.
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L243) uses different boundaries for Round vs Rectangular Pebbles in order to keep the score bar visible. It also makes the [window background color](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/main.c#L7) the same as the sky color to give the illusion of fullscreen.
+
+### Loading Tilesheets
+* Function: [`GBC_Graphics_load_from_tilesheet_into_vram`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L372)
+* The examples below provide a way to load entire tilesheets. However, you can load portions of tilesheets (e.g. 4 tiles for a sprite from a larger sprite tilesheet) by adjusting the `tilesheet_tile_offset` and `tiles_to_load`.
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/util.c#L126) demonstrates loading multiple tileshets at once, and keeps track of their offsets in order to access specific tilesheets later.
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L14) loads the Sample Tilesheet that we created earlier.
+
+### Editing Tilemaps and Attrmaps
+* Tilemaps define a 32x32 layer of tiles, 
+
+### Setting Background and Window Tiles
+* Function [`GBC_Graphics_bg_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L801)
+* You can also set the Window layer tiles with [`GBC_Graphics_window_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L969)
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/graphics/text.c#L70) uses this sometimes, but mostly uses `GBC_Graphics_bg_set_tile_and_attrs`
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L60) demonstrates a basic setting of tiles based on x position.
+
+### Creating Attributes
+* Function [`GBC_Graphics_attr_make`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L680)
+* This is a convenience function to create an attribute byte. 
+* Attribute bytes define the following characteristics of a tile:
+    * The palette the tile should use
+    * The VRAM bank the tile is in
+    * If the tile should be flipped horizontally or vertically
+    * Whether or not the background/window tile has rendering priority over the sprite layer
+* Attribute bytes for each layer are defined in these locations: [background attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175), [window attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L187), and [sprite attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L154).
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/actors/player.c#L106) does this quite often, and this example shows the creation of the attributes for the plane sprites.
+
+### Setting Background and Window Attributes
+* Function [`GBC_Graphics_bg_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L811)
+* You can also set the Window layer attributes with [`GBC_Graphics_window_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L979)
+* In general, I [create an attribute](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets) using the convenience function and pass the result into `set_attrs`.
+* You can also set each attribute individually. For example, the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L61) directly sets the tile palettes based on y position.
+* You can set both tiles and attributes simultaneously, using [`GBC_Graphics_bg_set_tile_and_attrs`]()
