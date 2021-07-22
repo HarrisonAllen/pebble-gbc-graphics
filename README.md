@@ -83,9 +83,27 @@ The Game Boy Color (and this library) use 3 layers for rendering. The background
 
 ![Background Layer](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/BackgroundExplained.png)
 
-The background consists of a 32 tile by 32 tile tilemap. The background itself doesn't move, but rather a viewport above the tilemap is moved instead. By default, this viewport is the size of the watch you are using. However, it can be adjusted to any size and position you want to use.
+The background layer consists of a 32 tile by 32 tile tilemap. The background layer itself doesn't move, but rather a viewport above the tilemap is moved instead via a scroll x and a scroll y. By default, this viewport is the size of the watch you are using. It can be adjusted to any size and position you want to use.
 
-You may notice that the scorebar isn't included in the viewport. We'll get into how the viewport is moved while the screen is rendering later.
+You may notice that the scorebar isn't included in the viewport. We'll get into how the viewport can be moved mid-frame later.
+
+### The Window Layer
+
+![Window Layer](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/WindowExplained.png)
+
+The window layer also consists of a 32 tile by 32 tile tilemap. The entire window layer moves relative to the viewport, via window offset x and window offset y. The window layer is rendered on top of the background layer, and has no transparency.
+
+### The Sprite Layer
+
+![Sprite Layer](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/SpritesExplained.png)
+
+The sprite layer is really a rendering space for the sprites. Sprites are stored in the OAM, and hold information for their x position, y position, and then tile and attribute data.
+
+A sprite can either consist of one tile (8px by 8px), or have two tiles instead (8px by 16px) such as in Tiny Pilot.
+
+The sprite layer actually starts off-screen, with the x position being 8 pixels left of the origin, and the y position being 16 pixels above the origin.
+
+The balloons take up one sprite, while the plane actually uses four sprites to render.
 
 ## Quick Start
 The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer.
