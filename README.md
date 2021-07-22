@@ -63,10 +63,29 @@ Some key differences between the Game Boy Color and this graphics engine:
 # The Tutorial
 Let's get started! This tutorial will take a look at code from both the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) and [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot).
 
+## Understanding Tiles
+The Game Boy Color uses tiles to render its graphics. A tile is an 8 pixel by 8 pixel image that can have 4 colors. These colors are defined in a palette.
+
+The tile itself is stored in a format known as 2 bits per pixel, or 2bpp. A pixel corresponding to 00 will take the first color in a palette, a pixel corresponding to 01 will take the second color in a palette, etc. If we map those pixels to various shades of gray (00 = black, 01 = dark gray, 10 = light gray, 11 = white), then we can come up with a visual representation of the tile.
+
+Let's take an example of a small tree, and see what it would look like before and after we apply a palette.
+
+![Layers](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/PalettesExplained.png)
+
+Put together, [we can create tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets) to store multiple tiles in memory, and load them when necessary.
+
 ## Understanding Layers
 The Game Boy Color (and this library) use 3 layers for rendering. The background layer, the window layer, and the sprite layer.
 
 ![Layers](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/Layers.png)
+
+### The Background Layer
+
+![Background Layer](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/BackgroundExplained.png)
+
+The background consists of a 32 tile by 32 tile tilemap. The background itself doesn't move, but rather a viewport above the tilemap is moved instead. By default, this viewport is the size of the watch you are using. However, it can be adjusted to any size and position you want to use.
+
+You may notice that the scorebar isn't included in the viewport. We'll get into how the viewport is moved while the screen is rendering later.
 
 ## Quick Start
 The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer.
@@ -75,8 +94,6 @@ The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/
 The process for creating tilesheets from an image has a few specific steps, I personally use [GIMP](https://www.gimp.org/):
 1. Create the spritesheet using the [2bpp palette](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/2bpp.gpl)
     * For the easiest setup, just modify [SampleTilesheet.xcf](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SampleTilesheet.xcf). The image should already be in an indexed color mode, and the palette should already exist as `Colormap of image #xx` in the Palettes window (`Windows`->`Dockable Dialogs`->`Palettes`).
-    * Here is an example of what a tile will look like on a tilesheet (left), the palette that will be applied to the tile in-game (middle), and the resulting paletted tile that will be rendered in-game
-        * ![Palette Example](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PaletteExample.png)
     * To convert a preexisting image to a 2bpp palette, you can change the image color mode by going to `image`->`mode`->`indexed`->`Use custom palette`->Select `2bpp` from the list. [This guide](https://daviesmediadesign.com/how-to-install-custom-palettes-in-gimp/) may or may not do the trick if you want to add the palette to your installation
     * I prefer to create my tilesheets in a ribbon, but they can be in any shape. Just keep in mind that the conversion script will scan your tilesheet from left to right, top to bottom, one tile at a time.
 2. Export the tilesheet as a `.png` file
