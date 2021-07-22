@@ -82,7 +82,7 @@ As long as you create a binary file in a 2bpp format, where each tile is 16 byte
 These are the tilesheets I designed and generate for Tiny Pilot. All of these can be found [here](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/assets/tilesheets), if you wish to edit or duplicate them.
 * **Base Tilesheet** 
     * Contains the basic one-color tiles, as well as the frames for the window layer
-    * ![Base Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/BaseTilesheet.png){:height="200%" width="200%"}
+    * ![Base Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/BaseTilesheet.png?s=200)
 * **Cloud Tilesheet**
     * Contains all of the cloud tiles
     * There is a [data structure](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/054ceeb92cf16f522b330313959ff4b0bf47bf3f/tiny-pilot/src/c/graphics/clouds.c#L9) that keeps track of the dimensions and position on the tilesheet of each cloud.
