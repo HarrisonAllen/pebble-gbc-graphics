@@ -5,7 +5,8 @@ Current version of pebble-gbc-graphics: **v1.2.0**
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://discord.com/invite/aRUAYFN) and we'll help you get set up.
 
-(insert table of contents here)
+# Table of Contents
+
 
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles, but Aplite (Pebble Classic and Pebble Steel) has a much smaller RAM than the others, meaning you can only really use 1 VRAM bank with it.
@@ -46,7 +47,13 @@ Other notes:
 * For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115)
 * You can create separate tilesheets for color and black and white Pebbled, just use the `tilesheet~color.bin` and `tilesheet~bw.bin` file naming scheme.
 
-# Creating Tilesheets
+# The Tutorial
+Let's get started! This tutorial will take a look at code from both the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) and [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot).
+
+## Quick Start
+The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer.
+
+## Creating Tilesheets
 The process for creating tilesheets from an image has a few specific steps, I personally use [GIMP](https://www.gimp.org/):
 1. Create the spritesheet using the [2bpp palette](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/2bpp.gpl)
     * For the easiest setup, just modify [SampleTilesheet.xcf](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SampleTilesheet.xcf). The image should already be in an indexed color mode, and the palette should already exist as `Colormap of image #xx` in the Palettes window (`Windows`->`Dockable Dialogs`->`Palettes`).
@@ -68,3 +75,29 @@ The process for creating tilesheets from an image has a few specific steps, I pe
     * [SampleTilesheet.bin](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/helper-scripts/Output/SampleTilesheet.bin)
     * I like to place the tilesheets under `[project name]/resources/data`, but you can place it anywhere in the `resources` folder
 5. To load in the tilesheet, you can follow the process in the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c)
+
+As long as you create a binary file in a 2bpp format, where each tile is 16 bytes (2 bits per pixel * 8 pixels wide * 8 pixels tall), then you can come up with your own methods to do so.
+
+### Tiny Pilot Tilesheets
+These are the tilesheets I designed and generate for Tiny Pilot. All of these can be found [here](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/assets/tilesheets), if you wish to edit or duplicate them.
+* **Base Tilesheet** 
+    * Contains the basic one-color tiles, as well as the frames for the window layer
+    * ![Base Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/BaseTilesheet.png)
+* **Cloud Tilesheet**
+    * Contains all of the cloud tiles
+    * There is a [data structure](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/054ceeb92cf16f522b330313959ff4b0bf47bf3f/tiny-pilot/src/c/graphics/clouds.c#L9) that keeps track of the dimensions and position on the tilesheet of each cloud.
+    * There are actually two tilesheets, `CloudTilesheet~color.png` and `CloudTilesheet~bw.png`. The black and white tilesheet features a border around the clouds since there is no contrast between the white of the clouds and the white of the background layer.
+    * Color: ![Cloud Tilesheet - Color](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/CloudTilesheet~color.png)
+    * Black and white: ![Cloud Tilesheet - bw](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/CloudTilesheet~bw.png)
+* **Fuel Bar Tilesheet**
+    * Contains the tiles for the fuel bar at the top of the score bar
+    * ![Fuel Bar Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/FuelBarTilesheet.png)
+* **Road Tilesheet**
+    * Contains the tiles for the road, trees, and cars at the bottom
+    * ![Road Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/RoadTilesheet.png)
+* **Sprites Tilesheet**
+    * Contains the tiles for the plane, balloon, +1, fuel, +F, and new high score sprites
+    * ![Sprites Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SpritesTilesheet.png)
+* **Text Tilesheet**
+    * Contains the tiles for text
+    * ![Text Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/TextTilesheet.png)
