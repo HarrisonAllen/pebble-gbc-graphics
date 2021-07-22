@@ -8,11 +8,11 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 (insert table of contents here)
 
 # Introduction
-This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. It is compatible with all Pebbles, but Aplite (Pebble Classic and Pebble Steel) has a much smaller RAM than the others, meaning you can only really use 1 VRAM bank with it.
+This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles, but Aplite (Pebble Classic and Pebble Steel) has a much smaller RAM than the others, meaning you can only really use 1 VRAM bank with it.
 
 In this repo:
 * [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) - App - pebble-gbc-graphics v1.2.0
-    * A barebones implementation of the grpahics library, you can use this as a template!
+    * A barebones implementation of the graphics library, you can use this as a template!
     * ![Starter Project](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProject.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProject-bw.png)
 * [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot) - App - pebble-gbc-graphics v1.2.0
     * A well-documented, full game that demonstrate most of the features in the library
@@ -21,10 +21,11 @@ In this repo:
 Some other projects using this library:
 * [Pebblemon](https://github.com/HarrisonAllen/pebble-gbc-graphics-demo/tree/master/pebblemon) - App - pebble-gbc-graphics v1.0.0
     * ![Pebblemon](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon.png) ![Pebblemon - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon-bw.png)
+    * A mini Pokemon adventure that does some very complex things with the engine, but isn't as easy to understand or reverse engineer.
+    * The codebase is too large to fit on the Aplite platform, there isn't enough ram available.
 * [Pebblemon Time](https://github.com/HarrisonAllen/pebblemon-watchface) - Watchface - pebble-gbc-graphics v1.1.0
     * ![Pebblemon Time](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime.png) ![Pebblemon Time - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime-bw.png)
-
-The complexities of rendering are abstracted away for the user. For example, the viewport over the background can be moved simply by using the function [`GBC_Graphics_bg_move`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L766).
+    * A stripped down version of Pebblemon that demonstrates a less-frequent draw cycle, as well as combining standard Pebble graphics with the engine.
 
 If you are unfamiliar with how graphics worked on the Game Boy Color, I recommend you check out the following links:
 * [How Graphics worked on the Nintendo Game Boy Color | MVG](https://youtu.be/ZEJVOH6Pxkg?t=201) (started from 3:21)
@@ -39,10 +40,11 @@ Some key differences between the Game Boy Color and this graphics engine:
 * STAT byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L225)
 * Attribute bytes have a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L186)
 * Dimensions of the viewport (screen) can be set and changed at runtime [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L267)
-* The 10-sprites-per-line limitation has been removed
+* The 10-sprites-per-line limitation on the GBC has been removed
 
 Other notes:
 * For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115)
+* You can create separate tilesheets for color and black and white Pebbled, just use the `tilesheet~color.bin` and `tilesheet~bw.bin` file naming scheme.
 
 # Creating Tilesheets
 The process for creating tilesheets from an image has a few specific steps, I personally use [GIMP](https://www.gimp.org/):
