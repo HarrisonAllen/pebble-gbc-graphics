@@ -7,6 +7,17 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 
 # Table of Contents
 
+### [Introduction](https://github.com/HarrisonAllen/pebble-gbc-graphics#introduction)
+* [In This Repo](https://github.com/HarrisonAllen/pebble-gbc-graphics#in-this-repo)
+* [Other Projects](https://github.com/HarrisonAllen/pebble-gbc-graphics#other-projects)
+* [Background Information](https://github.com/HarrisonAllen/pebble-gbc-graphics#background-information)
+* [Key Differences](https://github.com/HarrisonAllen/pebble-gbc-graphics#key-differences)
+* [Other Notes](https://github.com/HarrisonAllen/pebble-gbc-graphics#other-notes)
+
+### [The Tutorial](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-tutorial)
+* [Quick Start](https://github.com/HarrisonAllen/pebble-gbc-graphics#quick-start)
+* [Creating Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets)
+    * [Tiny Pilot Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#tiny-pilot-tilesheets)
 
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles, but Aplite (Pebble Classic and Pebble Steel) has a much smaller RAM than the others, meaning you can only really use 1 VRAM bank with it.
