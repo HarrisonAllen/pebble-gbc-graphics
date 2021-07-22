@@ -23,7 +23,13 @@
       "dummy"
     ],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "raw",
+          "name": "DATA_SAMPLE_TILESHEET",
+          "file": "data/SampleTilesheet.bin"
+        }
+      ]
     }
   }
 }
