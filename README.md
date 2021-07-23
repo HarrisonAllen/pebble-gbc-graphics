@@ -70,9 +70,31 @@ The tile itself is stored in a format known as 2 bits per pixel, or 2bpp. A pixe
 
 Let's take an example of a small tree, and see what it would look like before and after we apply a palette.
 
-![Layers](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/PalettesExplained.png)
+![Palettes](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/PalettesExplained.png)
 
 Put together, [we can create tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets) to store multiple tiles in memory, and load them when necessary.
+
+## Understanding VRAM
+VRAM is where the tiles are stored in RAM. Since we don't have to fetch the tiles from storage, this allows quick access for a variety of operations.
+
+Accessing a tile in a VRAM bank is as simple as setting the index to where the tile is sitting in VRAM. Since you will be creating or generating the tilesheets, then loading them into the VRAM buffer, you should know what these indexes are.
+
+For the background and window layers, tiles are placed on a 32 by 32 tile tilemap. For the sprite layer, each sprite contains an index to its corresponding tile(s).
+
+## Understanding Attributes
+While the VRAM contains the tiles, it doesn't store info regarding their color palette, orientation, or anything like that. Furthermore, how does the tile know which VRAM bank it belongs to? That's where tile attributes come into play.
+
+The attributes a tile has are as follows:
+* **Palette Number** (0-7): The palette to apply to this tile.
+* **VRAM Bank** (0-3): The VRAM bank to load the tile from. (While this can go up to 3, this is limited by the number of VRAM banks allocated by the user.)
+* **X Flip**: Will flip the tile horizontally, across the Y-axis.
+* **Y Flip**: Will flip the tile vertically, across the X-axis.
+* **Background Priority**: Whether or not the background or window tile has rendering priority over the sprite layer.
+    * If the priority bit is set on a background or window tile, then any pixel in that tile that is not 00 will render above the sprite layer.
+    * If the priority bit is set on a sprite tile, then any pixel on the background or window layrs below the sprite tile that is not 00 will render above the sprite tile.
+    * ![Priority](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/BackgroundPriority.png)
+    
+For the background and window layers, tiles are placed on a 32 by 32 tile attribute map (or attrmap). For the sprite layer, each sprite contains its own attributes.
 
 ## Understanding Layers
 The Game Boy Color (and this library) use 3 layers for rendering. The background layer, the window layer, and the sprite layer.
@@ -104,6 +126,8 @@ A sprite can either consist of one tile (8px by 8px), or have two tiles instead 
 The sprite layer actually starts off-screen, with the x position being 8 pixels left of the origin, and the y position being 16 pixels above the origin.
 
 The balloons take up one sprite, while the plane actually uses four sprites to render.
+
+The sprite layer has transparency! This means that any pixels that use the 1st palette color (00) will be rendered as transparency, no matter what the palette color is.
 
 ## Quick Start
 The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer.
