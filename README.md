@@ -109,7 +109,7 @@ The Game Boy Color (and this library) use 3 layers for rendering. The background
 
 The background layer consists of a 32 tile by 32 tile tilemap. The background layer itself doesn't move, but rather a viewport above the tilemap is moved via a scroll x and a scroll y. By default, this viewport is the size of the watch you are using. It can be adjusted to any size and position you want to use.
 
-You may notice that the scorebar isn't included in the viewport. We'll get into how the viewport can be moved mid-frame later.
+You may notice that the score bar isn't included in the viewport. We'll get into how the viewport can be moved mid-frame later.
 
 ### The Window Layer
 
@@ -226,6 +226,41 @@ Related functions:
 * [`GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L527-L533) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/de3617e08dc0c94c1e46aaf978ad7a821b717a09/tiny-pilot/src/c/game.c#L261-L266))
 
 ## STAT (callbacks)
+The [STAT byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L214-L225) handles information related to the draw cycle.
+4 parameters are read-only flags:
+* HBlank flag (set after each line is drawn)
+* VBlank flag (set after all lines are rendered)
+* Line Compare flag (set when the line being drawn is equal to the line set for the line compare)
+* OAM flag (set after all sprites are drawn)
+
+4 parameters are set by the user:
+* HBlank Interrupt Enabled
+* VBlank Interrupt Enabled
+* Line Compare Interrupt Enabled
+* OAM Interrupt Enabled
+
+An incredibly useful feature is being able to set callbacks. For example, the line compare interrupt can allow you to do things like change palettes mid-frame, change the background scroll, etc. Tiny Pilot [has a great example](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L41-L117) of using the line interrupt to do a couple things:
+* The first is rendering the score bar. If you recall from the [Background Layer section](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-background-layer), the score bar isn't within the viewport. To account for this, a line interrupt is set for line 0. On this line, we set the background scroll to (0, 0), or right on top of the score bar. Another line interrupt is then set for line 8, which is at the end of the score bar. Once this next line interrupt fires, then the score bar has been rendered, so we return to the original scroll position.
+* The second is creating a parallax effect, where we create a 2.5D effect by moving foreground layers faster than the background. Line interrupts are set at the top of the trees behind the road, on the top line of the road, and on the top line of the trees below the road. At each one of these line interrupts, I increase the scroll position (i.e. increasing the speed), which makes it seem as though each part is moving faster.
+* These are just two examples of what you can do with interrupts!
+
+Related functions:
+* [`GBC_Graphics_stat_set`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L589-L595)
+* [`GBC_Graphics_stat_set_hblank_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L597-L603)
+* [`GBC_Graphics_stat_set_vblank_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L605-L611)
+* [`GBC_Graphics_stat_set_line_compare_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L613-L619) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L128))
+* [`GBC_Graphics_stat_set_oam_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L621-L627)
+* [`GBC_Graphics_stat_set_line_y_compare`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L629-L635) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L127))
+* [`GBC_Graphics_set_hblank_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L637-L643)
+* [`GBC_Graphics_set_vblank_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L645-L651)
+* [`GBC_Graphics_set_line_compare_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L653-L659) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L126))
+* [`GBC_Graphics_set_oam_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L661-L667)
+* [`GBC_Graphics_stat_get_current_line`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L535-L542)
+* [`GBC_Graphics_stat_get_line_y_compare`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L544-L551) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L68))
+* [`GBC_Graphics_stat_check_hblank_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L553-L560)
+* [`GBC_Graphics_stat_check_vblank_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L562-L569)
+* [`GBC_Graphics_stat_check_line_comp_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L571-L578)
+* [`GBC_Graphics_stat_check_oam_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L580-L587)
 
 ## Background Layer
 
