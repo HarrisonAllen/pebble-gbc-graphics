@@ -7,7 +7,7 @@
  * on the Pebble smartwatch
  * @file pebble-gbc-graphics.h
  * @author Harrison Allen
- * @version 1.1 7/20/2021
+ * @version 1.2.0 7/20/2021
  * 
  * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
