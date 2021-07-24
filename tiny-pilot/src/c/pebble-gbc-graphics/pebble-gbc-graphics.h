@@ -149,8 +149,8 @@ struct _gbc_graphics {
      *  -Byte 1: Sprite y position, offset by -16 (sprite height) to allow for off-screen rendering
      *      When y == 0 or y >= screen_height, the sprite will be hidden
      *  -Byte 2: Sprite tile position in VRAM bank
-     *      Note: When the Sprite Size bit of LCDC is set, Bit 0 will be ignored, and the two tiles 
-     *            at the memory location will be used to render the 8x16 sprite
+     *      Note: When the Sprite Size bit of LCDC is set, the tile at the memory location will be 
+     *            on top, and the tile at memory location + 1 will be on the bottom
      *  -Byte 3: Sprite attribute data:
      *      -Bits 0-2: Palette number, from 0 to 7
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
