@@ -20,7 +20,7 @@ Want to create an app or watchface for the Pebble, but don't know where to start
     * [Tiny Pilot Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#tiny-pilot-tilesheets)
 
 # Introduction
-This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles, but Aplite (Pebble Classic and Pebble Steel) has a much smaller RAM than the others, meaning you can only really use 1 VRAM bank with it.
+This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles.
 
 ## In This Repo
 * [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) - App - pebble-gbc-graphics v1.2.0
@@ -50,18 +50,18 @@ If you are unfamiliar with how graphics worked on the Game Boy Color, I recommen
 Some key differences between the Game Boy Color and this graphics engine:
 * This engine contains up to 4 VRAM banks with 256 tiles each [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L143)
     * The VRAM itself works mostly the same, it just has a different structure
-* LCDC byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L136)
-* STAT byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L225)
-* Attribute bytes have a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L186)
-* Dimensions of the viewport (screen) can be set and changed at runtime [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L267)
+* LCDC byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L124-L136)
+* STAT byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L214-L225)
+* Attribute bytes have a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175-L186)
+* Dimensions of the viewport (screen) can be set and changed at runtime [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L346)
 * The 10-sprites-per-line limitation on the GBC has been removed
 
 ## Other Notes
 * For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115)
 * You can create separate tilesheets for color and black and white Pebbles, just use the `tilesheet~color.bin` and `tilesheet~bw.bin` file naming scheme.
 
-# The Tutorial
-Let's get started! This tutorial will take a look at code from both the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) and [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot).
+# Understanding the Engine
+Let's get started! First, I'll go over some basics about the engine.
 
 ## Understanding Tiles
 The Game Boy Color uses tiles to render its graphics. A tile is an 8 pixel by 8 pixel image that can have 4 colors. These colors are defined in a palette.
@@ -79,7 +79,9 @@ VRAM is where the tiles are stored in RAM. Since we don't have to fetch the tile
 
 Accessing a tile in a VRAM bank is as simple as setting the index to where the tile is sitting in VRAM. Since you will be creating or generating the tilesheets, then loading them into the VRAM buffer, you should know what these indexes are.
 
-For the background and window layers, tiles are placed on a 32 by 32 tile tilemap. For the sprite layer, each sprite contains an index to its corresponding tile(s).
+For the background and window layers, tiles are placed on a 32 by 32 tile tilemap. For the sprite layer, each sprite contains an index into the VRAM for its corresponding tile(s).
+
+Each bank in the VRAM contains 256 tile slots, and each tile takes up 16 bytes. This means that one VRAM bank takes up 4kb of RAM. 
 
 ## Understanding Attributes
 While the VRAM contains the tiles, it doesn't store info regarding their color palette, orientation, or anything like that. Furthermore, how does the tile know which VRAM bank it belongs to? That's where tile attributes come into play.
@@ -94,7 +96,7 @@ The attributes a tile has are as follows:
     * If the priority bit is set on a sprite tile, then any pixel on the background or window layrs below the sprite tile that is not 00 will render above the sprite tile.
     * ![Priority](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/BackgroundPriority.png)
     
-For the background and window layers, tiles are placed on a 32 by 32 tile attribute map (or attrmap). For the sprite layer, each sprite contains its own attributes.
+For the background and window layers, tiles are placed on a 32 by 32 tile attribute map (or attrmap). The attrmap corresponds directly to the tilemap. So a tile at position (2,4) on the tilemap has its corresponding attribute at (2,4) on the attrmap. For the sprite layer, each sprite contains its own attributes.
 
 ## Understanding Layers
 The Game Boy Color (and this library) use 3 layers for rendering. The background layer, the window layer, and the sprite layer.
@@ -105,7 +107,7 @@ The Game Boy Color (and this library) use 3 layers for rendering. The background
 
 ![Background Layer](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/BackgroundExplained.png)
 
-The background layer consists of a 32 tile by 32 tile tilemap. The background layer itself doesn't move, but rather a viewport above the tilemap is moved instead via a scroll x and a scroll y. By default, this viewport is the size of the watch you are using. It can be adjusted to any size and position you want to use.
+The background layer consists of a 32 tile by 32 tile tilemap. The background layer itself doesn't move, but rather a viewport above the tilemap is moved via a scroll x and a scroll y. By default, this viewport is the size of the watch you are using. It can be adjusted to any size and position you want to use.
 
 You may notice that the scorebar isn't included in the viewport. We'll get into how the viewport can be moved mid-frame later.
 
@@ -119,18 +121,81 @@ The window layer also consists of a 32 tile by 32 tile tilemap. The entire windo
 
 ![Sprite Layer](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/SpritesExplained.png)
 
-The sprite layer is really a rendering space for the sprites. Sprites are stored in the OAM, and hold information for their x position, y position, and then tile and attribute data.
+The sprite layer is really a rendering space for the sprites. Sprites data is stored in the OAM.
 
-A sprite can either consist of one tile (8px by 8px), or have two tiles instead (8px by 16px) such as in Tiny Pilot.
+The sprite layer has transparency! This means that any pixels that use the 1st palette color (00) will be rendered as transparency, no matter what the palette color actually is.
 
 The sprite layer actually starts off-screen, with the x position being 8 pixels left of the origin, and the y position being 16 pixels above the origin.
 
-The balloons take up one sprite, while the plane actually uses four sprites to render.
+## Understanding OAM
+The OAM stores data for the sprites. The OAM can store up to 40 sprites.
 
-The sprite layer has transparency! This means that any pixels that use the 1st palette color (00) will be rendered as transparency, no matter what the palette color is.
+Each sprite in the OAM stores the following data:
+* The sprite's x location on-screen
+* The sprite's y location on-screen
+* The sprite's tile offset in the VRAM
+* The sprite's attributes
+
+A sprite can either consist of one tile (8px by 8px), or have two tiles (8px by 16px) such as in Tiny Pilot. If in the 8x16 mode, the sprite will take the tile at the tile offset for the top, and the tile at the next offset (+1) for the bottom.
+
+When two sprites overlap, the sprite with the lower index in OAM will be rendered on top. For example, sprite 0 will render on top of sprite 7.
+
+# The Tutorial
+Now, let's get more technical. I'm going to go through various things that you may want to do, and provide examples shown in the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) and [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot).
 
 ## Quick Start
 The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer.
+
+## Using a GBC_Graphics Object
+The first thing you'll want to do is create a [`GBC_Graphics`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L121-L237) object using [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251).
+* The first argument is the `Window` that the app/watchface is using, and the second is the number of VRAM banks you want to use. For Aplite, I recommend only using one VRAM bank due to the limited RAM available.
+* Create the `GBC_Graphics` object *after* creating the app/watchface window, such as in a window_load function
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L78) creates and keeps a reference to the `GBC_Graphics` object in a window_load function
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L241) creates and keeps a reference to the `GBC_Graphics` object in a separate file
+* Example usage: `GBC_Graphics *gbc_graphics = GBC_Graphics_ctor(window, 1);`
+
+Once you're done with the `GBC_Graphics` object, call [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258)
+* *Always* call the destroy function when the app is closed, such as in a window_unload function. Otherwise you've got kilobytes of leftover allocated RAM.
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L88) destroys the object in a window_unload function
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L462) destroys the object in a different file
+* Example usage: `GBC_Graphics_destroy(gbc_graphics);`
+
+As in `GBC_Graphics_destroy`, calling the functions in the library will require passing the generated `GBC_Graphics` object as the the first argument, unless otherwise noted.
+
+
+## Adjusting the Viewport
+The viewport (or screen) is the space in which the GBC Graphics will be displayed on the Pebble's screen. By default, the viewport is set to fit the dimensions of the entire Pebble. You can use [`GBC_Graphics_set_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L267) and pass in a `GRect` with the boundaries you want the screen to have.
+For your convenience, I have [defined some useful screen boundaries](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L96-L113). One example is `GBC_SCREEN_BOUNDS_SQUARE`, which creates a 144px by 144px (or 18 tile by 18 tile) square in the center of the Pebble's screen. This allows for a consistent viewing experience across all Pebbles.
+
+Related functions:
+* [`GBC_Graphics_set_screen_origin_x](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L269-L275)
+* [`GBC_Graphics_set_screen_origin_y](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L277-L283)
+* [`GBC_Graphics_set_screen_width](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L285-L292)
+* [`GBC_Graphics_set_screen_height](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L294-L301)
+* [`GBC_Graphics_get_screen_bounds](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L303-L310)
+* [`GBC_Graphics_set_screen_x_origin](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L312-L319)
+* [`GBC_Graphics_set_screen_y_origin](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L321-L328)
+* [`GBC_Graphics_set_screen_width](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L330-L337)
+* [`GBC_Graphics_set_screen_height](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L339-L346)
+(talk about setting the screen bounds, the predefined boundaries, etc)
+(link is to the block of code)
+
+## Manipulating the VRAM
+(loading tilesheets, moving tiles, direct access)
+
+## Palettes
+
+## LCDC (enables, sprite mode)
+
+## STAT (callbacks)
+
+## Background Layer
+
+## Window Layer
+
+## OAM
+
+## Misc
 
 ## Creating Tilesheets
 The process for creating tilesheets from an image has a few specific steps, I personally use [GIMP](https://www.gimp.org/):
@@ -154,6 +219,8 @@ The process for creating tilesheets from an image has a few specific steps, I pe
 5. To load in the tilesheet, [see below](https://github.com/HarrisonAllen/pebble-gbc-graphics#loading-tilesheets)
 
 As long as you create a binary file in a 2bpp format, where each tile is 16 bytes (2 bits per pixel * 8 pixels wide * 8 pixels tall), then you can come up with your own methods to do so.
+
+You can create different tilesheets for different platforms. Check out [this link on the Pebble developer docs](https://developer.rebble.io/developer.pebble.com/guides/app-resources/platform-specific/index.html) for more information.
 
 ### Tiny Pilot Tilesheets
 These are the tilesheets I designed and generate for Tiny Pilot. All of these can be found [here](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/assets/tilesheets), if you wish to edit or duplicate them.
