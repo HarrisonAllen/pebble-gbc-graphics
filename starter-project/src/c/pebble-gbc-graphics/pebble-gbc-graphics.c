@@ -538,7 +538,7 @@ void GBC_Graphics_lcdc_set_enabled(GBC_Graphics *self, bool enabled) {
     modify_byte(&self->lcdc, GBC_LCDC_ENABLE_FLAG, enabled, GBC_LCDC_ENABLE_FLAG);
 }
 
-void GBC_Graphics_lcdc_set_graphics_layer_enabled(GBC_Graphics *self, bool enabled) {
+void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, bool enabled) {
     modify_byte(&self->lcdc, GBC_LCDC_BCKGND_ENABLE_FLAG, enabled, GBC_LCDC_BCKGND_ENABLE_FLAG);
 }
 
