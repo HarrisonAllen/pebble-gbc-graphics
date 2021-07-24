@@ -100,7 +100,7 @@ void draw_clouds(GBC_Graphics *graphics, uint8_t cloud_vram_start) {
     load_cloud_palette(graphics, CLOUD_PALETTE);
 
     // Fill the background with the sky
-    uint8_t sky_attrs = GBC_Graphics_attr_make(0, 0, false, false, false);
+    uint8_t sky_attrs = GBC_Graphics_attr_make(CLOUD_PALETTE, 0, false, false, false);
     for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
         for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
             GBC_Graphics_bg_set_tile_and_attrs(graphics, x, y, CLOUD_SKY_TILE, sky_attrs);
@@ -126,7 +126,7 @@ void draw_clouds(GBC_Graphics *graphics, uint8_t cloud_vram_start) {
 
             // Make some of the clouds foreground objects for an extra layer of depth
             bool should_cloud_be_foreground = rand()%2 == 0;
-            uint8_t cloud_attrs = GBC_Graphics_attr_make(0, 0, false, false, should_cloud_be_foreground);
+            uint8_t cloud_attrs = GBC_Graphics_attr_make(CLOUD_PALETTE, 0, false, false, should_cloud_be_foreground);
 
             // And now draw the cloud
             uint8_t x_pos = (x) * s_cloud_box_dims[0] + x_offset;
