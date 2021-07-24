@@ -209,7 +209,21 @@ Related functions:
 * [`GBC_Graphics_copy_all_sprite_palettes`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L472-L478)
 
 
-## LCDC (enables, sprite mode)
+## LCDC
+The [LCDC byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L124-L136) contains data regarding rendering. The data it contains is:
+* Should rendering be enabled?
+* Should the background layer be enabled?
+* Should the window layer be enabled?
+* Should sprites be enabled?
+* Should the sprite mode be 8x8 or 8x16?
+
+Related functions:
+* [`GBC_Graphics_lcdc_set`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L487-L493)
+* [`GBC_Graphics_lcdc_set_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
+* [`GBC_Graphics_lcdc_set_bg_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
+* [`GBC_Graphics_lcdc_set_window_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L511-L517)
+* [`GBC_Graphics_lcdc_set_sprite_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L519-L525)
+* [`GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L527-L533) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/de3617e08dc0c94c1e46aaf978ad7a821b717a09/tiny-pilot/src/c/game.c#L261-L266))
 
 ## STAT (callbacks)
 
