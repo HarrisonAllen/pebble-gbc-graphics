@@ -76,11 +76,14 @@ static void hide_window_layer() {
 static void window_load(Window *window) {
     // Create the GBC_Graphics object
     s_gbc_graphics = GBC_Graphics_ctor(s_window, NUMBER_OF_VRAM_BANKS_TO_GENERATE);
-    
+
     load_tilesheet();
     create_palettes();
     generate_background();
     hide_window_layer();
+
+    // Display the graphics
+    GBC_Graphics_render(s_gbc_graphics);
 }
 
 static void window_unload(Window *window) {
