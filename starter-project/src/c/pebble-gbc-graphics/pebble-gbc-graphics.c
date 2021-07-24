@@ -638,6 +638,10 @@ bool GBC_Graphics_attr_is_y_flipped(uint8_t attributes) {
     return (bool)(attributes & GBC_ATTR_FLIP_FLAG_Y);
 }
 
+bool GBC_Graphics_attr_background_has_priority(uint8_t attributes) {
+    return (bool)(attributes & GBC_ATTR_PRIORITY_FLAG);
+}
+
 uint8_t GBC_Graphics_bg_get_scroll_x(GBC_Graphics *self) {
     return self->bg_scroll_x;
 }

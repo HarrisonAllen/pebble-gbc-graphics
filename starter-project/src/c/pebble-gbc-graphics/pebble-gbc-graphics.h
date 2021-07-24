@@ -716,6 +716,15 @@ bool GBC_Graphics_attr_is_x_flipped(uint8_t attributes);
 bool GBC_Graphics_attr_is_y_flipped(uint8_t attributes);
 
 /**
+ * Checks if the attribute byte has a background priority flag
+ * 
+ * @param attributes An attribute byte
+ * 
+ * @return true if the attribute has a background priority flag
+ */
+bool GBC_Graphics_attr_background_has_priority(uint8_t attributes);
+
+/**
  * Gets the current x position of the background scroll
  * 
  * @param self A pointer to the target GBC Graphics object
