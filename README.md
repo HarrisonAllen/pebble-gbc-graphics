@@ -48,16 +48,16 @@ If you are unfamiliar with how graphics worked on the Game Boy Color, I recommen
 
 ## Key Differences
 Some key differences between the Game Boy Color and this graphics engine:
-* This engine contains up to 4 VRAM banks with 256 tiles each [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L143)
+* This engine contains up to 4 VRAM banks with 256 tiles each [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L143)
     * The VRAM itself works mostly the same, it just has a different structure
-* LCDC byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L124-L136)
-* STAT byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L214-L225)
-* Attribute bytes have a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175-L186)
-* Dimensions of the viewport (screen) can be set and changed at runtime [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L346)
+* LCDC byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L124-L136)
+* STAT byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L214-L225)
+* Attribute bytes have a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175-L186)
+* Dimensions of the viewport (screen) can be set and changed at runtime [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L346)
 * The 10-sprites-per-line limitation on the GBC has been removed
 
 ## Other Notes
-* For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115)
+* For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115)
 * You can create separate tilesheets for color and black and white Pebbles, just use the `tilesheet~color.bin` and `tilesheet~bw.bin` file naming scheme.
 
 # Understanding the Engine
@@ -147,70 +147,70 @@ Now, let's get more technical. I'm going to go through various things that you m
 The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer.
 
 ## Using a GBC_Graphics Object
-The first thing you'll want to do is create a [`GBC_Graphics`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L121-L237) object using [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251).
+The first thing you'll want to do is create a [`GBC_Graphics`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L121-L237) object using [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251).
 * The first argument is the `Window` that the app/watchface is using, and the second is the number of VRAM banks you want to use. For Aplite, I recommend only using one VRAM bank due to the limited RAM available.
 * Create the `GBC_Graphics` object *after* creating the app/watchface window, such as in a window_load function
 
-Once you're done with the `GBC_Graphics` object, call [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258)
+Once you're done with the `GBC_Graphics` object, call [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258)
 * *Always* call the destroy function when the app is closed, such as in a window_unload function. Otherwise you've got kilobytes of leftover allocated RAM.
 
 As in `GBC_Graphics_destroy`, calling the functions in the library will require passing the generated `GBC_Graphics` object as the the first argument, unless otherwise noted.
 
-To get the graphics to display, you must call [`GBC_Graphics_render](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485). This will render the graphics at the next available opportunity (just like [`layer_mark_dirty`](https://developer.rebble.io/developer.pebble.com/docs/c/User_Interface/Layers/index.html#layer_mark_dirty))
+To get the graphics to display, you must call [`GBC_Graphics_render](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485). This will render the graphics at the next available opportunity (just like [`layer_mark_dirty`](https://developer.rebble.io/developer.pebble.com/docs/c/User_Interface/Layers/index.html#layer_mark_dirty))
 
 Related functions:
-* [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L241) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L78))
-* [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L462) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L91))
-* [`GBC_Graphics_render`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/00cf86d0217571a0a513f4a4f256c20d2a63128c/tiny-pilot/src/c/game.c#L203) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/ad6126091a195f70da67967402ab76938cd2371a/starter-project/src/c/main.c#L86))
+* [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L241) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L78))
+* [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L462) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L91))
+* [`GBC_Graphics_render`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L203) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L86))
 
 ## Adjusting the Viewport
-The viewport (or screen) is the space in which the GBC Graphics will be displayed on the Pebble's screen. By default, the viewport is set to fit the dimensions of the entire Pebble. You can use [`GBC_Graphics_set_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L267) and pass in a `GRect` with the boundaries you want the screen to have.
-For your convenience, I have [defined some useful screen boundaries](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L96-L113). One example is `GBC_SCREEN_BOUNDS_SQUARE`, which creates a 144px by 144px (or 18 tile by 18 tile) square in the center of the Pebble's screen. This allows for a consistent viewing experience across all Pebbles.
+The viewport (or screen) is the space in which the GBC Graphics will be displayed on the Pebble's screen. By default, the viewport is set to fit the dimensions of the entire Pebble. You can use [`GBC_Graphics_set_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L267) and pass in a `GRect` with the boundaries you want the screen to have.
+For your convenience, I have [defined some useful screen boundaries](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L96-L113). One example is `GBC_SCREEN_BOUNDS_SQUARE`, which creates a 144px by 144px (or 18 tile by 18 tile) square in the center of the Pebble's screen. This allows for a consistent viewing experience across all Pebbles.
 
 Related functions:
-* [`GBC_Graphics_set_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L267) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/84effa692e27c790f824bc3fa846764baa247eac/tiny-pilot/src/c/game.c#L243-L259))
-* [`GBC_Graphics_set_screen_origin_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L269-L275)
-* [`GBC_Graphics_set_screen_origin_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L277-L283)
-* [`GBC_Graphics_set_screen_width`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L285-L292)
-* [`GBC_Graphics_set_screen_height`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L294-L301)
-* [`GBC_Graphics_get_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L303-L310)
-* [`GBC_Graphics_get_screen_x_origin`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L312-L319)
-* [`GBC_Graphics_get_screen_y_origin`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L321-L328)
-* [`GBC_Graphics_get_screen_width`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L330-L337) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/84effa692e27c790f824bc3fa846764baa247eac/tiny-pilot/src/c/graphics/window.c#L32))
-* [`GBC_Graphics_get_screen_height`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L339-L346) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/84effa692e27c790f824bc3fa846764baa247eac/tiny-pilot/src/c/graphics/window.c#L32) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/84effa692e27c790f824bc3fa846764baa247eac/starter-project/src/c/main.c#L70))
+* [`GBC_Graphics_set_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L267) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L243-L259))
+* [`GBC_Graphics_set_screen_origin_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L269-L275)
+* [`GBC_Graphics_set_screen_origin_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L277-L283)
+* [`GBC_Graphics_set_screen_width`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L285-L292)
+* [`GBC_Graphics_set_screen_height`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L294-L301)
+* [`GBC_Graphics_get_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L303-L310)
+* [`GBC_Graphics_get_screen_x_origin`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L312-L319)
+* [`GBC_Graphics_get_screen_y_origin`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L321-L328)
+* [`GBC_Graphics_get_screen_width`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L330-L337) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L32))
+* [`GBC_Graphics_get_screen_height`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L339-L346) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L32) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L70))
 
 ## Manipulating the VRAM
-The VRAM is useful because it stores the tiles we want to render in memory. To load the tiles from a tilesheet (see [Creating Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets)), we want to use [`GBC_Graphics_load_from_tilesheet_into_vram`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L362-L373). The Tiny Pilot example demonstrates loading from multiple tilesheets while keeping track of where they're stored in VRAM.
+The VRAM is useful because it stores the tiles we want to render in memory. To load the tiles from a tilesheet (see [Creating Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets)), we want to use [`GBC_Graphics_load_from_tilesheet_into_vram`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L362-L373). The Tiny Pilot example demonstrates loading from multiple tilesheets while keeping track of where they're stored in VRAM.
 
-If you want to directly access a VRAM bank (Pebblemon does this when decompressing sprites), then [`GBC_Graphics_get_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L375-L382) is the function you want to call. 
+If you want to directly access a VRAM bank (Pebblemon does this when decompressing sprites), then [`GBC_Graphics_get_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L375-L382) is the function you want to call. 
 
 Related functions:
-* [`GBC_Graphics_vram_move_tiles`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L348-L360)
-* [`GBC_Graphics_load_from_tilesheet_into_vram`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L362-L373) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/00cf86d0217571a0a513f4a4f256c20d2a63128c/tiny-pilot/src/c/util.c#L125-L186) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/84effa692e27c790f824bc3fa846764baa247eac/starter-project/src/c/main.c#L11-L25))
-* [`GBC_Graphics_get_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L375-L382)
+* [`GBC_Graphics_vram_move_tiles`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L348-L360)
+* [`GBC_Graphics_load_from_tilesheet_into_vram`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L362-L373) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/util.c#L125-L186) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L11-L25))
+* [`GBC_Graphics_get_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L375-L382)
 
 ## Palettes
 Palettes are the source of color for your tiles. Each palette has 4 tiles. The background and window layers share 8 palettes, and the sprite layer gets its own 8 palettes.
 * For color Pebbles, use the `ARGB8` version of the GColors. For example, instead of `GColorGreen`, use `GColorGreenARGB8`. Alternatively, you can create your own ARGB 8 bit color (each color, including alpha, uses 2 bits).
-* For black and white Pebbles, I have [defined three colors for you to use](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115-L118): `GBC_COLOR_BLACK`, `GBC_COLOR_GRAY`, and `GBC_COLOR_WHITE`.
+* For black and white Pebbles, I have [defined three colors for you to use](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115-L118): `GBC_COLOR_BLACK`, `GBC_COLOR_GRAY`, and `GBC_COLOR_WHITE`.
 
 Palettes can be set individually or by copying from an array.
 
 Related functions:
-* [`GBC_Graphics_set_bg_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L384-L394) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/ad6126091a195f70da67967402ab76938cd2371a/tiny-pilot/src/c/graphics/road.c#L3-L33) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/ad6126091a195f70da67967402ab76938cd2371a/starter-project/src/c/main.c#L27-L50))
-* [`GBC_Graphics_set_bg_palette_array`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L396-L403) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/ad6126091a195f70da67967402ab76938cd2371a/tiny-pilot/src/c/graphics/clouds.c#L70))
-* [`GBC_Graphics_set_bg_palette_color`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L405-L413) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/ad6126091a195f70da67967402ab76938cd2371a/tiny-pilot/src/c/graphics/fuel.c#L8-L29))
-* [`GBC_Graphics_copy_one_bg_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L415-L422)
-* [`GBC_Graphics_copy_all_bg_palettes`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L424-L430)
-* [`GBC_Graphics_set_sprite_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L432-L442) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/ad6126091a195f70da67967402ab76938cd2371a/tiny-pilot/src/c/actors/player.c#L93-L97))
-* [`GBC_Graphics_set_sprite_palette_array`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L444-L451)
-* [`GBC_Graphics_set_sprite_palette_color`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L453-L461) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/ad6126091a195f70da67967402ab76938cd2371a/tiny-pilot/src/c/actors/hiscore.c#L104))
-* [`GBC_Graphics_copy_one_sprite_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L463-L470)
-* [`GBC_Graphics_copy_all_sprite_palettes`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L472-L478)
+* [`GBC_Graphics_set_bg_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L384-L394) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/road.c#L3-L33) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L27-L50))
+* [`GBC_Graphics_set_bg_palette_array`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L396-L403) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/clouds.c#L70))
+* [`GBC_Graphics_set_bg_palette_color`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L405-L413) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/fuel.c#L8-L29))
+* [`GBC_Graphics_copy_one_bg_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L415-L422)
+* [`GBC_Graphics_copy_all_bg_palettes`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L424-L430)
+* [`GBC_Graphics_set_sprite_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L432-L442) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/player.c#L93-L97))
+* [`GBC_Graphics_set_sprite_palette_array`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L444-L451)
+* [`GBC_Graphics_set_sprite_palette_color`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L453-L461) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/hiscore.c#L104))
+* [`GBC_Graphics_copy_one_sprite_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L463-L470)
+* [`GBC_Graphics_copy_all_sprite_palettes`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L472-L478)
 
 
 ## LCDC
-The [LCDC byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L124-L136) contains data regarding rendering. The data it contains is:
+The [LCDC byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L124-L136) contains data regarding rendering. The data it contains is:
 * Should rendering be enabled?
 * Should the background layer be enabled?
 * Should the window layer be enabled?
@@ -218,15 +218,15 @@ The [LCDC byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40
 * Should the sprite mode be 8x8 or 8x16?
 
 Related functions:
-* [`GBC_Graphics_lcdc_set`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L487-L493)
-* [`GBC_Graphics_lcdc_set_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
-* [`GBC_Graphics_lcdc_set_bg_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
-* [`GBC_Graphics_lcdc_set_window_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L511-L517)
-* [`GBC_Graphics_lcdc_set_sprite_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L519-L525)
-* [`GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/14cc40ab5e61bffaad3381c670b154d5f46bd7a5/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L527-L533) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/de3617e08dc0c94c1e46aaf978ad7a821b717a09/tiny-pilot/src/c/game.c#L261-L266))
+* [`GBC_Graphics_lcdc_set`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L487-L493)
+* [`GBC_Graphics_lcdc_set_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
+* [`GBC_Graphics_lcdc_set_bg_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
+* [`GBC_Graphics_lcdc_set_window_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L511-L517)
+* [`GBC_Graphics_lcdc_set_sprite_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L519-L525)
+* [`GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L527-L533) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L261-L266))
 
 ## STAT (callbacks)
-The [STAT byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c854e7def04bd4cbb5b083a2cd0a5c65b1f0/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L214-L225) handles information related to the draw cycle.
+The [STAT byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L214-L225) handles information related to the draw cycle.
 4 parameters are read-only flags:
 * HBlank flag (set after each line is drawn)
 * VBlank flag (set after all lines are rendered)
@@ -239,28 +239,28 @@ The [STAT byte](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/1928c8
 * Line Compare Interrupt Enabled
 * OAM Interrupt Enabled
 
-An incredibly useful feature is being able to set callbacks. For example, the line compare interrupt can allow you to do things like change palettes mid-frame, change the background scroll, etc. Tiny Pilot [has a great example](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L41-L117) of using the line interrupt to do a couple things:
+An incredibly useful feature is being able to set callbacks. For example, the line compare interrupt can allow you to do things like change palettes mid-frame, change the background scroll, etc. Tiny Pilot [has a great example](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L41-L117) of using the line interrupt to do a couple things:
 * The first is rendering the score bar. If you recall from the [Background Layer section](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-background-layer), the score bar isn't within the viewport. To account for this, a line interrupt is set for line 0. On this line, we set the background scroll to (0, 0), or right on top of the score bar. Another line interrupt is then set for line 8, which is at the end of the score bar. Once this next line interrupt fires, then the score bar has been rendered, so we return to the original scroll position.
 * The second is creating a parallax effect, where we create a 2.5D effect by moving foreground layers faster than the background. Line interrupts are set at the top of the trees behind the road, on the top line of the road, and on the top line of the trees below the road. At each one of these line interrupts, I increase the scroll position (i.e. increasing the speed), which makes it seem as though each part is moving faster.
 * These are just two examples of what you can do with interrupts!
 
 Related functions:
-* [`GBC_Graphics_stat_set`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L589-L595)
-* [`GBC_Graphics_stat_set_hblank_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L597-L603)
-* [`GBC_Graphics_stat_set_vblank_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L605-L611)
-* [`GBC_Graphics_stat_set_line_compare_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L613-L619) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L128))
-* [`GBC_Graphics_stat_set_oam_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L621-L627)
-* [`GBC_Graphics_stat_set_line_y_compare`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L629-L635) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L127))
-* [`GBC_Graphics_set_hblank_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L637-L643)
-* [`GBC_Graphics_set_vblank_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L645-L651)
-* [`GBC_Graphics_set_line_compare_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L653-L659) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L126))
-* [`GBC_Graphics_set_oam_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L661-L667)
-* [`GBC_Graphics_stat_get_current_line`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L535-L542)
-* [`GBC_Graphics_stat_get_line_y_compare`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L544-L551) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/graphics/background.c#L68))
-* [`GBC_Graphics_stat_check_hblank_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L553-L560)
-* [`GBC_Graphics_stat_check_vblank_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L562-L569)
-* [`GBC_Graphics_stat_check_line_comp_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L571-L578)
-* [`GBC_Graphics_stat_check_oam_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/11dde3339805c3f263a99dc6eaad49fc76b44d86/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L580-L587)
+* [`GBC_Graphics_stat_set`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L589-L595)
+* [`GBC_Graphics_stat_set_hblank_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L597-L603)
+* [`GBC_Graphics_stat_set_vblank_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L605-L611)
+* [`GBC_Graphics_stat_set_line_compare_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L613-L619) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L128))
+* [`GBC_Graphics_stat_set_oam_interrupt_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L621-L627)
+* [`GBC_Graphics_stat_set_line_y_compare`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L629-L635) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L127))
+* [`GBC_Graphics_set_hblank_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L637-L643)
+* [`GBC_Graphics_set_vblank_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L645-L651)
+* [`GBC_Graphics_set_line_compare_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L653-L659) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L126))
+* [`GBC_Graphics_set_oam_interrupt_callback`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L661-L667)
+* [`GBC_Graphics_stat_get_current_line`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L535-L542)
+* [`GBC_Graphics_stat_get_line_y_compare`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L544-L551) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L68))
+* [`GBC_Graphics_stat_check_hblank_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L553-L560)
+* [`GBC_Graphics_stat_check_vblank_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L562-L569)
+* [`GBC_Graphics_stat_check_line_comp_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L571-L578)
+* [`GBC_Graphics_stat_check_oam_flag`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L580-L587)
 
 ## Background Layer
 
@@ -302,7 +302,7 @@ These are the tilesheets I designed and generate for Tiny Pilot. All of these ca
     * ![Base Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/BaseTilesheet.png)
 * **Cloud Tilesheet**
     * Contains all of the cloud tiles
-    * There is a [data structure](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/054ceeb92cf16f522b330313959ff4b0bf47bf3f/tiny-pilot/src/c/graphics/clouds.c#L9) that keeps track of the dimensions and position on the tilesheet of each cloud.
+    * There is a [data structure](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/clouds.c#L9) that keeps track of the dimensions and position on the tilesheet of each cloud.
     * There are actually two tilesheets, `CloudTilesheet~color.png` and `CloudTilesheet~bw.png`. The black and white tilesheet features a border around the clouds since there is no contrast between the white of the clouds and the white of the background layer.
     * Color: ![Cloud Tilesheet - Color](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/CloudTilesheet~color.png)
     * Black and white: ![Cloud Tilesheet - bw](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/CloudTilesheet~bw.png)
@@ -320,56 +320,26 @@ These are the tilesheets I designed and generate for Tiny Pilot. All of these ca
     * Contains the tiles for text
     * ![Text Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/TextTilesheet.png)
 
-## Using The Library
-Here, I'm going to go through various functions, how they are implemented in Tiny Pilot and the Starter Project, and various tips or notes. All functions (except for `GBC_Graphics_ctor`) require you to pass in the `GBC_Graphics` object, so be sure to keep track of it!
-
-### Creating a GBC_Graphics Object
-* Function: [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L251)
-* To use, pass in the window you want to render the graphics into (generated from `window_create`, part of the standard app/watchface setup), and the number of VRAM banks you wish to use (each VRAM bank holds 256 tiles and takes up 4kB).
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L241) creates and keeps a reference to the GBC_Graphics object in a separate file
-* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L78) creates and keeps a reference to the GBC_Graphics object in a window_load function
-* Create the `GBC_Graphics` object *after* creating the app/watchface window, such as in a window_load function
-
-### Destroying a GBC_Graphics Object
-* Function: [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L258)
-* *Always* call the destroy function when the app is closed, such as in a window_unload function. Otherwise you've got kilobytes of leftover allocated RAM.
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L462) destroys the object in a different file
-* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L88) destroys the object in a window_unload function
-
-### Changing the Boundaries of the Screen/Viewport
-* Function: [`GBC_Graphics_set_screen_bounds`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L267)
-* I have defined some useful screen boundaries for your convenience [here](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L96), but you can define your own boundaries.
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/game.c#L243) uses different boundaries for Round vs Rectangular Pebbles in order to keep the score bar visible. It also makes the [window background color](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/main.c#L7) the same as the sky color to give the illusion of fullscreen.
-
-### Loading Tilesheets
-* Function: [`GBC_Graphics_load_from_tilesheet_into_vram`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L372)
-* The examples below provide a way to load entire tilesheets. However, you can load portions of tilesheets (e.g. 4 tiles for a sprite from a larger sprite tilesheet) by adjusting the `tilesheet_tile_offset` and `tiles_to_load`.
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/util.c#L126) demonstrates loading multiple tileshets at once, and keeps track of their offsets in order to access specific tilesheets later.
-* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L14) loads the Sample Tilesheet that we created earlier.
-
-### Editing Tilemaps and Attrmaps
-* Tilemaps define a 32x32 layer of tiles, 
-
 ### Setting Background and Window Tiles
-* Function [`GBC_Graphics_bg_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L801)
-* You can also set the Window layer tiles with [`GBC_Graphics_window_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L969)
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/graphics/text.c#L70) uses this sometimes, but mostly uses `GBC_Graphics_bg_set_tile_and_attrs`
-* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L60) demonstrates a basic setting of tiles based on x position.
+* Function [`GBC_Graphics_bg_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L801)
+* You can also set the Window layer tiles with [`GBC_Graphics_window_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L969)
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/text.c#L70) uses this sometimes, but mostly uses `GBC_Graphics_bg_set_tile_and_attrs`
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L60) demonstrates a basic setting of tiles based on x position.
 
 ### Creating Attributes
-* Function [`GBC_Graphics_attr_make`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L680)
+* Function [`GBC_Graphics_attr_make`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L680)
 * This is a convenience function to create an attribute byte. 
 * Attribute bytes define the following characteristics of a tile:
     * The palette the tile should use
     * The VRAM bank the tile is in
     * If the tile should be flipped horizontally or vertically
     * Whether or not the background/window tile has rendering priority over the sprite layer
-* Attribute bytes for each layer are defined in these locations: [background attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175), [window attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L187), and [sprite attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L154).
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/tiny-pilot/src/c/actors/player.c#L106) does this quite often, and this example shows the creation of the attributes for the plane sprites.
+* Attribute bytes for each layer are defined in these locations: [background attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175), [window attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L187), and [sprite attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L154).
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/player.c#L106) does this quite often, and this example shows the creation of the attributes for the plane sprites.
 
 ### Setting Background and Window Attributes
-* Function [`GBC_Graphics_bg_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L811)
-* You can also set the Window layer attributes with [`GBC_Graphics_window_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/850c4169b41fae2bc9b7103d5b209cd6610204e3/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L979)
+* Function [`GBC_Graphics_bg_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L811)
+* You can also set the Window layer attributes with [`GBC_Graphics_window_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L979)
 * In general, I [create an attribute](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets) using the convenience function and pass the result into `set_attrs`.
-* You can also set each attribute individually. For example, the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/f64dad0d4075f45cf23316f8f031161f40cdb9a2/starter-project/src/c/main.c#L61) directly sets the tile palettes based on y position.
+* You can also set each attribute individually. For example, the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L61) directly sets the tile palettes based on y position.
 * You can set both tiles and attributes simultaneously, using [`GBC_Graphics_bg_set_tile_and_attrs`]()
