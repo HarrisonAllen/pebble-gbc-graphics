@@ -293,32 +293,78 @@ Related functions:
 ## Background Layer
 Read more about the [background layer here](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-background-layer). The main idea is that you move the viewport over the background. If the viewport moves past the edge of the background, then it will just wrap around.
 
-You can place tiles on the background at x and y positions, as well as attributes. You can also place them both with one function. You can also set attributes individually.
+You can place tiles on the background at x and y positions, as well as attributes. Both can be placed with one function. Attributes can also be set on an individual basis.
 
 Related functions:
 * Setters
- * [`GBC_Graphics_bg_move`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L767-L775) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L120-L121), although not a direct example)
- * [`GBC_Graphics_bg_set_scroll_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L777-L783) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L88-L89))
- * [`GBC_Graphics_bg_set_scroll_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L785-L791)
- * [`GBC_Graphics_bg_set_scroll_pos`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L793-L800) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L75-L76))
- * [`GBC_Graphics_bg_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L802-L810) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/road.c#L75-L78) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L60))
- * [`GBC_Graphics_bg_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L812-L820)
- * [`GBC_Graphics_bg_set_tile_and_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L822-L831) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/road.c#L57))
- * [`GBC_Graphics_bg_set_tile_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L833-L841) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/text.c#L69) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L61))
- * [`GBC_Graphics_bg_set_tile_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L843-L851)
- * [`GBC_Graphics_bg_set_tile_x_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L853-L861)
- * [`GBC_Graphics_bg_set_tile_y_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L863-L871)
- * [`GBC_Graphics_bg_set_tile_priority`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L873-L881)
- * [`GBC_Graphics_bg_move_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L883-L893)
+    * [`GBC_Graphics_bg_move`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L767-L775) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L120-L121), although not a direct example)
+    * [`GBC_Graphics_bg_set_scroll_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L777-L783) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L88-L89))
+    * [`GBC_Graphics_bg_set_scroll_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L785-L791)
+    * [`GBC_Graphics_bg_set_scroll_pos`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L793-L800) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/background.c#L75-L76))
+    * [`GBC_Graphics_bg_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L802-L810) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/road.c#L75-L78) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L60))
+    * [`GBC_Graphics_bg_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L812-L820)
+    * [`GBC_Graphics_bg_set_tile_and_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L822-L831) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/road.c#L57))
+    * [`GBC_Graphics_bg_move_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L883-L893)
+* Attribute Setters
+    * [`GBC_Graphics_bg_set_tile_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L833-L841) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/text.c#L69) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L61))
+    * [`GBC_Graphics_bg_set_tile_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L843-L851)
+    * [`GBC_Graphics_bg_set_tile_x_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L853-L861)
+    * [`GBC_Graphics_bg_set_tile_y_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L863-L871)
+    * [`GBC_Graphics_bg_set_tile_priority`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L873-L881)
 * Getters
- * [`GBC_Graphics_bg_get_scroll_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L727-L734)
- * [`GBC_Graphics_bg_get_scroll_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L736-L743) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/player.c#L108-L109))
- * [`GBC_Graphics_bg_get_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L745-L754)
- * [`GBC_Graphics_bg_get_attr`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L756-L765)
+    * [`GBC_Graphics_bg_get_scroll_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L727-L734)
+    * [`GBC_Graphics_bg_get_scroll_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L736-L743) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/player.c#L108-L109))
+    * [`GBC_Graphics_bg_get_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L745-L754)
+    * [`GBC_Graphics_bg_get_attr`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L756-L765)
 
 ## Window Layer
+Read more about the [window layer here](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-window-layer). It will render on top of the background layer. The main idea is that you move the window layer relative to the viewport. It works on an offset, so it can only move down and right. To hide the window layer, just move it off-screen, or disable it.
+
+Just like the background layer, you can place tiles on the background at x and y positions, as well as attributes. You can also place them both with one function. You can also set attributes individually.
+
+Related functions:
+* Setters
+    * [`GBC_Graphics_window_move`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L935-L943)
+    * [`GBC_Graphics_window_set_offset_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L945-L951) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L93))
+    * [`GBC_Graphics_window_set_offset_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L953-L959) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L94) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L70))
+    * [`GBC_Graphics_window_set_offset_pos`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L961-L968) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L31-L32))
+    * [`GBC_Graphics_window_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L970-L978) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/text.c#L73))
+    * [`GBC_Graphics_window_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L980-L988)
+    * [`GBC_Graphics_window_set_tile_and_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L990-L999) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L58))
+    * [`GBC_Graphics_window_move_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1051-L1061)
+* Attribute Setters
+    * [`GBC_Graphics_window_set_tile_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1001-L1009) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/text.c#L69))
+    * [`GBC_Graphics_window_set_tile_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1011-L1019)
+    * [`GBC_Graphics_window_set_tile_x_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1021-L1029) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L61))
+    * [`GBC_Graphics_window_set_tile_y_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1031-L1039) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L64))
+    * [`GBC_Graphics_window_set_tile_priority`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1041-L1049) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/window.c#L119))
+* Getters
+    * [`GBC_Graphics_window_get_offset_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L895-L902) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/items.c#L94-L95))
+    * [`GBC_Graphics_window_get_offset_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L904-L911) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/items.c#L94-L95))
+    * [`GBC_Graphics_window_get_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L913-L922)
+    * [`GBC_Graphics_window_get_attr`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L924-L933)
 
 ## OAM
+Read more about [the sprite layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-sprite-layer) and [the OAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam).
+
+Related functions:
+* Setters:
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+    * [``]()
+* Getters:
+    * [`GBC_Graphics_oam_get_sprite_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1063-L1071)
+    * [``]()
+    * [``]()
+    * [``]()
 
 ## Misc
 
