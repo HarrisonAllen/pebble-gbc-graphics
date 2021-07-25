@@ -48,6 +48,8 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 # Downloads
 You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-graphics/releases) for the library (.zip), Tiny Pilot (.pbw), and the Starter Project (.pbw). You can also go to the [downloads directory](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/downloads) and download them there.
 
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
+
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles.
 
@@ -518,6 +520,6 @@ I hope you're able to make some cool things with this engine! Feel free to modif
 
 Pebblemon does a lot of cool things that aren't quite as well documented. These include a script for converting an image of a map into a playable route, changing tiles on the background tilemap as the player moves, storing 502 Pokémon sprites in a compressed format and then decompressing them (using the same compression/decompression algorithm that the games used), screen interrupts for battle transitions. It's worth exploring if you're trying to do something similar.
 
-Again, please enjoy, and feel free to reach out if you have any questions or problems with the library! My email is [harrisonallen555@gmail.com](mailto:harrisonallen555@gmail.com).
+Feel free to reach out if you have any questions or problems with the library! My email is [harrisonallen555@gmail.com](mailto:harrisonallen555@gmail.com). You can also open an issue.
 
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
