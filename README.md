@@ -377,6 +377,10 @@ Related functions:
     * [`GBC_Graphics_oam_get_sprite_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1093-L1101)
 
 ## Misc
+These apply to both the background and window layers, so I'm putting them here.
+
+* [`GBC_Graphics_copy_background_to_window`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1270-L1276)
+* [`GBC_Graphics_copy_window_to_background`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1278-L1284)
 
 
 ## Creating Tilesheets
