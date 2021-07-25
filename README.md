@@ -222,7 +222,7 @@ The library should be exhaustive in doing everything you could want to do with a
 
 Related functions:
 * [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L241) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L78))
-* [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L462) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L91))
+* [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L466) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L91))
 * [`GBC_Graphics_render`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L203) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L86))
 
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
@@ -261,7 +261,7 @@ Related functions:
 
 ## Palettes
 Palettes are the source of color for your tiles. Each palette has 4 tiles. The background and window layers share 8 palettes, and the sprite layer gets its own 8 palettes.
-* For color Pebbles, use the `ARGB8` version of the GColors. For example, instead of `GColorGreen`, use `GColorGreenARGB8`. Alternatively, you can create your own ARGB 8 bit color (each color, including alpha, uses 2 bits).
+* For color Pebbles, use the `ARGB8` version of the GColors. For example, instead of `GColorGreen`, use `GColorGreenARGB8`. Alternatively, you can create your own ARGB 8 bit color (each color, including alpha, uses 2 bits). For example, to create [`GColorIndigo`](https://developer.rebble.io/developer.pebble.com/guides/tools-and-resources/color-picker/index.html#AA55FF), which is `#AA55FF` in HTML, we would use `0b11100111`, where transparency is always `11`, red is `AA->10`, blue is `55->01`, and green is `FF->11`.
 * For black and white Pebbles, I have [defined three colors for you to use](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115-L118): `GBC_COLOR_BLACK`, `GBC_COLOR_GRAY`, and `GBC_COLOR_WHITE`.
 
 Palettes can be set individually or by copying from an array.
