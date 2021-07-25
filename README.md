@@ -7,6 +7,8 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 
 # Table of Contents
 
+### [Downloads]
+
 ### [Introduction](https://github.com/HarrisonAllen/pebble-gbc-graphics#introduction)
 * [In This Repo](https://github.com/HarrisonAllen/pebble-gbc-graphics#in-this-repo)
 * [Other Projects](https://github.com/HarrisonAllen/pebble-gbc-graphics#other-projects)
@@ -19,6 +21,9 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 * [Creating Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets)
     * [Tiny Pilot Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#tiny-pilot-tilesheets)
 
+# Downloads
+
+
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles.
 
@@ -29,6 +34,8 @@ This library allows you to create graphics for your watchface, app, or game (alm
 * [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot) - App - pebble-gbc-graphics v1.2.0
     * A well-documented, full game that demonstrates most of the features in the library
     * ![Tiny Pilot](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot.png) ![Tiny Pilot - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot-bw.png)
+    
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 ## Other Projects
 * [Pebblemon](https://github.com/HarrisonAllen/pebble-gbc-graphics-demo/tree/master/pebblemon) - App - pebble-gbc-graphics v1.0.0
@@ -38,6 +45,8 @@ This library allows you to create graphics for your watchface, app, or game (alm
 * [Pebblemon Time](https://github.com/HarrisonAllen/pebblemon-watchface) - Watchface - pebble-gbc-graphics v1.1.0
     * ![Pebblemon Time](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime.png) ![Pebblemon Time - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime-bw.png)
     * A stripped down version of Pebblemon that demonstrates a less-frequent draw cycle, as well as combining standard Pebble graphics with the engine.
+    
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 ## Background Information
 If you are unfamiliar with how graphics worked on the Game Boy Color, I recommend you check out the following links:
@@ -45,6 +54,8 @@ If you are unfamiliar with how graphics worked on the Game Boy Color, I recommen
     * This is an excellent rundown of, as the title says, how the graphics worked on the gameboy color
 * [Pan Docs](http://bgb.bircd.org/pandocs.htm#videodisplay)
     * For a low level analysis, check this one out. You don't need to really understand this to use the library, but it's useful to know if you want to do some more advanced techniques
+    
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 ## Key Differences
 Some key differences between the Game Boy Color and this graphics engine:
@@ -56,9 +67,13 @@ Some key differences between the Game Boy Color and this graphics engine:
 * Dimensions of the viewport (screen) can be set and changed at runtime [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L346)
 * The 10-sprites-per-line limitation on the GBC has been removed
 
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
+
 ## Other Notes
 * For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115)
 * You can create separate tilesheets for color and black and white Pebbles, just use the `tilesheet~color.bin` and `tilesheet~bw.bin` file naming scheme.
+
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 # Understanding the Engine
 Let's get started! First, I'll go over some basics about the engine.
@@ -74,6 +89,8 @@ Let's take an example of a small tree, and see what it would look like before an
 
 Put together, [we can create tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets) to store multiple tiles in memory, and load them when necessary.
 
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
+
 ## Understanding VRAM
 VRAM is where the tiles are stored in RAM. Since we don't have to fetch the tiles from storage, this allows quick access for a variety of operations.
 
@@ -82,6 +99,8 @@ Accessing a tile in a VRAM bank is as simple as setting the index to where the t
 For the background and window layers, tiles are placed on a 32 by 32 tile tilemap. For the sprite layer, each sprite contains an index into the VRAM for its corresponding tile(s).
 
 Each bank in the VRAM contains 256 tile slots, and each tile takes up 16 bytes. This means that one VRAM bank takes up 4kb of RAM. 
+
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 ## Understanding Attributes
 While the VRAM contains the tiles, it doesn't store info regarding their color palette, orientation, or anything like that. Furthermore, how does the tile know which VRAM bank it belongs to? That's where tile attributes come into play.
@@ -383,7 +402,7 @@ These apply to both the background and window layers, so I'm putting them here.
 * [`GBC_Graphics_copy_window_to_background`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1278-L1284)
 
 
-## Creating Tilesheets
+# Creating Tilesheets
 The process for creating tilesheets from an image has a few specific steps, I personally use [GIMP](https://www.gimp.org/):
 1. Create the spritesheet using the [2bpp palette](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/2bpp.gpl)
     * For the easiest setup, just modify [SampleTilesheet.xcf](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SampleTilesheet.xcf). The image should already be in an indexed color mode, and the palette should already exist as `Colormap of image #xx` in the Palettes window (`Windows`->`Dockable Dialogs`->`Palettes`).
@@ -408,7 +427,7 @@ As long as you create a binary file in a 2bpp format, where each tile is 16 byte
 
 You can create different tilesheets for different platforms. Check out [this link on the Pebble developer docs](https://developer.rebble.io/developer.pebble.com/guides/app-resources/platform-specific/index.html) for more information.
 
-### Tiny Pilot Tilesheets
+## Tiny Pilot Tilesheets
 These are the tilesheets I designed and generate for Tiny Pilot. All of these can be found [here](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/assets/tilesheets), if you wish to edit or duplicate them.
 * **Base Tilesheet** 
     * Contains the basic one-color tiles, as well as the frames for the window layer
@@ -432,3 +451,10 @@ These are the tilesheets I designed and generate for Tiny Pilot. All of these ca
 * **Text Tilesheet**
     * Contains the tiles for text
     * ![Text Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/TextTilesheet.png)
+
+# Closing Remarks
+I hope you're able to make some cool things with this engine! Feel free to modify it, upgrade it, do whatever you'd like with it. I'm sure there are ways to further optimize the [rendering script](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.c#L243-L517) (removing what branching is left, reducing number of operations, some other random C optimizations that I'm unfamiliar with, etc.).
+
+Pebblemon does a lot of cool things that aren't quite as well documented. These include a script for converting an image of a map into a playable route, changing tiles on the background tilemap as the player moves, storing 502 Pokémon sprites in a compressed format and then decompressing them (using the same compression/decompression algorithm that the games used), screen interrupts for battle transitions. It's worth exploring if you're trying to do something similar.
+
+Again, please enjoy, and feel free to reach out if you have any questions or problems with the library!
