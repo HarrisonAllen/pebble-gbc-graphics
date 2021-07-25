@@ -216,7 +216,7 @@ Once you're done with the `GBC_Graphics` object, call [`GBC_Graphics_destroy`](h
 
 As in `GBC_Graphics_destroy`, calling the functions in the library will require passing the generated `GBC_Graphics` object as the the first argument, unless otherwise noted.
 
-To get the graphics to display, you must call [`GBC_Graphics_render](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485). This will render the graphics at the next available opportunity (just like [`layer_mark_dirty`](https://developer.rebble.io/developer.pebble.com/docs/c/User_Interface/Layers/index.html#layer_mark_dirty))
+To get the graphics to display, you must call [`GBC_Graphics_render`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485). This will render the graphics at the next available opportunity (just like [`layer_mark_dirty`](https://developer.rebble.io/developer.pebble.com/docs/c/User_Interface/Layers/index.html#layer_mark_dirty))
 
 The library should be exhaustive in doing everything you could want to do with a `GBC_Graphics` object, but you can always directly access the variables inside the object in case you want to do something way more advanced.
 
