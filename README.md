@@ -218,6 +218,8 @@ As in `GBC_Graphics_destroy`, calling the functions in the library will require 
 
 To get the graphics to display, you must call [`GBC_Graphics_render](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L480-L485). This will render the graphics at the next available opportunity (just like [`layer_mark_dirty`](https://developer.rebble.io/developer.pebble.com/docs/c/User_Interface/Layers/index.html#layer_mark_dirty))
 
+The library should be exhaustive in doing everything you could want to do with a `GBC_Graphics` object, but you can always directly access the variables inside the object in case you want to do something way more advanced.
+
 Related functions:
 * [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L241) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L78))
 * [`GBC_Graphics_destroy`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L253-L258) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L462) | [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L91))
