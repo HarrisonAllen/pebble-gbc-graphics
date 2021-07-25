@@ -23,10 +23,10 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 * [Understanding Layers](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-layers)
     * [The Background Layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-background-layer)
     * [The Window Layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-window-layer)
-    * [The Sprite Layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-window-layer)
+    * [The Sprite Layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-sprite-layer)
 * [Understanding OAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam)
 
-[**Using the Library**](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam)
+[**Using the Library**](https://github.com/HarrisonAllen/pebble-gbc-graphics#using-the-library)
 * [Quick Start](https://github.com/HarrisonAllen/pebble-gbc-graphics#quick-start)
 * [Using a GBC_Graphics Object](https://github.com/HarrisonAllen/pebble-gbc-graphics#using-a-gbc_graphics-object)
 * [Adjusting the Viewport](https://github.com/HarrisonAllen/pebble-gbc-graphics#adjusting-the-viewport)
@@ -66,7 +66,7 @@ This library allows you to create graphics for your watchface, app, or game (alm
 ## Other Projects
 * [Pebblemon](https://github.com/HarrisonAllen/pebble-gbc-graphics-demo/tree/master/pebblemon) - App - pebble-gbc-graphics v1.0.0
     * ![Pebblemon](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon.png) ![Pebblemon - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon-bw.png)
-    * A mini Pokemon adventure that does some very complex things with the engine, but isn't as easy to understand or reverse engineer.
+    * A mini Pokemon adventure that does some very neat things using the engine
     * The codebase is too large to fit on the Aplite platform, there isn't enough ram available.
 * [Pebblemon Time](https://github.com/HarrisonAllen/pebblemon-watchface) - Watchface - pebble-gbc-graphics v1.1.0
     * ![Pebblemon Time](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime.png) ![Pebblemon Time - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime-bw.png)
@@ -85,18 +85,18 @@ If you are unfamiliar with how graphics worked on the Game Boy Color, I recommen
 
 ## Key Differences
 Some key differences between the Game Boy Color and this graphics engine:
-* This engine contains up to 4 VRAM banks with 256 tiles each [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L143)
+* This engine contains up to 4 VRAM banks with 256 tiles each
     * The VRAM itself works mostly the same, it just has a different structure
-* LCDC byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L124-L136)
-* STAT byte has a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L214-L225)
-* Attribute bytes have a different mapping [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175-L186)
-* Dimensions of the viewport (screen) can be set and changed at runtime [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L260-L346)
-* The 10-sprites-per-line limitation on the GBC has been removed
+* LCDC byte has a different mapping
+* STAT byte has a different mapping
+* Attribute bytes have a different mapping
+* Dimensions of the viewport (screen) can be set and changed at runtime
+* The 10-sprites-per-line limitation that was present on the GBC has been resolved in this library
 
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 ## Other Notes
-* For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray [link to code](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L115)
+* For black and white pebbles (Pebble Classic, Pebble Steel, Pebble 2), there are 3 colors available: Black, White, and a ditherered Gray
 * You can create separate tilesheets for color and black and white Pebbles, just use the `tilesheet~color.bin` and `tilesheet~bw.bin` file naming scheme.
 
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
@@ -135,10 +135,11 @@ The attributes a tile has are as follows:
 * **Palette Number** (0-7): The palette to apply to this tile.
 * **VRAM Bank** (0-3): The VRAM bank to load the tile from. (While this can go up to 3, this is limited by the number of VRAM banks allocated by the user.)
 * **X Flip**: Will flip the tile horizontally, across the Y-axis.
-* **Y Flip**: Will flip the tile vertically, across the X-axis.
+* **Y Flip**: Will flip the tile vertically, across the X-axis. For 8x16 sprites, this will also swap the top and bottom sprites.
 * **Background Priority**: Whether or not the background or window tile has rendering priority over the sprite layer.
     * If the priority bit is set on a background or window tile, then any pixel in that tile that is not 00 will render above the sprite layer.
     * If the priority bit is set on a sprite tile, then any pixel on the background or window layers below the sprite tile that is not 00 will render above the sprite tile.
+    * If the priority bit is not set on a sprite or the tiles underneath, then the sprite will render on top as usual.
     * ![Priority](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/BackgroundPriority.png)
     
 For the background and window layers, tiles are placed on a 32 by 32 tile attribute map (or attrmap). The attrmap corresponds directly to the tilemap. So a tile at position (2,4) on the tilemap has its corresponding attribute at (2,4) on the attrmap. For the sprite layer, each sprite contains its own attributes.
@@ -201,7 +202,9 @@ When two sprites overlap, the sprite with the lower index in OAM will be rendere
 Now, let's get more technical. I'm going to go through various things that you may want to do, and provide examples shown in the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) and [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot).
 
 ## Quick Start
-The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer. Be sure to change the `uuid` in `project.json`!  
+The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer. Be sure to change the `uuid` in `project.json`!
+
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 ## Using a GBC_Graphics Object
 The first thing you'll want to do is create a [`GBC_Graphics`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L121-L237) object using [`GBC_Graphics_ctor`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L239-L251).
