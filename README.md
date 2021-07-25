@@ -7,16 +7,16 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 
 # Table of Contents
 
-### [Downloads](https://github.com/HarrisonAllen/pebble-gbc-graphics#downloads)
+[Downloads](https://github.com/HarrisonAllen/pebble-gbc-graphics#downloads)
 
-### [Introduction](https://github.com/HarrisonAllen/pebble-gbc-graphics#introduction)
+[Introduction](https://github.com/HarrisonAllen/pebble-gbc-graphics#introduction)
 * [In This Repo](https://github.com/HarrisonAllen/pebble-gbc-graphics#in-this-repo)
 * [Other Projects](https://github.com/HarrisonAllen/pebble-gbc-graphics#other-projects)
 * [Background Information](https://github.com/HarrisonAllen/pebble-gbc-graphics#background-information)
 * [Key Differences](https://github.com/HarrisonAllen/pebble-gbc-graphics#key-differences)
 * [Other Notes](https://github.com/HarrisonAllen/pebble-gbc-graphics#other-notes)
 
-### [Understanding the Engine](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-the-engine)
+[Understanding the Engine](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-the-engine)
 * [Understanding Tiles](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-tiles)
 * [Understanding VRAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-vram)
 * [Understanding Attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-attributes)
@@ -26,7 +26,7 @@ Want to create an app or watchface for the Pebble, but don't know where to start
     * [The Sprite Layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-window-layer)
 * [Understanding OAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam)
 
-### [Using the Library]()
+[Using the Library](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam)
 * [Quick Start]()
 * [Using a GBC_Graphics Object]()
 * [Adjusting the Viewport]()
@@ -40,10 +40,10 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 * [OAM]()
 * [Other]()
 
-### [Creating Tilesheets]()
+[Creating Tilesheets]()
 * [Tiny Pilot Tilesheets]()
 
-### [Closing Remarks]()
+[Closing Remarks]()
 
 # Downloads
 (Once releases are complete, link here)
