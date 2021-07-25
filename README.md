@@ -3,7 +3,7 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
-Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://discord.com/invite/aRUAYFN) and we'll help you get set up.
+Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
 # Table of Contents
 
@@ -27,23 +27,23 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 * [Understanding OAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam)
 
 [**Using the Library**](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam)
-* [Quick Start]()
-* [Using a GBC_Graphics Object]()
-* [Adjusting the Viewport]()
-* [Manipulating the VRAM]()
-* [Palettes]()
-* [LCDC]()
-* [STAT]()
-* [Attributes]()
-* [Background Layer]()
-* [Window Layer]()
-* [OAM]()
-* [Other]()
+* [Quick Start](https://github.com/HarrisonAllen/pebble-gbc-graphics#quick-start)
+* [Using a GBC_Graphics Object](https://github.com/HarrisonAllen/pebble-gbc-graphics#using-a-gbc_graphics-object)
+* [Adjusting the Viewport](https://github.com/HarrisonAllen/pebble-gbc-graphics#adjusting-the-viewport)
+* [Manipulating the VRAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#manipulating-the-vram)
+* [Palettes](https://github.com/HarrisonAllen/pebble-gbc-graphics#palettes)
+* [LCDC](https://github.com/HarrisonAllen/pebble-gbc-graphics#lcdc)
+* [STAT](https://github.com/HarrisonAllen/pebble-gbc-graphics#stat)
+* [Attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics#attributes)
+* [Background Layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#background-layer)
+* [Window Layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#window-layer)
+* [OAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#oam)
+* [Other](https://github.com/HarrisonAllen/pebble-gbc-graphics#other)
 
-[**Creating Tilesheets**]()
-* [Tiny Pilot Tilesheets]()
+[**Creating Tilesheets**](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets)
+* [Tiny Pilot Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#tiny-pilot-tilesheets)
 
-[**Closing Remarks**]()
+[**Closing Remarks**](https://github.com/HarrisonAllen/pebble-gbc-graphics#closing-remarks)
 
 # Downloads
 (Once releases are complete, link here)
