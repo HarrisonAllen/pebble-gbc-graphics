@@ -294,7 +294,7 @@ Related functions:
 * Setters
     * [`GBC_Graphics_lcdc_set`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L487-L493)
     * [`GBC_Graphics_lcdc_set_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
-    * [`GBC_Graphics_lcdc_set_bg_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L495-L501)
+    * [`GBC_Graphics_lcdc_set_bg_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L503-L509)
     * [`GBC_Graphics_lcdc_set_window_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L511-L517)
     * [`GBC_Graphics_lcdc_set_sprite_layer_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L519-L525)
     * [`GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L527-L533) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/game.c#L261-L266))
