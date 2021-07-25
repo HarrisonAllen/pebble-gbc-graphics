@@ -1,14 +1,14 @@
 {
     "files.associations": {
+        "background.h": "c",
+        "cstdlib": "c",
+        "hiscore.h": "c",
+        "items.h": "c",
+        "main_window.h": "c",
         "mario.h": "c",
         "pebble.h": "c",
-        "pokemon.h": "c",
-        "main_window.h": "c",
-        "cstdlib": "c",
         "pebble-gbc-graphics.h": "c",
+        "pokemon.h": "c",
         "util.h": "c",
-        "background.h": "c",
-        "items.h": "c",
-        "hiscore.h": "c"
     }
 }
