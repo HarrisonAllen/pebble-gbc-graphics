@@ -46,7 +46,7 @@ Want to create an app or watchface for the Pebble, but don't know where to start
 [**Closing Remarks**](https://github.com/HarrisonAllen/pebble-gbc-graphics#closing-remarks)
 
 # Downloads
-(Once releases are complete, link here)
+You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-graphics/releases) for the library (.zip), Tiny Pilot (.pbw), and the Starter Project (.pbw). You can also go to the [downloads directory](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/downloads) and download them there.
 
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. However, these rendering techniques are wrapped into an easy to use library. It is compatible with all Pebbles.
