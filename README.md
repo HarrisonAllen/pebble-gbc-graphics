@@ -388,7 +388,7 @@ The process for creating tilesheets from an image has a few specific steps, I pe
 1. Create the spritesheet using the [2bpp palette](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/2bpp.gpl)
     * For the easiest setup, just modify [SampleTilesheet.xcf](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SampleTilesheet.xcf). The image should already be in an indexed color mode, and the palette should already exist as `Colormap of image #xx` in the Palettes window (`Windows`->`Dockable Dialogs`->`Palettes`).
     * To convert a preexisting image to a 2bpp palette, you can change the image color mode by going to `image`->`mode`->`indexed`->`Use custom palette`->Select `2bpp` from the list. [This guide](https://daviesmediadesign.com/how-to-install-custom-palettes-in-gimp/) may or may not do the trick if you want to add the palette to your installation
-    * I prefer to create my tilesheets in a ribbon, but they can be in any shape. Just keep in mind that the conversion script will scan your tilesheet from left to right, top to bottom, one tile at a time.
+    * I prefer to create my tilesheets as a ribbon (all tiles in a line), but they can be in any shape. Just keep in mind that the conversion script will scan your tilesheet from left to right, top to bottom, one tile at a time.
 2. Export the tilesheet as a `.png` file
     * ![SampleTilesheet.png](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/tilesheets/SampleTilesheet.png)
 3. From the command line, run the [`convert_tilesheet.py`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/assets/helper-scripts/convert_tilesheet.py) script with your filename as arguments
@@ -402,7 +402,7 @@ The process for creating tilesheets from an image has a few specific steps, I pe
 4. Now, take the `.bin` file from `assets/helper-scripts/Output` and place it into your project resources
     * [SampleTilesheet.bin](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/helper-scripts/Output/SampleTilesheet.bin)
     * I like to place the tilesheets under `[project name]/resources/data`, but you can place it anywhere in the `resources` folder
-5. To load in the tilesheet, [see below](https://github.com/HarrisonAllen/pebble-gbc-graphics#loading-tilesheets)
+5. To load in the tilesheet, [see 'Manipulating the VRAM'](https://github.com/HarrisonAllen/pebble-gbc-graphics#manipulating-the-vram)
 
 As long as you create a binary file in a 2bpp format, where each tile is 16 bytes (2 bits per pixel * 8 pixels wide * 8 pixels tall), then you can come up with your own methods to do so.
 
@@ -432,27 +432,3 @@ These are the tilesheets I designed and generate for Tiny Pilot. All of these ca
 * **Text Tilesheet**
     * Contains the tiles for text
     * ![Text Tilesheet](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/TextTilesheet.png)
-
-### Setting Background and Window Tiles
-* Function [`GBC_Graphics_bg_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L801)
-* You can also set the Window layer tiles with [`GBC_Graphics_window_set_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L969)
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/graphics/text.c#L70) uses this sometimes, but mostly uses `GBC_Graphics_bg_set_tile_and_attrs`
-* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L60) demonstrates a basic setting of tiles based on x position.
-
-### Creating Attributes
-* Function [`GBC_Graphics_attr_make`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L680)
-* This is a convenience function to create an attribute byte. 
-* Attribute bytes define the following characteristics of a tile:
-    * The palette the tile should use
-    * The VRAM bank the tile is in
-    * If the tile should be flipped horizontally or vertically
-    * Whether or not the background/window tile has rendering priority over the sprite layer
-* Attribute bytes for each layer are defined in these locations: [background attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L175), [window attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L187), and [sprite attributes](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L154).
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/player.c#L106) does this quite often, and this example shows the creation of the attributes for the plane sprites.
-
-### Setting Background and Window Attributes
-* Function [`GBC_Graphics_bg_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L811)
-* You can also set the Window layer attributes with [`GBC_Graphics_window_set_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L979)
-* In general, I [create an attribute](https://github.com/HarrisonAllen/pebble-gbc-graphics#creating-tilesheets) using the convenience function and pass the result into `set_attrs`.
-* You can also set each attribute individually. For example, the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/starter-project/src/c/main.c#L61) directly sets the tile palettes based on y position.
-* You can set both tiles and attributes simultaneously, using [`GBC_Graphics_bg_set_tile_and_attrs`]()
