@@ -347,26 +347,37 @@ Related functions:
 ## OAM
 Read more about [the sprite layer](https://github.com/HarrisonAllen/pebble-gbc-graphics#the-sprite-layer) and [the OAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam).
 
+While one sprite can only be either 8x8 or 8x16 pixels, if you use some strategic programming, you can combine these single sprites into a larger object, like the plane in Tiny Pilot.
+
 Related functions:
 * Setters:
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
-    * [``]()
+    * [`GBC_Graphics_oam_set_sprite`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1103-L1113) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/player.c#L113))
+    * [`GBC_Graphics_oam_move_sprite`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1115-L1123) 
+    * [`GBC_Graphics_oam_set_sprite_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1125-L1132)
+    * [`GBC_Graphics_oam_set_sprite_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1134-L1141)
+    * [`GBC_Graphics_oam_set_sprite_pos`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1143-L1151) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/hiscore.c#L79-L83)
+    * [`GBC_Graphics_oam_hide_sprite`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1153-L1159) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/items.c#L89-L91))
+    * [`GBC_Graphics_oam_change_sprite_num`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1224-L1232)
+    * [`GBC_Graphics_oam_swap_sprites`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1234-L1241)
+    * [`GBC_Graphics_oam_swap_sprite_tiles`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1243-L1250)
+    * [`GBC_Graphics_oam_swap_sprite_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1252-L1259)
+    * [`GBC_Graphics_oam_swap_sprite_tiles_and_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1261-L1268)
+* Attribute setters:
+    * [`GBC_Graphics_oam_set_sprite_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1161-L1168) ([Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/actors/items.c#L121))
+    * [`GBC_Graphics_oam_set_sprite_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1170-L1177)
+    * [`GBC_Graphics_oam_set_sprite_palette`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1179-L1186)
+    * [`GBC_Graphics_oam_set_sprite_vram_bank`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1188-L1195)
+    * [`GBC_Graphics_oam_set_sprite_x_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1197-L1204)
+    * [`GBC_Graphics_oam_set_sprite_y_flip`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1206-L1213)
+    * [`GBC_Graphics_oam_set_sprite_priority`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1215-L1222)
 * Getters:
     * [`GBC_Graphics_oam_get_sprite_x`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1063-L1071)
-    * [``]()
-    * [``]()
-    * [``]()
+    * [`GBC_Graphics_oam_get_sprite_y`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1073-L1081)
+    * [`GBC_Graphics_oam_get_sprite_tile`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1083-L1091)
+    * [`GBC_Graphics_oam_get_sprite_attrs`](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/tiny-pilot/src/c/pebble-gbc-graphics/pebble-gbc-graphics.h#L1093-L1101)
 
 ## Misc
+
 
 ## Creating Tilesheets
 The process for creating tilesheets from an image has a few specific steps, I personally use [GIMP](https://www.gimp.org/):
