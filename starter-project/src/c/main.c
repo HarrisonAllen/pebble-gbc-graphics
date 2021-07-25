@@ -25,7 +25,7 @@ static void load_tilesheet() {
 }
 
 /**
- * Sets palettes for the background in various colors. You may find this link helpful: https://developer.rebble.io/developer.pebble.com/guides/tools-and-resources/color-picker/index.html
+ * Sets palettes for the background in various gradients. You may find this link helpful: https://developer.rebble.io/developer.pebble.com/guides/tools-and-resources/color-picker/index.html
  */
 static void create_palettes() {
 #if defined(PBL_COLOR) // Pebbles with color screens use the ARGB8 Pebble color definitions for palettes
