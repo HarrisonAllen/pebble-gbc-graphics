@@ -5,6 +5,8 @@ Current version of pebble-gbc-graphics: **v1.2.0**
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
+You can check out my published [Pebble projects here!](https://apps.rebble.io/en_US/developer/5e28ea923dd3109f151c7e08/1)
+
 # Table of Contents
 
 [**Downloads**](https://github.com/HarrisonAllen/pebble-gbc-graphics#downloads)
