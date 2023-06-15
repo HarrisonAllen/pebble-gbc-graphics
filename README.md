@@ -2,6 +2,7 @@
 This is the repository and tutorial for the GBC Graphics library for the Pebble smartwatch.
 
 Current version of pebble-gbc-graphics: **v1.2.0**
+Current version of pebble-gbc-graphics-advanced: **v1.0.0**
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
@@ -55,6 +56,9 @@ You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-gra
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. It is compatible with all Pebbles.
 
+*NEW* I'm working on implementing `pebble-gbc-graphics-advanced`, with the goal of getting closer to GBA graphics. So far, this new library has:
+* 4bpp tiles. In other words, there are now up to 16 colors per tile!
+
 ## In This Repo
 * [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) - App - pebble-gbc-graphics v1.2.0
     * A barebones implementation of the graphics library, you can use this as a template!
@@ -62,6 +66,9 @@ This library allows you to create graphics for your watchface, app, or game (alm
 * [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot) - App - pebble-gbc-graphics v1.2.0
     * A well-documented, full game that demonstrates most of the features in the library
     * ![Tiny Pilot](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot.png) ![Tiny Pilot - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot-bw.png)
+* [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.0.0
+    * A barebones implementation of the advanced graphics library, you can use this as a template!
+    * ![Starter Project Advanced](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-bw.png)
     
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
