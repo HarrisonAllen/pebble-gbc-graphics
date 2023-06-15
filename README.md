@@ -2,6 +2,7 @@
 This is the repository and tutorial for the GBC Graphics library for the Pebble smartwatch.
 
 Current version of pebble-gbc-graphics: **v1.2.0**
+
 Current version of pebble-gbc-graphics-advanced: **v1.0.0**
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
