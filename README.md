@@ -4,6 +4,9 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
 Current version of pebble-gbc-graphics-advanced: **v1.0.0**
+Changelogs:
+* v1.0.0
+    * Tiles are now 4bpp, i.e. 16 colors per tile/palette
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
@@ -57,8 +60,7 @@ You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-gra
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. It is compatible with all Pebbles.
 
-*NEW* I'm working on implementing `pebble-gbc-graphics-advanced`, with the goal of getting closer to GBA graphics. So far, this new library has:
-* 4bpp tiles. In other words, there are now up to 16 colors per tile!
+*NEW* I'm working on implementing `pebble-gbc-graphics-advanced`, with the goal of getting closer to GBA graphics.
 
 ## In This Repo
 * [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) - App - pebble-gbc-graphics v1.2.0
