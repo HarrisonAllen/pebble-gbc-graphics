@@ -1,6 +1,20 @@
 #include <pebble.h>
 #include "pebble-gbc-graphics-advanced/pebble-gbc-graphics-advanced.h"
 
+/*
+ * This is the duration of a frame, in milliseconds (more or less)
+ * E.g. a FRAME_DURATION of 33ms will give ~30 fps
+ * For "as fast as possible" (i.e. render as soon as the
+ * graphics engine has completed its last draw cycle),
+ * use a FRAME_DURATION of 2. 
+ * Aplite has a slower CPU than the rest, so it will get worse frame 
+ * rate no matter what
+ * Basalt and Chalk are very similar, Chalk is just barely slower
+ * Diorite has similar performance to Basalt and Chalk, but may
+ * need to be tweaked to get the same performance
+ */
+#define FRAME_DURATION 250
+
 #define NUMBER_OF_VRAM_BANKS_TO_GENERATE 1
 
 #define Y_OFFSET (PBL_DISPLAY_HEIGHT - 180) / 2
@@ -9,8 +23,12 @@
 static Window *s_window;
 static GBC_Graphics *s_gbc_graphics;
 static BitmapLayer *s_background_layer;
-
 static GBitmap *s_background_bitmap;
+static AppTimer *s_frame_timer;  // The timer used to setup the game step callback
+bool sprite_reverse;
+int sprite_min = 90 - 30 + X_OFFSET + GBC_SPRITE_OFFSET_X;
+int sprite_max = 90 + 30 + X_OFFSET + GBC_SPRITE_OFFSET_X;
+
 
 /**
  * Loads a tilesheet from the resources into a VRAM bank
@@ -33,33 +51,79 @@ static void load_tilesheet() {
  */
 static void create_palettes() {
 #if defined(PBL_COLOR) // Pebbles with color screens use the ARGB8 Pebble color definitions for palettes (which are just bytes)
-    GBC_Graphics_set_bg_palette(s_gbc_graphics, 0, 16, GColorBlackARGB8, GColorOxfordBlueARGB8, GColorDukeBlueARGB8, GColorBlueARGB8, GColorImperialPurpleARGB8, GColorPurpleARGB8, GColorMagentaARGB8, GColorBulgarianRoseARGB8, GColorDarkCandyAppleRedARGB8, GColorRedARGB8, GColorArmyGreenARGB8, GColorLimerickARGB8, GColorYellowARGB8, GColorDarkGreenARGB8, GColorIslamicGreenARGB8, GColorGreenARGB8);
+    GBC_Graphics_set_bg_palette(s_gbc_graphics, 0, 5, GColorBlackARGB8, GColorRedARGB8, GColorYellowARGB8, GColorBlueARGB8, GColorGreenARGB8);
+    GBC_Graphics_set_sprite_palette(s_gbc_graphics, 0, 2, GColorBlackARGB8, GColorBlackARGB8);
 #else // Pebbles with black and white screens use the GBC_COLOR definitions for palettes
-    GBC_Graphics_set_bg_palette(s_gbc_graphics, 0, 16, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_GRAY, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_GRAY, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_GRAY, GBC_COLOR_WHITE, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_GRAY, GBC_COLOR_WHITE);
+    GBC_Graphics_set_bg_palette(s_gbc_graphics, 0, 5, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_GRAY, GBC_COLOR_WHITE, GBC_COLOR_BLACK);
+    GBC_Graphics_set_sprite_palette(s_gbc_graphics, 0, 2, GBC_COLOR_BLACK, GBC_COLOR_BLACK);
 #endif
 }
 
 /**
  * Sets the background tiles in a test pattern to demonstrate palettes
  */
-static void generate_background() {
+static void generate_backgrounds() {
     for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
         for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
-            if (y % 3 == 1 || x % 3 == 1) {
-                GBC_Graphics_bg_set_tile(s_gbc_graphics, x, y, 0);
-            } else {
-                GBC_Graphics_bg_set_tile(s_gbc_graphics, x, y, (x + y) % 16);
+            for (uint8_t bg_num = 0; bg_num < GBC_NUM_BG_LAYERS; bg_num++) {
+                if (rand() % 8 > 0) {
+                    GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, 0);
+                } else {
+                    GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, bg_num + 1);
+                }
+                GBC_Graphics_bg_set_tile_palette(s_gbc_graphics, bg_num, x, y, 0);
             }
-            GBC_Graphics_bg_set_tile_palette(s_gbc_graphics, x, y, 0);
         }
     }
 }
 
+static void generate_sprite() {
+    GBC_Graphics_oam_set_sprite(s_gbc_graphics, 0, 90 + X_OFFSET + GBC_SPRITE_OFFSET_X, 90 + Y_OFFSET + GBC_SPRITE_OFFSET_Y, 1, GBC_Graphics_attr_make(0, 0, false, false));
+}
+
+static void step() {
+    GBC_Graphics_bg_move(s_gbc_graphics, 0, 0, 1);
+    GBC_Graphics_bg_move(s_gbc_graphics, 1, -1, 0);
+    GBC_Graphics_bg_move(s_gbc_graphics, 2, 1, -1);
+    GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
+
+    if (sprite_reverse) {
+        GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, -2, 0);
+        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) < sprite_min)
+            sprite_reverse = false;
+    } else {
+        GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, 2, 0);
+        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) > sprite_max)
+            sprite_reverse = true;
+    }
+    
+    GBC_Graphics_render(s_gbc_graphics); // Render the screen every step
+}
+
 /**
- * Hides the window layer from view by pushing it off of the screen
+ * The callback for the timer, this is where we call the game step
  */
-static void hide_window_layer() {
-    GBC_Graphics_window_set_offset_y(s_gbc_graphics, GBC_Graphics_get_screen_height(s_gbc_graphics));
+static void frame_timer_handle(void* context) {
+    s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);
+    step();
+}
+
+/**
+ * Handler for when the app loses or gains focus
+ */
+static void will_focus_handler(bool in_focus) {
+    if (!in_focus) {
+        // If a notification pops up while the timer is firing
+        // very rapidly, it will crash the entire watch :)
+        // Stopping the timer when a notification appears will prevent this
+        if (s_frame_timer != NULL) {
+            app_timer_cancel(s_frame_timer);
+        }
+    } else {
+        if (s_frame_timer != NULL) {
+            s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);
+        }
+    }
 }
 
 /**
@@ -79,10 +143,15 @@ static void window_load(Window *window) {
     // Create the GBC_Graphics object
     s_gbc_graphics = GBC_Graphics_ctor(s_window, NUMBER_OF_VRAM_BANKS_TO_GENERATE);
 
+    GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(s_gbc_graphics, true);
     load_tilesheet();
     create_palettes();
-    generate_background();
-    hide_window_layer();
+    generate_backgrounds();
+    generate_sprite();
+
+    // Setup the frame timer that will call the game step function
+    s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);
+    app_focus_service_subscribe(will_focus_handler);
 
     // Display the graphics
     GBC_Graphics_render(s_gbc_graphics);

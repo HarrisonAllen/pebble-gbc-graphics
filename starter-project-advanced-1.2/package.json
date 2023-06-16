@@ -7,8 +7,7 @@
   "dependencies": {},
   "pebble": {
     "displayName": "Starter Project Advanced 1.2",
-    "uuid": "347ec361-6f14-4a32-9b72-58149e2869ff",
-    "uuidNote": "When done, replace uuid with '! INVALID ! REPLACE WITH UUID FROM https://www.uuidgenerator.net/ OR START A NEW PROJECT'",
+    "uuid": "! INVALID ! REPLACE WITH UUID FROM https://www.uuidgenerator.net/ OR START A NEW PROJECT",
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [

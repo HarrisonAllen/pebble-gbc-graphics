@@ -3,12 +3,16 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
-Current version of pebble-gbc-graphics-advanced: **v1.1.0**
+Current version of pebble-gbc-graphics-advanced: **v1.2.0**
 Changelogs:
 * v1.0.0
     * Tiles are now 4bpp, i.e. 16 colors per tile/palette
 * v1.1.0
     * Background layers now use transparancy for the 0th pixel
+* v1.2.0
+    * Removed window layer
+    * Increased number of background layers to 4
+    * Disabled priority, sprites always render on top (temporary until sprite update)
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
@@ -77,6 +81,9 @@ This library allows you to create graphics for your watchface, app, or game (alm
 * [Starter Project Advanced 1.1](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.1) - App - pebble-gbc-graphics-advanced v1.1.0
     * A barebones implementation of the advanced graphics library v1.1.0, you can use this as a template!
     * ![Starter Project Advanced 1.1](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.1.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.1-bw.png)
+* [Starter Project Advanced 1.2](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.2) - App - pebble-gbc-graphics-advanced v1.2.0
+    * A barebones implementation of the advanced graphics library v1.2.0, you can use this as a template!
+    * ![Starter Project Advanced 1.2](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2-bw.png)
     
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
