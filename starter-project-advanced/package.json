@@ -1,12 +1,12 @@
 {
-  "name": "starter-project",
+  "name": "starter-project-advanced",
   "author": "Your Name Here",
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
   "dependencies": {},
   "pebble": {
-    "displayName": "Starter Project",
+    "displayName": "Starter Project Advanced",
     "uuid": "! INVALID ! REPLACE WITH UUID FROM https://www.uuidgenerator.net/ OR START A NEW PROJECT",
     "sdkVersion": "3",
     "enableMultiJS": true,
