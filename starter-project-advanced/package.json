@@ -7,7 +7,7 @@
   "dependencies": {},
   "pebble": {
     "displayName": "Starter Project",
-    "uuid": "When done, replace uuid with '! INVALID ! REPLACE WITH UUID FROM https://www.uuidgenerator.net/ OR START A NEW PROJECT'",
+    "uuid": "! INVALID ! REPLACE WITH UUID FROM https://www.uuidgenerator.net/ OR START A NEW PROJECT",
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
