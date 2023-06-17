@@ -1,0 +1,35 @@
+{
+  "name": "starter-project-advanced-1.3",
+  "author": "Your Name Here",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Starter Project Advanced 1.3",
+    "uuid": "! INVALID ! REPLACE WITH UUID FROM https://www.uuidgenerator.net/ OR START A NEW PROJECT",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "dummy"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "raw",
+          "name": "DATA_SAMPLE_TILESHEET",
+          "file": "data/SampleTilesheet.bin"
+        }
+      ]
+    }
+  }
+}
