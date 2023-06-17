@@ -13,7 +13,7 @@
  * Diorite has similar performance to Basalt and Chalk, but may
  * need to be tweaked to get the same performance
  */
-#define FRAME_DURATION 250
+#define FRAME_DURATION 100
 
 #define NUMBER_OF_VRAM_BANKS_TO_GENERATE 1
 
@@ -22,8 +22,6 @@
 
 static Window *s_window;
 static GBC_Graphics *s_gbc_graphics;
-static BitmapLayer *s_background_layer;
-static GBitmap *s_background_bitmap;
 static AppTimer *s_frame_timer;  // The timer used to setup the game step callback
 bool sprite_reverse;
 int sprite_min = 90 - 30 + X_OFFSET + GBC_SPRITE_OFFSET_X;
@@ -130,18 +128,10 @@ static void will_focus_handler(bool in_focus) {
  * Execute all of the graphics functions
  */
 static void window_load(Window *window) {
-    // Normal pebble things
-    Layer *window_layer = window_get_root_layer(window);
-    
-    // background image
-    s_background_layer = bitmap_layer_create(GRect(0 + X_OFFSET, 0 + Y_OFFSET, 180, 180));
-    s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND);
-    bitmap_layer_set_bitmap(s_background_layer, s_background_bitmap);
-    
-    layer_add_child(window_layer, bitmap_layer_get_layer(s_background_layer));
-
     // Create the GBC_Graphics object
     s_gbc_graphics = GBC_Graphics_ctor(s_window, NUMBER_OF_VRAM_BANKS_TO_GENERATE);
+
+    GBC_Graphics_set_screen_bounds(s_gbc_graphics, GBC_SCREEN_BOUNDS_SQUARE);
 
     GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(s_gbc_graphics, true);
     load_tilesheet();
@@ -160,13 +150,6 @@ static void window_load(Window *window) {
 static void window_unload(Window *window) {
     // Destroy the GBC_Graphics object
     GBC_Graphics_destroy(s_gbc_graphics);
-
-    // Destroy pebble assets
-    if (s_background_layer != NULL)
-        bitmap_layer_destroy(s_background_layer);
-
-    if (s_background_bitmap != NULL)
-        gbitmap_destroy(s_background_bitmap);
 }
 
 static void init(void) {

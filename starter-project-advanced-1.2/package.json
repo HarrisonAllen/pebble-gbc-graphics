@@ -28,11 +28,6 @@
           "type": "raw",
           "name": "DATA_SAMPLE_TILESHEET",
           "file": "data/SampleTilesheet.bin"
-        },
-        {
-            "type": "bitmap", 
-            "name": "IMAGE_BACKGROUND", 
-            "file": "img/Background.png"
         }
       ]
     }
