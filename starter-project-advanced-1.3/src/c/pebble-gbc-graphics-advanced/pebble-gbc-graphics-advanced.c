@@ -311,6 +311,9 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 // Get the tile and attrs from the map
                 tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH ??? what ???
                 tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
+                if (tile_attr & GBC_ATTR_HIDE_FLAG) {
+                    continue;
+                }
                 
                 // Get the tile from vram
                 offset = tile_num << 5; // tile_num * GBC_TILE_NUM_BYTES
@@ -374,7 +377,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
             sprite = &self->oam[overlapped_sprites[i]*4];
             sprite_y = sprite[1] - GBC_SPRITE_OFFSET_Y;
             // Don't draw the sprite if it's offscreen
-            if (sprite[0] == 0 || sprite[1] == 0 || sprite[0] >= self->screen_width + GBC_SPRITE_OFFSET_X || sprite[1] >= self->screen_height + GBC_SPRITE_OFFSET_Y) {
+            if (sprite[0] == 0 || sprite[1] == 0 || sprite[0] >= self->screen_width + GBC_SPRITE_OFFSET_X 
+                || sprite[1] >= self->screen_height + GBC_SPRITE_OFFSET_Y || sprite[3] & GBC_ATTR_HIDE_FLAG) {
                 continue;
             }
 
@@ -560,8 +564,8 @@ void GBC_Graphics_set_oam_interrupt_callback(GBC_Graphics *self, void (*callback
     self->oam_interrupt_callback = callback;
 }
 
-uint8_t GBC_Graphics_attr_make(uint8_t palette, uint8_t vram_bank, bool is_x_flipped, bool is_y_flipped) {
-    return (palette) | (vram_bank * GBC_ATTR_VRAM_BANK_START) | (is_x_flipped * GBC_ATTR_FLIP_FLAG_X) | (is_y_flipped * GBC_ATTR_FLIP_FLAG_Y);
+uint8_t GBC_Graphics_attr_make(uint8_t palette, uint8_t vram_bank, bool is_x_flipped, bool is_y_flipped, bool is_hidden) {
+    return (palette) | (vram_bank * GBC_ATTR_VRAM_BANK_START) | (is_x_flipped * GBC_ATTR_FLIP_FLAG_X) | (is_y_flipped * GBC_ATTR_FLIP_FLAG_Y) | (is_hidden * GBC_ATTR_HIDE_FLAG);
 }
 
 uint8_t GBC_Graphics_attr_get_palette_num(uint8_t attributes) {
@@ -578,6 +582,10 @@ bool GBC_Graphics_attr_is_x_flipped(uint8_t attributes) {
 
 bool GBC_Graphics_attr_is_y_flipped(uint8_t attributes) {
     return (bool)(attributes & GBC_ATTR_FLIP_FLAG_Y);
+}
+
+bool GBC_Graphics_attr_is_hidden(uint8_t attributes) {
+    return (bool)(attributes & GBC_ATTR_HIDE_FLAG);
 }
 
 uint8_t GBC_Graphics_bg_get_scroll_x(GBC_Graphics *self, uint8_t bg_layer) {
@@ -656,6 +664,10 @@ void GBC_Graphics_bg_set_tile_x_flip(GBC_Graphics *self, uint8_t bg_layer, uint8
 
 void GBC_Graphics_bg_set_tile_y_flip(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, bool flipped) {
     modify_byte(&(self->bg_attrmaps + bg_layer * GBC_TILEMAP_NUM_BYTES)[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_FLIP_FLAG_Y, flipped, GBC_ATTR_FLIP_FLAG_Y);
+}
+
+void GBC_Graphics_bg_set_tile_hidden(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, bool hidden) {
+    modify_byte(&(self->bg_attrmaps + bg_layer * GBC_TILEMAP_NUM_BYTES)[GBC_POINT_TO_OFFSET(x, y)], GBC_ATTR_HIDE_FLAG, hidden, GBC_ATTR_HIDE_FLAG);
 }
 
 void GBC_Graphics_bg_move_tile(GBC_Graphics *self, uint8_t bg_layer, uint8_t src_x, uint8_t src_y, uint8_t dest_x, uint8_t dest_y, bool swap) {
@@ -743,6 +755,10 @@ void GBC_Graphics_oam_set_sprite_x_flip(GBC_Graphics *self, uint8_t sprite_num, 
 
 void GBC_Graphics_oam_set_sprite_y_flip(GBC_Graphics *self, uint8_t sprite_num, bool flipped) {
     modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_FLIP_FLAG_Y, flipped, GBC_ATTR_FLIP_FLAG_Y);
+}
+
+void GBC_Graphics_oam_set_sprite_hidden(GBC_Graphics *self, uint8_t sprite_num, bool hidden) {
+    modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_HIDE_FLAG, hidden, GBC_ATTR_HIDE_FLAG);
 }
 
 void GBC_Graphics_oam_change_sprite_num(GBC_Graphics *self, uint8_t source_sprite_num, uint8_t target_sprite_num, bool copy) {

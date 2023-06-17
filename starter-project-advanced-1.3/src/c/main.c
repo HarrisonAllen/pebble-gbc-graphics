@@ -16,7 +16,7 @@
 #define FRAME_DURATION 100
 
 #define NUM_VRAMS 1
-#define NUM_BACKGROUNDS 2
+#define NUM_BACKGROUNDS 4
 
 #define Y_OFFSET (PBL_DISPLAY_HEIGHT - 180) / 2
 #define X_OFFSET (PBL_DISPLAY_WIDTH - 180) / 2
@@ -77,14 +77,14 @@ static void generate_backgrounds() {
 }
 
 static void generate_sprite() {
-    GBC_Graphics_oam_set_sprite(s_gbc_graphics, 0, 90 + X_OFFSET + GBC_SPRITE_OFFSET_X, 90 + Y_OFFSET + GBC_SPRITE_OFFSET_Y, 1, GBC_Graphics_attr_make(0, 0, false, false));
+    GBC_Graphics_oam_set_sprite(s_gbc_graphics, 0, 90 + X_OFFSET + GBC_SPRITE_OFFSET_X, 90 + Y_OFFSET + GBC_SPRITE_OFFSET_Y, 1, GBC_Graphics_attr_make(0, 0, false, false, false));
 }
 
 static void step() {
     GBC_Graphics_bg_move(s_gbc_graphics, 0, 0, 1);
     GBC_Graphics_bg_move(s_gbc_graphics, 1, -1, 0);
-    // GBC_Graphics_bg_move(s_gbc_graphics, 2, 1, -1);
-    // GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
+    GBC_Graphics_bg_move(s_gbc_graphics, 2, 1, -1);
+    GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
 
     if (sprite_reverse) {
         GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, -2, 0);
@@ -95,6 +95,7 @@ static void step() {
         if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) > sprite_max)
             sprite_reverse = true;
     }
+    GBC_Graphics_oam_set_sprite_hidden(s_gbc_graphics, 0, (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) % 4) < 2);
     
     GBC_Graphics_render(s_gbc_graphics); // Render the screen every step
 }

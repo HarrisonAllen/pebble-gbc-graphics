@@ -68,6 +68,7 @@
 #define GBC_ATTR_VRAM_BANK_03_FLAG 0X18 ///> Convenience flag for bank 3
 #define GBC_ATTR_FLIP_FLAG_X 0x20       ///> Flag for horizontal flip
 #define GBC_ATTR_FLIP_FLAG_Y 0x40       ///> Flag for vertical flip
+#define GBC_ATTR_HIDE_FLAG 0X80         ///> Flag for hide bit
 
 /** LCDC flags*/
 #define GBC_LCDC_ENABLE_FLAG 0x01        ///> Flag for LCDC enable bit
@@ -156,7 +157,7 @@ struct _gbc_graphics {
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
      *      -Bit 5: X Flip - Setting bit will flip the sprite horizontally when rendered
      *      -Bit 6: Y Flip - Setting bit will flip the sprite vertically when rendered
-     *      -Bit 7: Unused
+     *      -Bit 7: Hide - Setting the bit will make the sprite hidden
      */
     uint8_t *oam;
     /**
@@ -174,7 +175,7 @@ struct _gbc_graphics {
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
      *      -Bit 5: X Flip - Setting bit will flip the tile horizontally when rendered
      *      -Bit 6: Y Flip - Setting bit will flip the tile vertically when rendered
-     *      -Bit 7: Unused
+     *      -Bit 7: Hide - Setting the bit will make the tile hidden
      */
     uint8_t *bg_attrmaps;
     /**
@@ -640,12 +641,13 @@ void GBC_Graphics_set_oam_interrupt_callback(GBC_Graphics *self, void (*callback
  * 
  * @param palette The palette to use
  * @param vram_bank The VRAM bank to use
- * @param is_x_flipped Should the tile be flipped horizontally?
- * @param is_y_flipped Should the tile be flipped vertically?
+ * @param is_x_flipped Should the tile/sprite be flipped horizontally?
+ * @param is_y_flipped Should the tile/sprite be flipped vertically?
+ * @param is_hidden Should the tile/sprite be hidden?
  * 
  * @return An attribute byte containing the given parameters
  */
-uint8_t GBC_Graphics_attr_make(uint8_t palette, uint8_t vram_bank, bool is_x_flipped, bool is_y_flipped);
+uint8_t GBC_Graphics_attr_make(uint8_t palette, uint8_t vram_bank, bool is_x_flipped, bool is_y_flipped, bool is_hidden);
 
 /**
  * Extracts the palette number from an attribute byte
@@ -682,6 +684,16 @@ bool GBC_Graphics_attr_is_x_flipped(uint8_t attributes);
  * @return true if the attribute has a vertical flip flag
  */
 bool GBC_Graphics_attr_is_y_flipped(uint8_t attributes);
+
+/**
+ * Checks if the attribute byte has a hide flag
+ * 
+ * @param attributes An attribute byte
+ * 
+ * @return true if the attribute has a hide flag
+ */
+bool GBC_Graphics_attr_is_hidden(uint8_t attributes);
+
 
 /**
  * Gets the current x position of the background scroll
@@ -843,6 +855,17 @@ void GBC_Graphics_bg_set_tile_x_flip(GBC_Graphics *self, uint8_t bg_layer, uint8
  * @param flipped If the tile should be flipped vertically
  */
 void GBC_Graphics_bg_set_tile_y_flip(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, bool flipped);
+
+/**
+ * Sets if the tile at the given position on the background should be hidden
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param bg_layer The number of the background layer, from 0 to 3
+ * @param x The x position on the background, from 0 to 31
+ * @param y The y position on the background, from 0 to 31
+ * @param hidden If the tile should be hidden
+ */
+void GBC_Graphics_bg_set_tile_hidden(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, bool hidden);
 
 /**
  * Moves a tile from one location to another
@@ -1008,6 +1031,14 @@ void GBC_Graphics_oam_set_sprite_x_flip(GBC_Graphics *self, uint8_t sprite_num, 
  * @param flipped Should the sprite be flipped vertical?
  */
 void GBC_Graphics_oam_set_sprite_y_flip(GBC_Graphics *self, uint8_t sprite_num, bool flipped);
+/**
+ * Sets the sprite's hide bit
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * @param flipped Should the sprite be hidden?
+ */
+void GBC_Graphics_oam_set_sprite_hidden(GBC_Graphics *self, uint8_t sprite_num, bool hidden);
 
 /**
  * Moves a sprite from one position in OAM to another
