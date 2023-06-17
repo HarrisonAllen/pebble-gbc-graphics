@@ -15,7 +15,8 @@
  */
 #define FRAME_DURATION 100
 
-#define NUMBER_OF_VRAM_BANKS_TO_GENERATE 1
+#define NUM_VRAMS 1
+#define NUM_BACKGROUNDS 2
 
 #define Y_OFFSET (PBL_DISPLAY_HEIGHT - 180) / 2
 #define X_OFFSET (PBL_DISPLAY_WIDTH - 180) / 2
@@ -63,7 +64,7 @@ static void create_palettes() {
 static void generate_backgrounds() {
     for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
         for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
-            for (uint8_t bg_num = 0; bg_num < GBC_NUM_BG_LAYERS; bg_num++) {
+            for (uint8_t bg_num = 0; bg_num < NUM_BACKGROUNDS; bg_num++) {
                 if (rand() % 8 > 0) {
                     GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, 0);
                 } else {
@@ -82,8 +83,8 @@ static void generate_sprite() {
 static void step() {
     GBC_Graphics_bg_move(s_gbc_graphics, 0, 0, 1);
     GBC_Graphics_bg_move(s_gbc_graphics, 1, -1, 0);
-    GBC_Graphics_bg_move(s_gbc_graphics, 2, 1, -1);
-    GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
+    // GBC_Graphics_bg_move(s_gbc_graphics, 2, 1, -1);
+    // GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
 
     if (sprite_reverse) {
         GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, -2, 0);
@@ -129,7 +130,7 @@ static void will_focus_handler(bool in_focus) {
  */
 static void window_load(Window *window) {
     // Create the GBC_Graphics object
-    s_gbc_graphics = GBC_Graphics_ctor(s_window, NUMBER_OF_VRAM_BANKS_TO_GENERATE);
+    s_gbc_graphics = GBC_Graphics_ctor(s_window, NUM_VRAMS, NUM_BACKGROUNDS);
 
     GBC_Graphics_set_screen_bounds(s_gbc_graphics, GBC_SCREEN_BOUNDS_SQUARE);
 

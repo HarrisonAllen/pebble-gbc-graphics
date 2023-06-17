@@ -4,7 +4,7 @@
 ///> Forward declarations for static functions
 static void graphics_update_proc(Layer *layer, GContext *ctx);
 
-GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks) { 
+GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks, uint8_t num_backgrounds) { 
     GBC_Graphics *self = NULL;
     self = malloc(sizeof(GBC_Graphics));
     if (self == NULL)
@@ -28,16 +28,16 @@ GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks) {
     self->vram = (uint8_t*)malloc(GBC_VRAM_BANK_NUM_BYTES * num_vram_banks);
 
     // Allocate space for the tilemaps and attributemaps
-    self->bg_tilemaps = (uint8_t*)malloc(GBC_TILEMAP_NUM_BYTES * GBC_NUM_BG_LAYERS);
-    self->bg_attrmaps = (uint8_t*)malloc(GBC_ATTRMAP_NUM_BYTES * GBC_NUM_BG_LAYERS);
+    self->bg_tilemaps = (uint8_t*)malloc(GBC_TILEMAP_NUM_BYTES * num_backgrounds);
+    self->bg_attrmaps = (uint8_t*)malloc(GBC_ATTRMAP_NUM_BYTES * num_backgrounds);
 
     // Allocate space for the palette banks
     self->bg_palette_bank = (uint8_t*)malloc(GBC_PALETTE_BANK_NUM_BYTES);
     self->sprite_palette_bank = (uint8_t*)malloc(GBC_PALETTE_BANK_NUM_BYTES);
 
-    // TOOD: Scrollx and scroll y   
-    self->bg_scroll_x = (short*)malloc(GBC_NUM_BG_LAYERS * sizeof(short));
-    self->bg_scroll_y = (short*)malloc(GBC_NUM_BG_LAYERS * sizeof(short));
+    self->num_backgrounds = num_backgrounds;
+    self->bg_scroll_x = (short*)malloc(num_backgrounds * sizeof(short));
+    self->bg_scroll_y = (short*)malloc(num_backgrounds * sizeof(short));
 
     // Allocate space for the OAM
     self->oam = (uint8_t*)malloc(GBC_OAM_NUM_BYTES);
@@ -297,7 +297,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
         // First, draw the backgrounds
         for(x = min_x; x < max_x; x++) {
             // Decide what pixel to draw, in reverse bg order
-            for (bg_num = GBC_NUM_BG_LAYERS - 1; bg_num >= 0; bg_num--) {
+            for (bg_num = self->num_backgrounds - 1; bg_num >= 0; bg_num--) {
                 map_x = (x - self->screen_x_origin) + self->bg_scroll_x[bg_num];
                 map_y = self->line_y + self->bg_scroll_y[bg_num];
                 tile = self->vram + (bg_num << 10) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset

@@ -26,7 +26,6 @@
  * 256 tiles per bank * 32 bytes per tile = 8192 bytes
  */
 #define GBC_VRAM_BANK_NUM_BYTES 8192
-#define GBC_NUM_BG_LAYERS 4 ///> The number of background layers
 #define GBC_TILEMAP_WIDTH 32  ///> Width of the background layers in tiles
 #define GBC_TILEMAP_HEIGHT 32 ///> Height of the background layers in tiles
 /**
@@ -75,6 +74,8 @@
 #define GBC_LCDC_BCKGND_ENABLE_FLAG 0X02 ///> Flag for LCDC background enable bit
 #define GBC_LCDC_SPRITE_ENABLE_FLAG 0X08 ///> Flag for LCDC sprite enable bit
 #define GBC_LCDC_SPRITE_SIZE_FLAG 0x10   ///> Flag for LCDC sprite size bit
+#define GBC_LCDC_SPRITE_LAYER_Z_MASK 0x60///> Mask for LCDC sprite layer z number
+#define GBC_LCDC_SPRITE_LAYER_Z_SHIFT 5  ///> The bitshift for start of layer z mask
 
 /** STAT flags*/
 #define GBC_STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
@@ -129,8 +130,7 @@ struct _gbc_graphics {
      *  -Bit 3: Sprite Display Enable - Setting bit to 0 disables drawing of sprites
      *  -Bit 4: Sprite Size - Setting bit to 0 uses one tile per sprite (8x8), 
      *                        Setting bit to 1 uses two tiles per sprite(8x16)
-     *  -Bit 5: Unused
-     *  -Bit 6: Unused
+     *  -Bits 5-6: Sprite Layer Z, from 0 to 3
      *  -Bit 7: Unused
      */
     uint8_t lcdc;
@@ -161,8 +161,8 @@ struct _gbc_graphics {
     uint8_t *oam;
     /**
      * Background Tilemap buffers
-     * This tilemap contains 4 of 32 x 32 VRAM bank locations of 1 byte each, totaling 2096 bytes
-     * The offset of the screen view (which is 144x160 pixels) is set by bg_scroll_x and bg_scroll_y
+     * This tilemap contains 1-4 32 x 32 VRAM bank locations of 1 byte each, totaling 512 * num_backgrounds bytes
+     * The offset of the screen view is set by bg_scroll_x and bg_scroll_y
      */
     uint8_t *bg_tilemaps;
     /**
@@ -209,6 +209,7 @@ struct _gbc_graphics {
     void (*line_compare_interrupt_callback)(GBC_Graphics *); ///> The callback for the line compare interrupt
     void (*oam_interrupt_callback)(GBC_Graphics *); ///> The callback for the oam interrupt
 
+    uint8_t num_backgrounds; ///> The number of background layers
     uint8_t screen_x_origin; ///> The start x position of the rendered screen
     uint8_t screen_y_origin; ///> The start y position of the rendered screen
     uint8_t screen_width; ///> The width of the rendered screen
@@ -219,7 +220,8 @@ struct _gbc_graphics {
  * Creates a GBC Graphics object
  * 
  * @param window The window in which to display the GBC Graphics object
- * @param num_vram_banks The number of vram banks to generate, up to 4
+ * @param num_vram_banks The number of vram banks to generate, can be from 1-4
+ * @param num_backgrounds The number of background layers to generate, can be from 1-4
  * 
  * @return a pointer to the created GBC Graphics object
  * @note I recommend creating the GBC Graphics object in window_load or an equivalent function
@@ -227,7 +229,7 @@ struct _gbc_graphics {
  * loading from static resources on the fly. If designing for Basalt/Chalk/Diorite, then feel free
  * to use as many vram banks as you'd like
  */
-GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks);
+GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks, uint8_t num_backgrounds);
 
 /**
  * Destroys the GBC Graphics display object by freeing any memory it uses
