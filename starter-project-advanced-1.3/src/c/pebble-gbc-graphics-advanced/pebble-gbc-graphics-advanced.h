@@ -971,14 +971,6 @@ void GBC_Graphics_oam_set_sprite_y(GBC_Graphics *self, uint8_t sprite_num, uint8
 void GBC_Graphics_oam_set_sprite_pos(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y);
 
 /**
- * Hides a sprite by moving it off-screen
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- */
-void GBC_Graphics_oam_hide_sprite(GBC_Graphics *self, uint8_t sprite_num);
-
-/**
  * Sets the tile position in VRAM that the sprite will use to render
  * 
  * @param self A pointer to the target GBC Graphics object

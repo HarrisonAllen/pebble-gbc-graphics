@@ -728,11 +728,6 @@ void GBC_Graphics_oam_set_sprite_pos(GBC_Graphics *self, uint8_t sprite_num, uin
     self->oam[sprite_num*4+1] = y;
 }
 
-void GBC_Graphics_oam_hide_sprite(GBC_Graphics *self, uint8_t sprite_num) {
-    self->oam[sprite_num*4+0] = 0;
-    self->oam[sprite_num*4+1] = 0;
-}
-
 void GBC_Graphics_oam_set_sprite_tile(GBC_Graphics *self, uint8_t sprite_num, uint8_t tile_position) {
     self->oam[sprite_num*4+2] = tile_position;
 }
