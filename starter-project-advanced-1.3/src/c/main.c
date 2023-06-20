@@ -151,12 +151,6 @@ static void step() {
             }
             GBC_Graphics_oam_set_sprite_width(s_gbc_graphics, sprite_num, sprite_width);
             GBC_Graphics_oam_set_sprite_height(s_gbc_graphics, sprite_num, sprite_height);
-            // APP_LOG(APP_LOG_LEVEL_DEBUG, "Sprite dims: (%d, %d) -> %x, %d, %d",
-            //     sprite_width,
-            //     sprite_height,
-            //     s_gbc_graphics->oam[0 * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE],
-            //     GBC_Graphics_oam_get_sprite_width(s_gbc_graphics, 0),
-            //     GBC_Graphics_oam_get_sprite_height(s_gbc_graphics, 0));
         }
     } else {
         GBC_Graphics_oam_move_sprite(s_gbc_graphics, sprite_num, 2, 0);
