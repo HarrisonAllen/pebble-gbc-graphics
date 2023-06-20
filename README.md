@@ -22,10 +22,10 @@ Changelogs:
 
     | width/height | 0 | 1 | 2 | 3 |
     | --- | --- | --- | --- | --- |
-    | 0 | 1x1 tile<br>8x8 pixels | 2x1 tile<br>16x8 pixels | 4x1 tile<br>32x8 pixels | 8x1 tile<br>64x8 pixels |
-    | 1 | 1x tile<br>8x2 pixels | 2x2 tile<br>16x16 pixels | 4x2 tile<br>32x16 pixels | 8x2 tile<br>64x16 pixels |
-    | 2 | 1x tile<br>8x4 pixels | 2x4 tile<br>16x32 pixels | 4x4 tile<br>32x32 pixels | 8x4 tile<br>64x32 pixels |
-    | 3 | 1x tile<br>8x8 pixels | 2x8 tile<br>16x64 pixels | 4x8 tile<br>32x64 pixels | 8x8 tile<br>64x64 pixels |
+    | 0 | 1x1 tiles<br>8x8 pixels | 2x1 tiles<br>16x8 pixels | 4x1 tiles<br>32x8 pixels | 8x1 tiles<br>64x8 pixels |
+    | 1 | 1x tiles<br>8x2 pixels | 2x2 tiles<br>16x16 pixels | 4x2 tiles<br>32x16 pixels | 8x2 tiles<br>64x16 pixels |
+    | 2 | 1x tiles<br>8x4 pixels | 2x4 tiles<br>16x32 pixels | 4x4 tiles<br>32x32 pixels | 8x4 tiles<br>64x32 pixels |
+    | 3 | 1x tiles<br>8x8 pixels | 2x8 tiles<br>16x64 pixels | 4x8 tiles<br>32x64 pixels | 8x8 tiles<br>64x64 pixels |
 
     * Sprites draw from the tile bank starting at the sprite tile offset then left to right, top to bottom. So for a 2x4 tile sprite, it looks like this:
 
