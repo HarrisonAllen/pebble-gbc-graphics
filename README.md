@@ -8,7 +8,7 @@ Changelogs:
 * v1.0.0
     * Tiles are now 4bpp, i.e. 16 colors per tile/palette
 * v1.1.0
-    * Background layers now use transparancy for the 0th pixel
+    * Background layers now use transparency for the 0th pixel
 * v1.2.0
     * Removed window layer
     * Increased number of background layers to 4
