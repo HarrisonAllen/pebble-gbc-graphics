@@ -27,6 +27,7 @@ static AppTimer *s_frame_timer;  // The timer used to setup the game step callba
 bool sprite_reverse;
 int sprite_min = 90 - 30 + X_OFFSET + GBC_SPRITE_OFFSET_X;
 int sprite_max = 90 + 30 + X_OFFSET + GBC_SPRITE_OFFSET_X;
+int sprite_layer = NUM_BACKGROUNDS - 1;
 
 
 /**
@@ -88,14 +89,18 @@ static void step() {
 
     if (sprite_reverse) {
         GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, -2, 0);
-        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) < sprite_min)
+        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) < sprite_min) {
             sprite_reverse = false;
+            sprite_layer = (sprite_layer - 1) % NUM_BACKGROUNDS;
+            APP_LOG(APP_LOG_LEVEL_DEBUG, "Sprite layer: %d", sprite_layer);
+            GBC_Graphics_lcdc_set_sprite_layer_z(s_gbc_graphics, sprite_layer);
+        }
     } else {
         GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, 2, 0);
-        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) > sprite_max)
+        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) > sprite_max) {
             sprite_reverse = true;
+        }
     }
-    GBC_Graphics_oam_set_sprite_hidden(s_gbc_graphics, 0, (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) % 4) < 2);
     
     GBC_Graphics_render(s_gbc_graphics); // Render the screen every step
 }

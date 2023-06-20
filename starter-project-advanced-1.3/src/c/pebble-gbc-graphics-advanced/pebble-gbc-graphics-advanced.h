@@ -49,11 +49,14 @@
  */
 #define GBC_PALETTE_BANK_NUM_BYTES 128
 #define GBC_NUM_SPRITES 40 ///> The maximum number of sprites
+// TODO: Increase this to 5
+#define GBC_SPRITE_NUM_BYTES 4 ///> The number of bytes per sprite
 /**
  * The size of the OAM, calculated by:
  * 4 bytes per sprite * 40 sprite slots = 160 bytes
  */
 #define GBC_OAM_NUM_BYTES 160
+// TODO: Make x and y offsets 64 x 64 for new sprite sizes
 #define GBC_SPRITE_OFFSET_X 8 ///> The x offset to allow for offscreen rendering
 #define GBC_SPRITE_OFFSET_Y 16 ///> The y offset to allow for offscreen rendering
 
@@ -76,6 +79,7 @@
 #define GBC_LCDC_SPRITE_ENABLE_FLAG 0X08 ///> Flag for LCDC sprite enable bit
 #define GBC_LCDC_SPRITE_SIZE_FLAG 0x10   ///> Flag for LCDC sprite size bit
 #define GBC_LCDC_SPRITE_LAYER_Z_MASK 0x60///> Mask for LCDC sprite layer z number
+#define GBC_LCDC_SPRITE_LAYER_Z_START 0x20
 #define GBC_LCDC_SPRITE_LAYER_Z_SHIFT 5  ///> The bitshift for start of layer z mask
 
 /** STAT flags*/
@@ -124,6 +128,7 @@ typedef struct _gbc_graphics GBC_Graphics;
 struct _gbc_graphics {
     Layer *graphics_layer; ///< The Layer on which to render the graphics
     /**
+     * // TODO: Reorganize so that each background has their own enable flags
      * The LCD Control Byte
      *  -Bit 0: Enable - Setting bit to 0 disables drawing of backgrounds, and sprites
      *  -Bit 1: BG Display Enable - Setting bit to 0 disables drawing of backgrounds
@@ -132,6 +137,8 @@ struct _gbc_graphics {
      *  -Bit 4: Sprite Size - Setting bit to 0 uses one tile per sprite (8x8), 
      *                        Setting bit to 1 uses two tiles per sprite(8x16)
      *  -Bits 5-6: Sprite Layer Z, from 0 to 3
+     *      e.g. @ z = 3, sprite renders on top of BG 1, BG 2, BG 3, BG 4
+     *      e.g. @ z = 0, sprite renders on top of BG 1 and below BG 2, BG 3, BG 4
      *  -Bit 7: Unused
      */
     uint8_t lcdc;
@@ -145,10 +152,9 @@ struct _gbc_graphics {
     /**
      * OAM Buffer - Stores the data for the current sprites
      * The OAM contains 40 slots for 4 bytes of sprite information, which is as follows:
-     *  -Byte 0: Sprite x position, offset by -8 (sprite width) to allow for off-screen rendering
-     *      When x == 0 or x >= screen_width, the sprite will be hidden
-     *  -Byte 1: Sprite y position, offset by -16 (sprite height) to allow for off-screen rendering
-     *      When y == 0 or y >= screen_height, the sprite will be hidden
+     *  // TODO: Make x and y offsets 64 x 64 for new sprite sizes
+     *  -Byte 0: Sprite x position, offset by -8 (max sprite width) to allow for off-screen rendering
+     *  -Byte 1: Sprite y position, offset by -16 (max sprite height) to allow for off-screen rendering
      *  -Byte 2: Sprite tile position in VRAM bank
      *      Note: When the Sprite Size bit of LCDC is set, the tile at the memory location will be 
      *            on top, and the tile at memory location + 1 will be on the bottom
@@ -158,6 +164,13 @@ struct _gbc_graphics {
      *      -Bit 5: X Flip - Setting bit will flip the sprite horizontally when rendered
      *      -Bit 6: Y Flip - Setting bit will flip the sprite vertically when rendered
      *      -Bit 7: Hide - Setting the bit will make the sprite hidden
+     *  // TODO: Implement
+     *  - Byte 4: Sprite size data
+     *      -Bits 0-1: Sprite height, from 0-3
+     *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
+     *      -Bits 2-3: Sprite width, from 0-3
+     *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
+     *      -Bits 4-7: Unused
      */
     uint8_t *oam;
     /**
@@ -493,6 +506,15 @@ void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, bool enabled);
  * @param enabled Should the bit be enabled?
  */
 void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled);
+
+/**
+ * Sets the sprite layer z bits of the LCDC byte
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param layer_z The z position of the sprite layer
+ * 
+*/
+void GBC_Graphics_lcdc_set_sprite_layer_z(GBC_Graphics *self, uint8_t layer_z);
 
 /**
  * Sets the sprite mode bit of the LCDC byte
