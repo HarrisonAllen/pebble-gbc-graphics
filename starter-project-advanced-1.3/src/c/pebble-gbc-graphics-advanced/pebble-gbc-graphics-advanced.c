@@ -55,11 +55,12 @@ void GBC_Graphics_destroy(GBC_Graphics *self) {
     free(self->bg_attrmaps);
     free(self->bg_palette_bank);
     free(self->sprite_palette_bank);
+    free(self->bg_scroll_x);
+    free(self->bg_scroll_y);
     layer_destroy(self->graphics_layer);
     if (self == NULL) return;
         free(self);
 }
-
 
 void GBC_Graphics_set_screen_bounds(GBC_Graphics *self, GRect bounds) {
     self->screen_x_origin = bounds.origin.x;
@@ -84,7 +85,6 @@ void GBC_Graphics_set_screen_width(GBC_Graphics *self, uint8_t new_width) {
 void GBC_Graphics_set_screen_height(GBC_Graphics *self, uint8_t new_height) {
     self->screen_height = new_height;
 }
-
 
 GRect GBC_Graphics_get_screen_bounds(GBC_Graphics *self) {
     return GRect(self->screen_x_origin, self->screen_y_origin, self->screen_width, self->screen_height);
@@ -213,25 +213,6 @@ void GBC_Graphics_copy_all_sprite_palettes(GBC_Graphics *self, uint8_t *target_a
 }
 
 /**
- * Clamps a short variable between two uint8_t values
- * 
- * @param to_clamp The value to clamp
- * @param lower_bound The lower bound on the return value
- * @param uppper_bound The upper bound on the return value
- * 
- * @return The clamped value as uint8_t
- */
-static uint8_t clamp_short_to_uint8_t(short to_clamp, uint8_t lower_bound, uint8_t upper_bound) {
-    if (to_clamp < (short)lower_bound) {
-        return lower_bound;
-    }
-    if (to_clamp > (short)upper_bound) {
-        return upper_bound;
-    }
-    return (uint8_t) to_clamp;
-}
-
-/**
  * Sets the bits outlined by mask to new_value
  * 
  * @param byte A pointer to the byte to modify
@@ -264,17 +245,11 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
     uint8_t flip_x, flip_y;
     short bg_num;
     
-    short screen_x, screen_y;
     uint8_t tile_x, tile_y;
     uint8_t x_on_sprite, y_on_sprite;
-    uint8_t bg_tile_num, bg_tile_attr;
-    uint8_t *sprite, *bg_tile;
+    uint8_t *sprite;
     uint8_t sprite_w, sprite_h;
     uint8_t sprite_tile_offset;
-    uint8_t num_overlapped_sprites;
-    uint8_t overlapped_sprites[GBC_NUM_SPRITES];
-    bool line_overlap;
-    uint8_t i;
     uint8_t sprite_x, sprite_y;
     short sprite_id;
 
@@ -299,26 +274,12 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
 
         self->stat &= ~GBC_STAT_HBLANK_FLAG; // No longer in HBlank while we draw the line
 
-        // For each pixel
-        // - The idea is that we go down until we hit a pixel on a layer
-        //   so any time that we hit a pixel, we move on to the next pixel
-        // - Best case, only one loop
-        // - Worst case, max_sprites + 4 loops per pixel
-        // - So only drawing BG 4 becomes most expensive operation
-        // 1. Draw any backgrounds on top of the sprite layer
-        //  - This is done by going from 3 -> 3 - z layer
-        // 2. Draw the sprite layer
-        //  - This is done by going from top to bottom of sprites
-        // 3. Draw the rest of the backgrounds
-        //  - This is done by going from 3 - z layer -> 0
-
         // Now for each pixel in the row:
         for(x = min_x; x < max_x; x++) {
             pixel_set = false;
 
             // First draw the backgrounds above the sprite layer
             for (bg_num = background_start; bg_num > sprite_layer_z; bg_num--) {
-                // TODO: add in a new bg enable flag, that checks if the specific background is enabled
                 if (!(self->lcdc & (GBC_LCDC_BG_1_ENABLE_FLAG << bg_num))) {
                     continue;
                 }
@@ -396,15 +357,15 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                     sprite = &self->oam[sprite_id*GBC_SPRITE_NUM_BYTES];
 
                     // Check if the sprite is hidden
-                    if (sprite[3] & GBC_ATTR_HIDE_FLAG) {
+                    if (sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_HIDE_FLAG) {
                         continue;
                     }
 
                     // Check if the pixel we're rendering is within the sprite
-                    sprite_x = sprite[0] - GBC_SPRITE_OFFSET_X;
-                    sprite_y = sprite[1] - GBC_SPRITE_OFFSET_Y;
-                    sprite_w = GBC_TILE_WIDTH; // TODO: Replace with x size data
-                    sprite_h = GBC_TILE_HEIGHT; // TODO: Replace with y size data
+                    sprite_x = sprite[GBC_OAM_X_POS_BYTE] - GBC_SPRITE_OFFSET_X;
+                    sprite_y = sprite[GBC_OAM_Y_POS_BYTE] - GBC_SPRITE_OFFSET_Y;
+                    sprite_w = GBC_TILE_WIDTH << ((sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_WIDTH_MASK) >> GBC_OAM_SPRITE_WIDTH_SHIFT); // tile_width * (2 ^ sprite_width)
+                    sprite_h = GBC_TILE_HEIGHT << ((sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_HEIGHT_MASK) >> GBC_OAM_SPRITE_HEIGHT_SHIFT); // tile_height * (2 ^ sprite_height)
                     if (x < sprite_x || x >= (sprite_x + sprite_w) || self->line_y < sprite_y || self->line_y >= (sprite_y + sprite_h)) {
                         continue;
                     }
@@ -414,17 +375,16 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                     y_on_sprite = self->line_y - sprite_y;
 
                     // Apply flip flags
-                    flip_x = (sprite[2] & GBC_ATTR_FLIP_FLAG_X) >> 5; // Flip becomes 1
+                    flip_x = (sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_FLIP_FLAG_X) >> 5; // Flip becomes 1
                     x_on_sprite = x_on_sprite + flip_x * (sprite_w - (x_on_sprite << 1) - 1); // pixel_x = flip_x ? sprite_w - pixel_x - 1 : pixel_x
-                    flip_y = (sprite[3] & GBC_ATTR_FLIP_FLAG_Y) >> 5; // Flip becomes 1
+                    flip_y = (sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_FLIP_FLAG_Y) >> 5; // Flip becomes 1
                     y_on_sprite = y_on_sprite + flip_y * (sprite_w - (y_on_sprite << 1) - 1); // pixel_y = flip_y ? sprite_w - pixel_y - 1 : pixel_y
 
                     tile_x = x_on_sprite >> 3; // (x - sprite_x) / GBC_TILE_WIDTH (8)
                     tile_y = y_on_sprite >> 3; // (y - sprite_y) / GBC_TILE_HEIGHT (8)
-                    // TODO: replace with a bitshift, idk what that looks like
-                    sprite_tile_offset = tile_x + tile_y * (sprite_w >> 3); // tile_x + tile_y * (sprite_w / GBC_TILE_WIDTH (8))
-                    offset = (sprite[2] + sprite_tile_offset) << 5; // (tile_num + sprite_tile_offset) * GBC_TILE_NUM_BYTES (32)
-                    tile = self->vram + ((((sprite[3] & GBC_ATTR_VRAM_BANK_MASK) >> 3)) << 13) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES (8192) + offset
+                    sprite_tile_offset = tile_x + (tile_y << ((sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_WIDTH_MASK) >> GBC_OAM_SPRITE_WIDTH_SHIFT)); // tile_x + tile_y * (sprite_width)
+                    offset = (sprite[GBC_OAM_TILE_POS_BYTE] + sprite_tile_offset) << 5; // (tile_num + sprite_tile_offset) * GBC_TILE_NUM_BYTES (32)
+                    tile = self->vram + ((((sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_VRAM_BANK_MASK) >> 3)) << 13) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES (8192) + offset
 
                     // Find the pixel on this tile
                     pixel_x = x_on_sprite & 7; // tile_x % GBC_TILE_WIDTH (8)
@@ -447,7 +407,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                         continue;
                     }
             
-                    pixel_color = self->sprite_palette_bank[((sprite[3] & GBC_ATTR_PALETTE_MASK) << 4) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
+                    pixel_color = self->sprite_palette_bank[((sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_PALETTE_MASK) << 4) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
             
                 #if defined(PBL_COLOR)
                     memset(&info.data[x], pixel_color, 1);
@@ -781,81 +741,100 @@ void GBC_Graphics_bg_move_tile(GBC_Graphics *self, uint8_t bg_layer, uint8_t src
 }
 
 uint8_t GBC_Graphics_oam_get_sprite_x(GBC_Graphics *self, uint8_t sprite_num) {
-    return self->oam[sprite_num*4+0];
+    return self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE];
 }
 
 uint8_t GBC_Graphics_oam_get_sprite_y(GBC_Graphics *self, uint8_t sprite_num) {
-    return self->oam[sprite_num*4+1];
+    return self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE];
 }
 
 uint8_t GBC_Graphics_oam_get_sprite_tile(GBC_Graphics *self, uint8_t sprite_num) {
-    return self->oam[sprite_num*4+2];
+    return self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_TILE_POS_BYTE];
 }
 
 uint8_t GBC_Graphics_oam_get_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num) {
-    return self->oam[sprite_num*4+3];
+    return self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE];
 }
 
-void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes) {
-    self->oam[sprite_num*4+0] = x;
-    self->oam[sprite_num*4+1] = y;
-    self->oam[sprite_num*4+2] = tile_position;
-    self->oam[sprite_num*4+3] = attributes;
+uint8_t GBC_Graphics_oam_get_sprite_width(GBC_Graphics *self, uint8_t sprite_num) {
+    return (self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_WIDTH_MASK) >> GBC_OAM_SPRITE_WIDTH_SHIFT;
+}
+
+uint8_t GBC_Graphics_oam_get_sprite_height(GBC_Graphics *self, uint8_t sprite_num) {
+    return (self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_HEIGHT_MASK) >> GBC_OAM_SPRITE_HEIGHT_SHIFT;
+}
+
+void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height) {
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE] = x;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE] = y;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_TILE_POS_BYTE] = tile_position;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE] = attributes;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] = (
+        ((width & (GBC_OAM_SPRITE_WIDTH_MASK >> GBC_OAM_SPRITE_WIDTH_SHIFT)) << GBC_OAM_SPRITE_WIDTH_SHIFT) |
+        ((height & (GBC_OAM_SPRITE_HEIGHT_MASK >> GBC_OAM_SPRITE_HEIGHT_SHIFT)) << GBC_OAM_SPRITE_HEIGHT_SHIFT));
 }
 
 void GBC_Graphics_oam_move_sprite(GBC_Graphics *self, uint8_t sprite_num, short dx, short dy) {
     short new_x, new_y;
-    new_x = self->oam[sprite_num*4+0] + dx;
-    new_y = self->oam[sprite_num*4+1] + dy;
-    self->oam[sprite_num*4+0] = new_x;
-    self->oam[sprite_num*4+1] = new_y;
+    new_x = self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE] + dx;
+    new_y = self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE] + dy;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE] = new_x;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE] = new_y;
 }
 
 void GBC_Graphics_oam_set_sprite_x(GBC_Graphics *self, uint8_t sprite_num, uint8_t x) {
-    self->oam[sprite_num*4+0] = x;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE] = x;
 }
 
 void GBC_Graphics_oam_set_sprite_y(GBC_Graphics *self, uint8_t sprite_num, uint8_t y) {
-    self->oam[sprite_num*4+1] = y;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE] = y;
 }
 
 void GBC_Graphics_oam_set_sprite_pos(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y) {
-    self->oam[sprite_num*4+0] = x;
-    self->oam[sprite_num*4+1] = y;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE] = x;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE] = y;
 }
 
 void GBC_Graphics_oam_set_sprite_tile(GBC_Graphics *self, uint8_t sprite_num, uint8_t tile_position) {
-    self->oam[sprite_num*4+2] = tile_position;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_TILE_POS_BYTE] = tile_position;
 }
 
 void GBC_Graphics_oam_set_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num, uint8_t attributes) {
-    self->oam[sprite_num*4+3] = attributes;
+    self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE] = attributes;
 }
 
 void GBC_Graphics_oam_set_sprite_palette(GBC_Graphics *self, uint8_t sprite_num, uint8_t palette) {
-    modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_PALETTE_MASK, palette, GBC_ATTR_PALETTE_START);
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE], GBC_ATTR_PALETTE_MASK, palette, GBC_ATTR_PALETTE_START);
 }
 
 void GBC_Graphics_oam_set_sprite_vram_bank(GBC_Graphics *self, uint8_t sprite_num, uint8_t vram_bank) {
-    modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_VRAM_BANK_MASK, vram_bank, GBC_ATTR_VRAM_BANK_START);
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE], GBC_ATTR_VRAM_BANK_MASK, vram_bank, GBC_ATTR_VRAM_BANK_START);
 }
 
 void GBC_Graphics_oam_set_sprite_x_flip(GBC_Graphics *self, uint8_t sprite_num, bool flipped) {
-    modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_FLIP_FLAG_X, flipped, GBC_ATTR_FLIP_FLAG_X);
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE], GBC_ATTR_FLIP_FLAG_X, flipped, GBC_ATTR_FLIP_FLAG_X);
 }
 
 void GBC_Graphics_oam_set_sprite_y_flip(GBC_Graphics *self, uint8_t sprite_num, bool flipped) {
-    modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_FLIP_FLAG_Y, flipped, GBC_ATTR_FLIP_FLAG_Y);
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE], GBC_ATTR_FLIP_FLAG_Y, flipped, GBC_ATTR_FLIP_FLAG_Y);
 }
 
 void GBC_Graphics_oam_set_sprite_hidden(GBC_Graphics *self, uint8_t sprite_num, bool hidden) {
-    modify_byte(&self->oam[sprite_num * 4 + 3], GBC_ATTR_HIDE_FLAG, hidden, GBC_ATTR_HIDE_FLAG);
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE], GBC_ATTR_HIDE_FLAG, hidden, GBC_ATTR_HIDE_FLAG);
+}
+
+void GBC_Graphics_oam_set_sprite_width(GBC_Graphics *self, uint8_t sprite_num, uint8_t width) {
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE], GBC_OAM_SPRITE_WIDTH_MASK, width, GBC_OAM_SPRITE_WIDTH_START);
+}
+
+void GBC_Graphics_oam_set_sprite_height(GBC_Graphics *self, uint8_t sprite_num, uint8_t height) {
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE], GBC_OAM_SPRITE_HEIGHT_MASK, height, GBC_OAM_SPRITE_HEIGHT_START);
 }
 
 void GBC_Graphics_oam_change_sprite_num(GBC_Graphics *self, uint8_t source_sprite_num, uint8_t target_sprite_num, bool copy) {
-    uint8_t *source = &self->oam[source_sprite_num*4];
-    uint8_t *target = &self->oam[target_sprite_num*4];
-    for (uint8_t i = 0; i < 4; i++) {
+    uint8_t *source = &self->oam[source_sprite_num * GBC_SPRITE_NUM_BYTES];
+    uint8_t *target = &self->oam[target_sprite_num * GBC_SPRITE_NUM_BYTES];
+    for (uint8_t i = 0; i < GBC_SPRITE_NUM_BYTES; i++) {
             target[i] = source[i];
         if (!copy) {
             source[i] = 0;
@@ -865,9 +844,9 @@ void GBC_Graphics_oam_change_sprite_num(GBC_Graphics *self, uint8_t source_sprit
 
 void GBC_Graphics_oam_swap_sprites(GBC_Graphics *self, uint8_t sprite_num_1, uint8_t sprite_num_2) {
     uint8_t temp;
-    uint8_t *source_1 = &self->oam[sprite_num_1*4];
-    uint8_t *source_2 = &self->oam[sprite_num_2*4];
-    for (uint8_t i = 0; i < 4; i++) {
+    uint8_t *source_1 = &self->oam[sprite_num_1 * GBC_SPRITE_NUM_BYTES];
+    uint8_t *source_2 = &self->oam[sprite_num_2 * GBC_SPRITE_NUM_BYTES];
+    for (uint8_t i = 0; i < GBC_SPRITE_NUM_BYTES; i++) {
         temp = source_1[i];
         source_1[i] = source_2[i];
         source_2[i] = temp;
@@ -876,33 +855,25 @@ void GBC_Graphics_oam_swap_sprites(GBC_Graphics *self, uint8_t sprite_num_1, uin
 
 void GBC_Graphics_oam_swap_sprite_tiles(GBC_Graphics *self, uint8_t sprite_num_1, uint8_t sprite_num_2) {
     uint8_t temp;
-    uint8_t *source_1 = &self->oam[sprite_num_1*4];
-    uint8_t *source_2 = &self->oam[sprite_num_2*4];
-    uint8_t i = 2;
-    temp = source_1[i];
-    source_1[i] = source_2[i];
-    source_2[i] = temp;
+    uint8_t *source_1 = &self->oam[sprite_num_1 * GBC_SPRITE_NUM_BYTES];
+    uint8_t *source_2 = &self->oam[sprite_num_2 * GBC_SPRITE_NUM_BYTES];
+    temp = source_1[GBC_OAM_TILE_POS_BYTE];
+    source_1[GBC_OAM_TILE_POS_BYTE] = source_2[GBC_OAM_TILE_POS_BYTE];
+    source_2[GBC_OAM_TILE_POS_BYTE] = temp;
 }
 
 void GBC_Graphics_oam_swap_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num_1, uint8_t sprite_num_2) {
     uint8_t temp;
-    uint8_t *source_1 = &self->oam[sprite_num_1*4];
-    uint8_t *source_2 = &self->oam[sprite_num_2*4];
-    uint8_t i = 3;
-    temp = source_1[i];
-    source_1[i] = source_2[i];
-    source_2[i] = temp;
+    uint8_t *source_1 = &self->oam[sprite_num_1 * GBC_SPRITE_NUM_BYTES];
+    uint8_t *source_2 = &self->oam[sprite_num_2 * GBC_SPRITE_NUM_BYTES];
+    temp = source_1[GBC_OAM_ATTR_BYTE];
+    source_1[GBC_OAM_ATTR_BYTE] = source_2[GBC_OAM_ATTR_BYTE];
+    source_2[GBC_OAM_ATTR_BYTE] = temp;
 }
 
 void GBC_Graphics_oam_swap_sprite_tiles_and_attrs(GBC_Graphics *self, uint8_t sprite_num_1, uint8_t sprite_num_2) {
-    uint8_t temp;
-    uint8_t *source_1 = &self->oam[sprite_num_1*4];
-    uint8_t *source_2 = &self->oam[sprite_num_2*4];
-    for (uint8_t i = 2; i < 4; i++) {
-        temp = source_1[i];
-        source_1[i] = source_2[i];
-        source_2[i] = temp;
-    }
+    GBC_Graphics_oam_swap_sprite_tiles(self, sprite_num_1, sprite_num_2);
+    GBC_Graphics_oam_swap_sprite_attrs(self, sprite_num_1, sprite_num_2);
 }
 
 void GBC_Graphics_copy_background(GBC_Graphics *self, uint8_t source_bg_layer, uint8_t target_bg_layer) {

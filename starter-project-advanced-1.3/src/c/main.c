@@ -21,6 +21,46 @@
 #define Y_OFFSET (PBL_DISPLAY_HEIGHT - 180) / 2
 #define X_OFFSET (PBL_DISPLAY_WIDTH - 180) / 2
 
+#if defined(PBL_COLOR)
+static uint8_t full_palette[] = {
+    0b11110000,
+    0b11110100,
+    0b11111000,
+    0b11111100,
+    0b11101100,
+    0b11011100,
+    0b11001100,
+    0b11001101,
+    0b11001110,
+    0b11001111,
+    0b11001011,
+    0b11000111,
+    0b11000011,
+    0b11010011,
+    0b11100011,
+    0b11110011
+};
+#else
+static uint8_t full_palette[] = {
+    GBC_COLOR_BLACK,
+    GBC_COLOR_BLACK,
+    GBC_COLOR_BLACK,
+    GBC_COLOR_BLACK,
+    GBC_COLOR_GRAY,
+    GBC_COLOR_GRAY,
+    GBC_COLOR_GRAY,
+    GBC_COLOR_GRAY,
+    GBC_COLOR_WHITE,
+    GBC_COLOR_WHITE,
+    GBC_COLOR_WHITE,
+    GBC_COLOR_WHITE,
+    GBC_COLOR_GRAY,
+    GBC_COLOR_GRAY,
+    GBC_COLOR_GRAY,
+    GBC_COLOR_GRAY
+};
+#endif
+
 static Window *s_window;
 static GBC_Graphics *s_gbc_graphics;
 static AppTimer *s_frame_timer;  // The timer used to setup the game step callback
@@ -28,6 +68,8 @@ bool sprite_reverse;
 int sprite_min = 90 - 30 + X_OFFSET + GBC_SPRITE_OFFSET_X;
 int sprite_max = 90 + 30 + X_OFFSET + GBC_SPRITE_OFFSET_X;
 int sprite_layer = NUM_BACKGROUNDS - 1;
+int sprite_width, sprite_height;
+int sprite_num = 28;
 
 
 /**
@@ -44,19 +86,24 @@ static void load_tilesheet() {
     uint8_t vram_bank = 0; // The VRAM bank we want to store the tiles into
     GBC_Graphics_load_from_tilesheet_into_vram(s_gbc_graphics, RESOURCE_ID_DATA_SAMPLE_TILESHEET, tilesheet_start_offset, 
                                                 tiles_to_load, vram_start_offset, vram_bank);
+    vram_start_offset += tiles_to_load;
+    GBC_Graphics_load_from_tilesheet_into_vram(s_gbc_graphics, RESOURCE_ID_DATA_SAMPLE_TILESHEET, tilesheet_start_offset, 
+                                                tiles_to_load, vram_start_offset, vram_bank);
+    vram_start_offset += tiles_to_load;
+    GBC_Graphics_load_from_tilesheet_into_vram(s_gbc_graphics, RESOURCE_ID_DATA_SAMPLE_TILESHEET, tilesheet_start_offset, 
+                                                tiles_to_load, vram_start_offset, vram_bank);
+    vram_start_offset += tiles_to_load;
+    GBC_Graphics_load_from_tilesheet_into_vram(s_gbc_graphics, RESOURCE_ID_DATA_SAMPLE_TILESHEET, tilesheet_start_offset, 
+                                                tiles_to_load, vram_start_offset, vram_bank);
 }
 
 /**
- * Sets palettes for the background in various gradients. You may find this link helpful: https://developer.rebble.io/developer.pebble.com/guides/tools-and-resources/color-picker/index.html
+ * Sets palettes for the backgrounds and sprites. You may find this link helpful: https://developer.rebble.io/developer.pebble.com/guides/tools-and-resources/color-picker/index.html
  */
 static void create_palettes() {
-#if defined(PBL_COLOR) // Pebbles with color screens use the ARGB8 Pebble color definitions for palettes (which are just bytes)
-    GBC_Graphics_set_bg_palette(s_gbc_graphics, 0, 5, GColorBlackARGB8, GColorRedARGB8, GColorYellowARGB8, GColorBlueARGB8, GColorGreenARGB8);
-    GBC_Graphics_set_sprite_palette(s_gbc_graphics, 0, 2, GColorBlackARGB8, GColorBlackARGB8);
-#else // Pebbles with black and white screens use the GBC_COLOR definitions for palettes
-    GBC_Graphics_set_bg_palette(s_gbc_graphics, 0, 5, GBC_COLOR_BLACK, GBC_COLOR_GRAY, GBC_COLOR_GRAY, GBC_COLOR_WHITE, GBC_COLOR_BLACK);
-    GBC_Graphics_set_sprite_palette(s_gbc_graphics, 0, 2, GBC_COLOR_BLACK, GBC_COLOR_BLACK);
-#endif
+    GBC_Graphics_set_bg_palette_array(s_gbc_graphics, 0, full_palette);
+    GBC_Graphics_set_sprite_palette_array(s_gbc_graphics, 0, full_palette);
+    GBC_Graphics_set_sprite_palette_array(s_gbc_graphics, 4, full_palette);
 }
 
 /**
@@ -69,7 +116,7 @@ static void generate_backgrounds() {
                 if (rand() % 8 > 0) {
                     GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, 0);
                 } else {
-                    GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, bg_num + 1);
+                    GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, bg_num * 4 + 1);
                 }
                 GBC_Graphics_bg_set_tile_palette(s_gbc_graphics, bg_num, x, y, 0);
             }
@@ -78,7 +125,7 @@ static void generate_backgrounds() {
 }
 
 static void generate_sprite() {
-    GBC_Graphics_oam_set_sprite(s_gbc_graphics, 0, 90 + X_OFFSET + GBC_SPRITE_OFFSET_X, 90 + Y_OFFSET + GBC_SPRITE_OFFSET_Y, 1, GBC_Graphics_attr_make(0, 0, false, false, false));
+    GBC_Graphics_oam_set_sprite(s_gbc_graphics, sprite_num, 90 + X_OFFSET + GBC_SPRITE_OFFSET_X, 60 + Y_OFFSET + GBC_SPRITE_OFFSET_Y, 1, GBC_Graphics_attr_make(4, 0, false, false, false), 0, 0);
 }
 
 static void step() {
@@ -88,15 +135,32 @@ static void step() {
     GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
 
     if (sprite_reverse) {
-        GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, -2, 0);
-        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) < sprite_min) {
+        GBC_Graphics_oam_move_sprite(s_gbc_graphics, sprite_num, -2, 0);
+        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, sprite_num) < sprite_min) {
             sprite_reverse = false;
             sprite_layer = (sprite_layer - 1) % NUM_BACKGROUNDS;
             GBC_Graphics_lcdc_set_sprite_layer_z(s_gbc_graphics, sprite_layer);
+
+            sprite_width += 1;
+            if (sprite_width >= 4) {
+                sprite_width = 0;
+                sprite_height += 1;
+                if (sprite_height >= 4) {
+                    sprite_height = 0;
+                }
+            }
+            GBC_Graphics_oam_set_sprite_width(s_gbc_graphics, sprite_num, sprite_width);
+            GBC_Graphics_oam_set_sprite_height(s_gbc_graphics, sprite_num, sprite_height);
+            // APP_LOG(APP_LOG_LEVEL_DEBUG, "Sprite dims: (%d, %d) -> %x, %d, %d",
+            //     sprite_width,
+            //     sprite_height,
+            //     s_gbc_graphics->oam[0 * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE],
+            //     GBC_Graphics_oam_get_sprite_width(s_gbc_graphics, 0),
+            //     GBC_Graphics_oam_get_sprite_height(s_gbc_graphics, 0));
         }
     } else {
-        GBC_Graphics_oam_move_sprite(s_gbc_graphics, 0, 2, 0);
-        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) > sprite_max) {
+        GBC_Graphics_oam_move_sprite(s_gbc_graphics, sprite_num, 2, 0);
+        if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, sprite_num) > sprite_max) {
             sprite_reverse = true;
         }
     }

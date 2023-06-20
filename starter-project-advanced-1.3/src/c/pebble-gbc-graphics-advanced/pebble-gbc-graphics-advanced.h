@@ -49,16 +49,19 @@
  */
 #define GBC_PALETTE_BANK_NUM_BYTES 128
 #define GBC_NUM_SPRITES 40 ///> The maximum number of sprites
-// TODO: Increase this to 5
-#define GBC_SPRITE_NUM_BYTES 4 ///> The number of bytes per sprite
+#define GBC_SPRITE_NUM_BYTES 5 ///> The number of bytes per sprite
 /**
  * The size of the OAM, calculated by:
- * 4 bytes per sprite * 40 sprite slots = 160 bytes
+ * 5 bytes per sprite * 40 sprite slots = 160 bytes
  */
-#define GBC_OAM_NUM_BYTES 160
-// TODO: Make x and y offsets 64 x 64 for new sprite sizes
-#define GBC_SPRITE_OFFSET_X 8 ///> The x offset to allow for offscreen rendering
-#define GBC_SPRITE_OFFSET_Y 16 ///> The y offset to allow for offscreen rendering
+#define GBC_OAM_NUM_BYTES 200
+#define GBC_OAM_X_POS_BYTE 0    ///> The OAM x byte offset
+#define GBC_OAM_Y_POS_BYTE 1    ///> The OAM y byte offset
+#define GBC_OAM_TILE_POS_BYTE 2 ///> The OAM VRAM tile pos byte offset
+#define GBC_OAM_ATTR_BYTE 3     ///> The OAM ATTR byte offset
+#define GBC_OAM_DIMS_BYTE 4     ///> The OAM dimensions byte offset
+#define GBC_SPRITE_OFFSET_X 64  ///> The x offset to allow for offscreen rendering
+#define GBC_SPRITE_OFFSET_Y 64  ///> The y offset to allow for offscreen rendering
 
 /** Attribute flags */
 #define GBC_ATTR_PALETTE_MASK 0x07      ///> Mask for the palette number
@@ -73,7 +76,7 @@
 #define GBC_ATTR_FLIP_FLAG_Y 0x40       ///> Flag for vertical flip
 #define GBC_ATTR_HIDE_FLAG 0X80         ///> Flag for hide bit
 
-/** LCDC flags*/
+/** LCDC flags */
 #define GBC_LCDC_ENABLE_FLAG 0x01          ///> Flag for LCDC enable bit
 #define GBC_LCDC_BG_1_ENABLE_FLAG 0x02     ///> Flag for LCDC BG 1 enable bit
 #define GBC_LCDC_BG_2_ENABLE_FLAG 0x04     ///> Flag for LCDC BG 2 enable bit
@@ -84,7 +87,7 @@
 #define GBC_LCDC_SPRITE_LAYER_Z_START 0x40 ///> LSB of the sprite layer z mask
 #define GBC_LCDC_SPRITE_LAYER_Z_SHIFT 6    ///> The bitshift for start of layer z mask
 
-/** STAT flags*/
+/** STAT flags */
 #define GBC_STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
 #define GBC_STAT_VBLANK_FLAG 0X02        ///> Flag for STAT VBlank flag bit
 #define GBC_STAT_LINE_COMP_FLAG 0X04     ///> Flag for STAT line compare flag bit
@@ -95,6 +98,14 @@
 #define GBC_STAT_OAM_INT_FLAG 0X80       ///> Flag for STAT OAM interrupt bit
 #define GBC_STAT_READ_ONLY_MASK 0x0F     ///> Mask for the read only bits of STAT
 #define GBC_STAT_WRITEABLE_MASK 0xF0     ///> Mask for the writeable bits of STAT
+
+/** OAM flags */
+#define GBC_OAM_SPRITE_WIDTH_MASK 0x03   ///> Mask for OAM sprite width
+#define GBC_OAM_SPRITE_WIDTH_START 0x01  ///> LSB of the OAM sprite width
+#define GBC_OAM_SPRITE_WIDTH_SHIFT 0     ///> The bitshift for start of OAM sprite width
+#define GBC_OAM_SPRITE_HEIGHT_MASK 0x0C  ///> Mask for OAM sprite height
+#define GBC_OAM_SPRITE_HEIGHT_START 0x04 ///> LSB of the OAM sprite height
+#define GBC_OAM_SPRITE_HEIGHT_SHIFT 2    ///> The bitshift for start of OAM sprite height
 
 /** Helpful macros */
 #define GBC_MIN(x, y) (y) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the minimum of two values
@@ -130,7 +141,6 @@ typedef struct _gbc_graphics GBC_Graphics;
 struct _gbc_graphics {
     Layer *graphics_layer; ///< The Layer on which to render the graphics
     /**
-     * // TODO: Reorganize so that each background has their own enable flags
      * The LCD Control Byte
      *  -Bit 0: Enable - Setting bit to 0 disables drawing of backgrounds and sprites
      *  -Bit 1: BG 1 Display Enable - Setting bit to 0 disables drawing of BG 1
@@ -152,10 +162,9 @@ struct _gbc_graphics {
     uint8_t *vram;
     /**
      * OAM Buffer - Stores the data for the current sprites
-     * The OAM contains 40 slots for 4 bytes of sprite information, which is as follows:
-     *  // TODO: Make x and y offsets 64 x 64 for new sprite sizes
-     *  -Byte 0: Sprite x position, offset by -8 (max sprite width) to allow for off-screen rendering
-     *  -Byte 1: Sprite y position, offset by -16 (max sprite height) to allow for off-screen rendering
+     * The OAM contains 40 slots for 5 bytes of sprite information, which is as follows:
+     *  -Byte 0: Sprite x position, offset by -64 (max sprite width) to allow for off-screen rendering
+     *  -Byte 1: Sprite y position, offset by -64 (max sprite height) to allow for off-screen rendering
      *  -Byte 2: Sprite tile position in VRAM bank
      *      Note: When the Sprite Size bit of LCDC is set, the tile at the memory location will be 
      *            on top, and the tile at memory location + 1 will be on the bottom
@@ -937,6 +946,26 @@ uint8_t GBC_Graphics_oam_get_sprite_tile(GBC_Graphics *self, uint8_t sprite_num)
 uint8_t GBC_Graphics_oam_get_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num);
 
 /**
+ * Gets the width of the sprite in pixels
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * 
+ * @return The sprite's width in pixels
+ */
+uint8_t GBC_Graphics_oam_get_sprite_width(GBC_Graphics *self, uint8_t sprite_num);
+
+/**
+ * Gets the height of the sprite in pixels
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * 
+ * @return The sprite's height in pixels
+ */
+uint8_t GBC_Graphics_oam_get_sprite_height(GBC_Graphics *self, uint8_t sprite_num);
+
+/**
  * Creates and sets a sprite in OAM with the given values
  * 
  * @param self A pointer to the target GBC Graphics object
@@ -945,8 +974,10 @@ uint8_t GBC_Graphics_oam_get_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num
  * @param y The sprite's y position
  * @param tile_position The tile position in VRAM that the sprite will use to render
  * @param attributes The sprite's attributes
+ * @param width The sprite's width (see oam description), 0-3
+ * @param height The sprite's height (see oam description), 0-3
  */
-void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes);
+void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height);
 
 /**
  * Moves a sprite on the OAM by dx and dy
@@ -1047,6 +1078,24 @@ void GBC_Graphics_oam_set_sprite_y_flip(GBC_Graphics *self, uint8_t sprite_num, 
  * @param flipped Should the sprite be hidden?
  */
 void GBC_Graphics_oam_set_sprite_hidden(GBC_Graphics *self, uint8_t sprite_num, bool hidden);
+
+/**
+ * Sets the sprite's width (see OAM description)
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * @param width The width of the sprite (see OAM description)
+ */
+void GBC_Graphics_oam_set_sprite_width(GBC_Graphics *self, uint8_t sprite_num, uint8_t width);
+
+/**
+ * Sets the sprite's height (see OAM description)
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * @param height The width of the sprite (see OAM description)
+ */
+void GBC_Graphics_oam_set_sprite_height(GBC_Graphics *self, uint8_t sprite_num, uint8_t height);
 
 /**
  * Moves a sprite from one position in OAM to another
