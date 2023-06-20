@@ -29,11 +29,11 @@ Changelogs:
 
     * Sprites draw from the tile bank starting at the sprite tile offset then left to right, top to bottom. So for a 2x4 tile sprite, it looks like this:
 
-    | 0 || 1 |
+    | 0 | 1 |
     | --- | --- |
-    | 2 || 3 |
-    | 4 || 5 |
-    | 6 || 7 |
+    | 2 | 3 |
+    | 4 | 5 |
+    | 6 | 7 |
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
