@@ -92,7 +92,6 @@ static void step() {
         if (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, 0) < sprite_min) {
             sprite_reverse = false;
             sprite_layer = (sprite_layer - 1) % NUM_BACKGROUNDS;
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "Sprite layer: %d", sprite_layer);
             GBC_Graphics_lcdc_set_sprite_layer_z(s_gbc_graphics, sprite_layer);
         }
     } else {
@@ -140,7 +139,6 @@ static void window_load(Window *window) {
 
     GBC_Graphics_set_screen_bounds(s_gbc_graphics, GBC_SCREEN_BOUNDS_SQUARE);
 
-    GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(s_gbc_graphics, true);
     load_tilesheet();
     create_palettes();
     generate_backgrounds();

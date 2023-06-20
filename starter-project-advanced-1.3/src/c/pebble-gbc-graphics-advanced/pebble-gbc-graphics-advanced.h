@@ -74,13 +74,15 @@
 #define GBC_ATTR_HIDE_FLAG 0X80         ///> Flag for hide bit
 
 /** LCDC flags*/
-#define GBC_LCDC_ENABLE_FLAG 0x01        ///> Flag for LCDC enable bit
-#define GBC_LCDC_BCKGND_ENABLE_FLAG 0X02 ///> Flag for LCDC background enable bit
-#define GBC_LCDC_SPRITE_ENABLE_FLAG 0X08 ///> Flag for LCDC sprite enable bit
-#define GBC_LCDC_SPRITE_SIZE_FLAG 0x10   ///> Flag for LCDC sprite size bit
-#define GBC_LCDC_SPRITE_LAYER_Z_MASK 0x60///> Mask for LCDC sprite layer z number
-#define GBC_LCDC_SPRITE_LAYER_Z_START 0x20
-#define GBC_LCDC_SPRITE_LAYER_Z_SHIFT 5  ///> The bitshift for start of layer z mask
+#define GBC_LCDC_ENABLE_FLAG 0x01          ///> Flag for LCDC enable bit
+#define GBC_LCDC_BG_1_ENABLE_FLAG 0x02     ///> Flag for LCDC BG 1 enable bit
+#define GBC_LCDC_BG_2_ENABLE_FLAG 0x04     ///> Flag for LCDC BG 2 enable bit
+#define GBC_LCDC_BG_3_ENABLE_FLAG 0x08     ///> Flag for LCDC BG 3 enable bit
+#define GBC_LCDC_BG_4_ENABLE_FLAG 0x10     ///> Flag for LCDC BG 4 enable bit
+#define GBC_LCDC_SPRITE_ENABLE_FLAG 0X20   ///> Flag for LCDC sprite enable bit
+#define GBC_LCDC_SPRITE_LAYER_Z_MASK 0xC0  ///> Mask for LCDC sprite layer z number
+#define GBC_LCDC_SPRITE_LAYER_Z_START 0x40 ///> LSB of the sprite layer z mask
+#define GBC_LCDC_SPRITE_LAYER_Z_SHIFT 6    ///> The bitshift for start of layer z mask
 
 /** STAT flags*/
 #define GBC_STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
@@ -130,16 +132,15 @@ struct _gbc_graphics {
     /**
      * // TODO: Reorganize so that each background has their own enable flags
      * The LCD Control Byte
-     *  -Bit 0: Enable - Setting bit to 0 disables drawing of backgrounds, and sprites
-     *  -Bit 1: BG Display Enable - Setting bit to 0 disables drawing of backgrounds
-     *  -Bit 2: Unused
-     *  -Bit 3: Sprite Display Enable - Setting bit to 0 disables drawing of sprites
-     *  -Bit 4: Sprite Size - Setting bit to 0 uses one tile per sprite (8x8), 
-     *                        Setting bit to 1 uses two tiles per sprite(8x16)
-     *  -Bits 5-6: Sprite Layer Z, from 0 to 3
+     *  -Bit 0: Enable - Setting bit to 0 disables drawing of backgrounds and sprites
+     *  -Bit 1: BG 1 Display Enable - Setting bit to 0 disables drawing of BG 1
+     *  -Bit 2: BG 2 Display Enable - Setting bit to 0 disables drawing of BG 2
+     *  -Bit 3: BG 3 Display Enable - Setting bit to 0 disables drawing of BG 3
+     *  -Bit 4: BG 4 Display Enable - Setting bit to 0 disables drawing of BG 4
+     *  -Bit 5: Sprite Display Enable - Setting bit to 0 disables drawing of sprites
+     *  -Bits 6-7: Sprite Layer Z, from 0 to 3
      *      e.g. @ z = 3, sprite renders on top of BG 1, BG 2, BG 3, BG 4
      *      e.g. @ z = 0, sprite renders on top of BG 1 and below BG 2, BG 3, BG 4
-     *  -Bit 7: Unused
      */
     uint8_t lcdc;
     /**
@@ -495,9 +496,10 @@ void GBC_Graphics_lcdc_set_enabled(GBC_Graphics *self, bool enabled);
  * Sets the background layer enabled bit of the LCDC byte
  * 
  * @param self A pointer to the target GBC Graphics object
+ * @param bg_num The background to set, 0-3
  * @param enabled Should the bit be enabled?
  */
-void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, bool enabled);
+void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, uint8_t bg_num, bool enabled);
 
 /**
  * Sets the sprite layer enabled bit of the LCDC byte
@@ -515,14 +517,6 @@ void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled
  * 
 */
 void GBC_Graphics_lcdc_set_sprite_layer_z(GBC_Graphics *self, uint8_t layer_z);
-
-/**
- * Sets the sprite mode bit of the LCDC byte
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param use_8x16_sprites Should the system use 8x16 sprites?
- */
-void GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(GBC_Graphics *self, bool use_8x16_sprites);
 
 /**
  * Gets the current line being rendered

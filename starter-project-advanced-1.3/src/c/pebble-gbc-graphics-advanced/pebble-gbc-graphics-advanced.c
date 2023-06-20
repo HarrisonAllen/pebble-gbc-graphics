@@ -251,10 +251,6 @@ static void modify_byte(uint8_t *byte, uint8_t mask, uint8_t new_value, uint8_t 
  * @param ctx The graphics context for drawing
  */
 static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
-    // Return early if we don't need to render the backgrounds or sprites
-    if (!(self->lcdc & GBC_LCDC_ENABLE_FLAG) || (!(self->lcdc & GBC_LCDC_BCKGND_ENABLE_FLAG) && !(self->lcdc & GBC_LCDC_SPRITE_ENABLE_FLAG))) {
-        return;
-    }
     GBitmap *fb = graphics_capture_frame_buffer(ctx);
 
     // Predefine the variables we'll use in the loop
@@ -323,6 +319,9 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
             // First draw the backgrounds above the sprite layer
             for (bg_num = background_start; bg_num > sprite_layer_z; bg_num--) {
                 // TODO: add in a new bg enable flag, that checks if the specific background is enabled
+                if (!(self->lcdc & (GBC_LCDC_BG_1_ENABLE_FLAG << bg_num))) {
+                    continue;
+                }
                 map_x = (x - self->screen_x_origin) + self->bg_scroll_x[bg_num];
                 map_y = self->line_y + self->bg_scroll_y[bg_num];
                 tile = self->vram + (bg_num << 10) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset
@@ -391,7 +390,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 continue;
             }
 
-            if ((self->lcdc & GBC_LCDC_SPRITE_ENABLE_FLAG)) {
+            if (self->lcdc & GBC_LCDC_SPRITE_ENABLE_FLAG) {
                 for (sprite_id = GBC_NUM_SPRITES - 1; sprite_id >= 0; sprite_id--) {
                     // Get the sprite from OAM
                     sprite = &self->oam[sprite_id*GBC_SPRITE_NUM_BYTES];
@@ -405,7 +404,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                     sprite_x = sprite[0] - GBC_SPRITE_OFFSET_X;
                     sprite_y = sprite[1] - GBC_SPRITE_OFFSET_Y;
                     sprite_w = GBC_TILE_WIDTH; // TODO: Replace with x size data
-                    sprite_h = GBC_TILE_HEIGHT << ((self->lcdc & GBC_LCDC_SPRITE_SIZE_FLAG) > 0); // TODO: Replace with y size data
+                    sprite_h = GBC_TILE_HEIGHT; // TODO: Replace with y size data
                     if (x < sprite_x || x >= (sprite_x + sprite_w) || self->line_y < sprite_y || self->line_y >= (sprite_y + sprite_h)) {
                         continue;
                     }
@@ -470,7 +469,10 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
             
             // And last, draw the backgrounds below the sprite layer
             for (bg_num = sprite_layer_z; bg_num >= 0; bg_num--) {
-                // TODO: add in a new bg enable flag, that checks if the specific background is enabled
+                if (!(self->lcdc & (GBC_LCDC_BG_1_ENABLE_FLAG << bg_num))) {
+                    continue;
+                }
+
                 map_x = (x - self->screen_x_origin) + self->bg_scroll_x[bg_num];
                 map_y = self->line_y + self->bg_scroll_y[bg_num];
                 tile = self->vram + (bg_num << 10) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset
@@ -582,8 +584,8 @@ void GBC_Graphics_lcdc_set_enabled(GBC_Graphics *self, bool enabled) {
     modify_byte(&self->lcdc, GBC_LCDC_ENABLE_FLAG, enabled, GBC_LCDC_ENABLE_FLAG);
 }
 
-void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, bool enabled) {
-    modify_byte(&self->lcdc, GBC_LCDC_BCKGND_ENABLE_FLAG, enabled, GBC_LCDC_BCKGND_ENABLE_FLAG);
+void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, uint8_t bg_num, bool enabled) {
+    modify_byte(&self->lcdc, GBC_LCDC_BG_1_ENABLE_FLAG << bg_num, enabled, GBC_LCDC_BG_1_ENABLE_FLAG << bg_num);
 }
 
 void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled) {
@@ -592,10 +594,6 @@ void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled
 
 void GBC_Graphics_lcdc_set_sprite_layer_z(GBC_Graphics *self, uint8_t layer_z) {
     modify_byte(&self->lcdc, GBC_LCDC_SPRITE_LAYER_Z_MASK, layer_z, GBC_LCDC_SPRITE_LAYER_Z_START);
-}
-
-void GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(GBC_Graphics *self, bool use_8x16_sprites) {
-    modify_byte(&self->lcdc, GBC_LCDC_SPRITE_SIZE_FLAG, use_8x16_sprites, GBC_LCDC_SPRITE_SIZE_FLAG);
 }
 
 uint8_t GBC_Graphics_stat_get_current_line(GBC_Graphics *self) {
