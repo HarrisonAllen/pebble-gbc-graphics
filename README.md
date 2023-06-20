@@ -3,7 +3,7 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
-Current version of pebble-gbc-graphics-advanced: **v1.2.0**
+Current version of pebble-gbc-graphics-advanced: **v1.3.0**
 Changelogs:
 * v1.0.0
     * Tiles are now 4bpp, i.e. 16 colors per tile/palette
@@ -13,6 +13,27 @@ Changelogs:
     * Removed window layer
     * Increased number of background layers to 4
     * Disabled priority, sprites always render on top (temporary until sprite update)
+* v1.3.0
+    * Sprites now render on a layer
+    * The sprite layer can now be positioned between layers (instead of priority)
+    * LCDC now has individual background enable bits
+    * 8x16 bit removed from LCDC
+    * Sprites have additional byte defining dimensions: width and height
+
+    | width/height | 0 | 1 | 2 | 3 |
+    | --- | --- | --- | --- | --- |
+    | 0 | 1x1 tile<br>8x8 pixels | 2x1 tile<br>16x8 pixels | 4x1 tile<br>32x8 pixels | 8x1 tile<br>64x8 pixels |
+    | 1 | 1x tile<br>8x2 pixels | 2x2 tile<br>16x16 pixels | 4x2 tile<br>32x16 pixels | 8x2 tile<br>64x16 pixels |
+    | 2 | 1x tile<br>8x4 pixels | 2x4 tile<br>16x32 pixels | 4x4 tile<br>32x32 pixels | 8x4 tile<br>64x32 pixels |
+    | 3 | 1x tile<br>8x8 pixels | 2x8 tile<br>16x64 pixels | 4x8 tile<br>32x64 pixels | 8x8 tile<br>64x64 pixels |
+
+    * Sprites draw from the tile bank starting at the sprite tile offset then left to right, top to bottom. So for a 2x4 tile sprite, it looks like this:
+
+    | 0 || 1 |
+    | --- | --- |
+    | 2 || 3 |
+    | 4 || 5 |
+    | 6 || 7 |
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
@@ -76,14 +97,13 @@ This library allows you to create graphics for your watchface, app, or game (alm
     * A well-documented, full game that demonstrates most of the features in the library
     * ![Tiny Pilot](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot.png) ![Tiny Pilot - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot-bw.png)
 * [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.0.0
-    * A barebones implementation of the advanced graphics library, you can use this as a template!
     * ![Starter Project Advanced](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-bw.png)
 * [Starter Project Advanced 1.1](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.1) - App - pebble-gbc-graphics-advanced v1.1.0
-    * A barebones implementation of the advanced graphics library v1.1.0, you can use this as a template!
     * ![Starter Project Advanced 1.1](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.1.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.1-bw.png)
 * [Starter Project Advanced 1.2](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.2) - App - pebble-gbc-graphics-advanced v1.2.0
-    * A barebones implementation of the advanced graphics library v1.2.0, you can use this as a template!
     * ![Starter Project Advanced 1.2](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2-bw.png)
+* [Starter Project Advanced 1.3](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.3) - App - pebble-gbc-graphics-advanced v1.3.0
+    * ![Starter Project Advanced 1.3](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.3.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.3-bw.png)
     
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
