@@ -19,6 +19,11 @@ Changelogs:
     * LCDC now has individual background enable bits
     * 8x16 bit removed from LCDC
     * Sprites have additional byte defining dimensions: width and height
+* v1.4.0
+    * Adds alpha blending
+    * Optimization notes:
+        * Disable alpha blending
+        * Use fewer backgrounds
 
     | width/height | 0 | 1 | 2 | 3 |
     | --- | --- | --- | --- | --- |
