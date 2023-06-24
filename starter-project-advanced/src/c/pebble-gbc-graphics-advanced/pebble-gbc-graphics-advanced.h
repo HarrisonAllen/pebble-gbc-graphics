@@ -219,9 +219,6 @@ struct _gbc_graphics {
      *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
      *      -Bits 4-5: Sprite mosaic x, from 0-3
      *      -Bits 6-7: Sprite mosaic y, from 0-3
-     *      TODO:
-     *      - Add mosaic helper functions
-     *      - Implement mosaic (should just be pixel_x << mosaic)
      */
     uint8_t *oam;
     /**
