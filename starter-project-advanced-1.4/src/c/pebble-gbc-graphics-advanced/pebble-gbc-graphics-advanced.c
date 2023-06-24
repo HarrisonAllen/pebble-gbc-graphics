@@ -321,6 +321,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
 
             // First draw the backgrounds below the sprite layer
             for (bg_num = 0; bg_num <= sprite_layer_z; bg_num++) {
+                if ((self->lcdc & (GBC_LCDC_BG_1_ENABLE_FLAG << bg_num)) == 0) continue;
+
                 map_x = (x - self->screen_x_origin) + self->bg_scroll_x[bg_num];
                 map_y = self->line_y + self->bg_scroll_y[bg_num];
                 tile = self->vram + (bg_num << 10) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset
@@ -334,6 +336,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 // Get the tile and attrs from the map
                 tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH ??? what ???
                 tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
+
+                if (tile_attr & GBC_ATTR_HIDE_FLAG) continue;
                 
                 // Get the tile from vram
                 offset = tile_num << 5; // tile_num * GBC_TILE_NUM_BYTES
@@ -360,12 +364,6 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
 
                 // We shift the byte and get rid of any unwanted bits
                 pixel = 0b1111 & (pixel_byte >> shift);
-
-                // Hide pixel if background disabled
-                pixel = pixel & BOOL_MASK[(self->lcdc & (GBC_LCDC_BG_1_ENABLE_FLAG << bg_num)) != 0];
-
-                // Hide pixel if tile is hidden
-                pixel = pixel & BOOL_MASK[(tile_attr & GBC_ATTR_HIDE_FLAG) == 0];
 
                 // Finally, we get the corresponding color from attribute palette
                 new_pixel_color = self->bg_palette_bank[((tile_attr & GBC_ATTR_PALETTE_MASK) << 4) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
@@ -511,9 +509,6 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 // Hide pixel if sprites disabled
                 pixel = pixel & BOOL_MASK[(self->lcdc & GBC_LCDC_SPRITE_ENABLE_FLAG) != 0];
 
-                // Hide pixel if sprite is hidden
-                pixel = pixel & BOOL_MASK[(sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_HIDE_FLAG) == 0];
-
                 new_pixel_color = self->sprite_palette_bank[((sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_PALETTE_MASK) << 4) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
                 
                 // Now replace the pixel if we have a color
@@ -522,6 +517,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
             
             // And last, draw the backgrounds above the sprite layer
             for (bg_num = sprite_layer_z + 1; bg_num < self->num_backgrounds; bg_num++) {
+                if ((self->lcdc & (GBC_LCDC_BG_1_ENABLE_FLAG << bg_num)) == 0) continue;
+                
                 map_x = (x - self->screen_x_origin) + self->bg_scroll_x[bg_num];
                 map_y = self->line_y + self->bg_scroll_y[bg_num];
                 tile = self->vram + (bg_num << 10) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES + offset
@@ -535,6 +532,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 // Get the tile and attrs from the map
                 tile_num = tilemap[map_tile_x + (map_tile_y << 5)]; // map_tile_y * MAP_WIDTH ??? what ???
                 tile_attr = attrmap[map_tile_x + (map_tile_y << 5)];
+
+                if (tile_attr & GBC_ATTR_HIDE_FLAG) continue;
                 
                 // Get the tile from vram
                 offset = tile_num << 5; // tile_num * GBC_TILE_NUM_BYTES
@@ -561,12 +560,6 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
 
                 // We shift the byte and get rid of any unwanted bits
                 pixel = 0b1111 & (pixel_byte >> shift);
-
-                // Hide pixel if background disabled
-                pixel = pixel & BOOL_MASK[(self->lcdc & (GBC_LCDC_BG_1_ENABLE_FLAG << bg_num)) != 0];
-
-                // Hide pixel if tile is hidden
-                pixel = pixel & BOOL_MASK[(tile_attr & GBC_ATTR_HIDE_FLAG) == 0];
 
                 // Finally, we get the corresponding color from attribute palette
                 new_pixel_color = self->bg_palette_bank[((tile_attr & GBC_ATTR_PALETTE_MASK) << 4) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
