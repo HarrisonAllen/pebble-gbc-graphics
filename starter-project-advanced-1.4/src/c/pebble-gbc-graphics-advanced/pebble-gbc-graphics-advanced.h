@@ -106,12 +106,18 @@
 #define GBC_STAT_WRITEABLE_MASK 0xF0     ///> Mask for the writeable bits of STAT
 
 /** OAM flags */
-#define GBC_OAM_SPRITE_WIDTH_MASK 0x03   ///> Mask for OAM sprite width
-#define GBC_OAM_SPRITE_WIDTH_START 0x01  ///> LSB of the OAM sprite width
-#define GBC_OAM_SPRITE_WIDTH_SHIFT 0     ///> The bitshift for start of OAM sprite width
-#define GBC_OAM_SPRITE_HEIGHT_MASK 0x0C  ///> Mask for OAM sprite height
-#define GBC_OAM_SPRITE_HEIGHT_START 0x04 ///> LSB of the OAM sprite height
-#define GBC_OAM_SPRITE_HEIGHT_SHIFT 2    ///> The bitshift for start of OAM sprite height
+#define GBC_OAM_SPRITE_WIDTH_MASK 0x03     ///> Mask for OAM sprite width
+#define GBC_OAM_SPRITE_WIDTH_START 0x01    ///> LSB of the OAM sprite width
+#define GBC_OAM_SPRITE_WIDTH_SHIFT 0       ///> The bitshift for start of OAM sprite width
+#define GBC_OAM_SPRITE_HEIGHT_MASK 0x0C    ///> Mask for OAM sprite height
+#define GBC_OAM_SPRITE_HEIGHT_START 0x04   ///> LSB of the OAM sprite height
+#define GBC_OAM_SPRITE_HEIGHT_SHIFT 2      ///> The bitshift for start of OAM sprite height
+#define GBC_OAM_SPRITE_MOSAIC_X_MASK 0x30  ///> Mask for OAM sprite mosaic x
+#define GBC_OAM_SPRITE_MOSAIC_X_START 0x10 ///> LSB of the OAM sprite mosaic x
+#define GBC_OAM_SPRITE_MOSAIC_X_SHIFT 4    ///> The bitshift for start of OAM sprite mosaic x
+#define GBC_OAM_SPRITE_MOSAIC_Y_MASK 0xC0  ///> Mask for OAM sprite mosaic y
+#define GBC_OAM_SPRITE_MOSAIC_Y_START 0x40 ///> LSB of the OAM sprite mosaic y
+#define GBC_OAM_SPRITE_MOSAIC_Y_SHIFT 6    ///> The bitshift for start of OAM sprite mosaic y
 
 /** Helpful macros */
 #define GBC_MIN(x, y) ((y) ^ (((x) ^ (y)) & -((x) < (y)))) ///> Finds the minimum of two values
@@ -211,7 +217,11 @@ struct _gbc_graphics {
      *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
      *      -Bits 2-3: Sprite width, from 0-3
      *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
-     *      -Bits 4-7: Unused
+     *      -Bits 4-5: Sprite mosaic x, from 0-3
+     *      -Bits 6-7: Sprite mosaic y, from 0-3
+     *      TODO:
+     *      - Add mosaic helper functions
+     *      - Implement mosaic (should just be pixel_x << mosaic)
      */
     uint8_t *oam;
     /**
@@ -1015,6 +1025,26 @@ uint8_t GBC_Graphics_oam_get_sprite_width(GBC_Graphics *self, uint8_t sprite_num
 uint8_t GBC_Graphics_oam_get_sprite_height(GBC_Graphics *self, uint8_t sprite_num);
 
 /**
+ * Gets the mosaic x of the sprite in pixels
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * 
+ * @return The sprite's mosaic x in pixels
+ */
+uint8_t GBC_Graphics_oam_get_sprite_mosaic_x(GBC_Graphics *self, uint8_t sprite_num);
+
+/**
+ * Gets the mosaic y of the sprite in pixels
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * 
+ * @return The sprite's mosaic y in pixels
+ */
+uint8_t GBC_Graphics_oam_get_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_num);
+
+/**
  * Creates and sets a sprite in OAM with the given values
  * 
  * @param self A pointer to the target GBC Graphics object
@@ -1142,9 +1172,27 @@ void GBC_Graphics_oam_set_sprite_width(GBC_Graphics *self, uint8_t sprite_num, u
  * 
  * @param self A pointer to the target GBC Graphics object
  * @param sprite_num The sprite's position in OAM
- * @param height The width of the sprite (see OAM description)
+ * @param height The height of the sprite (see OAM description)
  */
 void GBC_Graphics_oam_set_sprite_height(GBC_Graphics *self, uint8_t sprite_num, uint8_t height);
+
+/**
+ * Sets the sprite's mosaic x (see OAM description)
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * @param mosaic_x The mosaic x of the sprite (see OAM description)
+ */
+void GBC_Graphics_oam_set_sprite_mosaic_x(GBC_Graphics *self, uint8_t sprite_num, uint8_t mosaic_x);
+
+/**
+ * Sets the sprite's mosaic y (see OAM description)
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ * @param mosaic_y The mosaic y of the sprite (see OAM description)
+ */
+void GBC_Graphics_oam_set_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_num, uint8_t mosaic_y);
 
 /**
  * Moves a sprite from one position in OAM to another

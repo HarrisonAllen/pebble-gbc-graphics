@@ -168,8 +168,10 @@ static void generate_backgrounds() {
 }
 
 static void generate_sprite() {
+    GRect bounds = GBC_Graphics_get_screen_bounds(s_gbc_graphics);
+
     GBC_Graphics_lcdc_set_sprite_layer_z(s_gbc_graphics, sprite_layer);
-    GBC_Graphics_oam_set_sprite(s_gbc_graphics, sprite_num, 90 + X_OFFSET + GBC_SPRITE_OFFSET_X, 60 + Y_OFFSET + GBC_SPRITE_OFFSET_Y, 16, GBC_Graphics_attr_make(0, 0, false, false, false), 1, 1);
+    GBC_Graphics_oam_set_sprite(s_gbc_graphics, sprite_num, (bounds.size.w / 2) - GBC_TILE_HEIGHT + sprite_width + GBC_SPRITE_OFFSET_X, (bounds.size.h / 2) - GBC_TILE_HEIGHT + GBC_SPRITE_OFFSET_Y, 16, GBC_Graphics_attr_make(0, 0, false, false, false), 1, 1);
 }
 
 static void step() {
@@ -208,8 +210,15 @@ static void step() {
             GBC_Graphics_alpha_mode_set_mode(s_gbc_graphics, 3, alpha_mode);
         }
     }
-    
 
+    if (sprite_reverse) {
+        GBC_Graphics_oam_set_sprite_mosaic_y(s_gbc_graphics, sprite_num, 3 - (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, sprite_num) / 8) % 4);
+        GBC_Graphics_oam_set_sprite_mosaic_x(s_gbc_graphics, sprite_num, 0);
+    } else {
+        GBC_Graphics_oam_set_sprite_mosaic_x(s_gbc_graphics, sprite_num, (GBC_Graphics_oam_get_sprite_x(s_gbc_graphics, sprite_num) / 8) % 4);
+        GBC_Graphics_oam_set_sprite_mosaic_y(s_gbc_graphics, sprite_num, 0);
+    }
+    
     GBC_Graphics_render(s_gbc_graphics); // Render the screen every step
 }
 

@@ -267,6 +267,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
     uint8_t sprite_w, sprite_h;
     uint8_t sprite_tile_offset;
     uint8_t sprite_x, sprite_y;
+    uint8_t sprite_mos_x, sprite_mos_y;
     short sprite_id;
 
     uint8_t sprites_on_this_line[GBC_NUM_SPRITES];
@@ -470,6 +471,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 sprite_y = sprite[GBC_OAM_Y_POS_BYTE] - GBC_SPRITE_OFFSET_Y;
                 sprite_w = GBC_TILE_WIDTH << ((sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_WIDTH_MASK) >> GBC_OAM_SPRITE_WIDTH_SHIFT); // tile_width * (2 ^ sprite_width)
                 sprite_h = GBC_TILE_HEIGHT << ((sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_HEIGHT_MASK) >> GBC_OAM_SPRITE_HEIGHT_SHIFT); // tile_height * (2 ^ sprite_height)
+                sprite_mos_x = (sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_MOSAIC_X_MASK) >> GBC_OAM_SPRITE_MOSAIC_X_SHIFT;
+                sprite_mos_y = (sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_MOSAIC_Y_MASK) >> GBC_OAM_SPRITE_MOSAIC_Y_SHIFT;
 
                 // Find the pixel on the sprite
                 x_on_sprite = x - sprite_x;
@@ -488,8 +491,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 tile = self->vram + (((sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_VRAM_BANK_MASK) >> 3) << 13) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES (8192) + offset
 
                 // Find the pixel on this tile
-                pixel_x = x_on_sprite & 7; // tile_x % GBC_TILE_WIDTH (8)
-                pixel_y = y_on_sprite & 7; // tile_y % GBC_TILE_HEIGHT (8)
+                pixel_x = (x_on_sprite & 7) >> sprite_mos_x; // tile_x % GBC_TILE_WIDTH (8) / 2^sprite_mos_x
+                pixel_y = (y_on_sprite & 7) >> sprite_mos_y; // tile_y % GBC_TILE_HEIGHT (8) / 2^sprite_mos_y
 
                 // To get the pixel, we first need to get the corresponding byte the pixel is in
                 // There are 4 bytes per row (y * 4), and 2 pixels per byte (x / 2)
@@ -941,6 +944,14 @@ uint8_t GBC_Graphics_oam_get_sprite_height(GBC_Graphics *self, uint8_t sprite_nu
     return (self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_HEIGHT_MASK) >> GBC_OAM_SPRITE_HEIGHT_SHIFT;
 }
 
+uint8_t GBC_Graphics_oam_get_sprite_mosaic_x(GBC_Graphics *self, uint8_t sprite_num) {
+    return (self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_MOSAIC_X_MASK) >> GBC_OAM_SPRITE_MOSAIC_X_SHIFT;
+}
+
+uint8_t GBC_Graphics_oam_get_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_num) {
+    return (self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_MOSAIC_Y_MASK) >> GBC_OAM_SPRITE_MOSAIC_Y_SHIFT;
+}
+
 void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height) {
     self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE] = x;
     self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE] = y;
@@ -1006,6 +1017,15 @@ void GBC_Graphics_oam_set_sprite_width(GBC_Graphics *self, uint8_t sprite_num, u
 
 void GBC_Graphics_oam_set_sprite_height(GBC_Graphics *self, uint8_t sprite_num, uint8_t height) {
     modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE], GBC_OAM_SPRITE_HEIGHT_MASK, height, GBC_OAM_SPRITE_HEIGHT_START);
+}
+
+
+void GBC_Graphics_oam_set_sprite_mosaic_x(GBC_Graphics *self, uint8_t sprite_num, uint8_t mosaic_x) {
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE], GBC_OAM_SPRITE_MOSAIC_X_MASK, mosaic_x, GBC_OAM_SPRITE_MOSAIC_X_START);
+}
+
+void GBC_Graphics_oam_set_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_num, uint8_t mosaic_y) {
+    modify_byte(&self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE], GBC_OAM_SPRITE_MOSAIC_Y_MASK, mosaic_y, GBC_OAM_SPRITE_MOSAIC_Y_START);
 }
 
 void GBC_Graphics_oam_change_sprite_num(GBC_Graphics *self, uint8_t source_sprite_num, uint8_t target_sprite_num, bool copy) {
