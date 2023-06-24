@@ -3,7 +3,7 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
-Current version of pebble-gbc-graphics-advanced: **v1.3.0**
+Current version of pebble-gbc-graphics-advanced: **v1.4.0**
 Changelogs:
 * v1.0.0
     * Tiles are now 4bpp, i.e. 16 colors per tile/palette
@@ -19,11 +19,6 @@ Changelogs:
     * LCDC now has individual background enable bits
     * 8x16 bit removed from LCDC
     * Sprites have additional byte defining dimensions: width and height
-* v1.4.0
-    * Adds alpha blending
-    * Optimization notes:
-        * Disable alpha blending
-        * Use fewer backgrounds
 
     | width/height | 0 | 1 | 2 | 3 |
     | --- | --- | --- | --- | --- |
@@ -39,6 +34,19 @@ Changelogs:
     | 2 | 3 |
     | 4 | 5 |
     | 6 | 7 |
+* v1.4.0
+    * Adds alpha blending modes
+        * Mode 0: Normal rendering
+        * Mode 1: Add - adds two colors together
+        * Mode 2: Subtract - subtracts alpha color from lower color
+        * Mode 3: Average - averages two colors together
+        * Mode 4: AND - performs bitwise AND (&) on two colors
+        * Mode 5: OR - performs bitwise OR (|) on two colors
+        * Mode 6: XOR - performs bitwise XOR (^) on two colors
+    * Adds sprite mosaic effects
+    * Optimization notes:
+        * Disable alpha blending
+        * Enable fewer backgrounds (e.g. disable a menu background when doing gameplay)
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
@@ -92,7 +100,7 @@ You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-gra
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. It is compatible with all Pebbles.
 
-*NEW* I'm working on implementing `pebble-gbc-graphics-advanced`, with the goal of getting closer to GBA graphics.
+*NEW* `pebble-gbc-graphics-advanced` provides more features, closer to what the GBA offers
 
 ## In This Repo
 * [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) - App - pebble-gbc-graphics v1.2.0
@@ -109,6 +117,8 @@ This library allows you to create graphics for your watchface, app, or game (alm
     * ![Starter Project Advanced 1.2](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2-bw.png)
 * [Starter Project Advanced 1.3](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.3) - App - pebble-gbc-graphics-advanced v1.3.0
     * ![Starter Project Advanced 1.3](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.3.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.3-bw.png)
+* [Starter Project Advanced 1.4](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.4) - App - pebble-gbc-graphics-advanced v1.4.0
+    * ![Starter Project Advanced 1.4](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4-bw.png)
     
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
