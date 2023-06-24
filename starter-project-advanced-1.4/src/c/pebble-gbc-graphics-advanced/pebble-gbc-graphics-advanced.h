@@ -7,7 +7,7 @@
  * on the Pebble smartwatch, with some Game Boy Advance style modifications
  * @file pebble-gbc-graphics-advanced.h
  * @author Harrison Allen
- * @version 1.3.2 6/21/2023
+ * @version 1.4 6/23/2023
  * 
  * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
@@ -83,9 +83,15 @@
 #define GBC_LCDC_BG_3_ENABLE_FLAG 0x08     ///> Flag for LCDC BG 3 enable bit
 #define GBC_LCDC_BG_4_ENABLE_FLAG 0x10     ///> Flag for LCDC BG 4 enable bit
 #define GBC_LCDC_SPRITE_ENABLE_FLAG 0X20   ///> Flag for LCDC sprite enable bit
-#define GBC_LCDC_SPRITE_LAYER_Z_MASK 0xC0  ///> Mask for LCDC sprite layer z number
+#define GBC_LCDC_SPRITE_LAYER_Z_MASK 0xC0  ///> Mask for sprite layer z number
 #define GBC_LCDC_SPRITE_LAYER_Z_START 0x40 ///> LSB of the sprite layer z mask
 #define GBC_LCDC_SPRITE_LAYER_Z_SHIFT 6    ///> The bitshift for start of layer z mask
+
+/** Alpha Mode flags */
+#define GBC_ALPHA_MODE_BG_ENABLED_FLAG 0x01   ///> Flag for BG Alpha Mode enable bit
+#define GBC_ALPHA_MODE_MASK 0x0E              ///> Mask for alpha mode
+#define GBC_ALPHA_MODE_START 0x02             ///> LSB of the alpha mode
+#define GBC_ALPHA_MODE_SHIFT 1                ///> The bitshift for start of alpha mode
 
 /** STAT flags */
 #define GBC_STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
@@ -108,9 +114,15 @@
 #define GBC_OAM_SPRITE_HEIGHT_SHIFT 2    ///> The bitshift for start of OAM sprite height
 
 /** Helpful macros */
-#define GBC_MIN(x, y) (y) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the minimum of two values
-#define GBC_MAX(x, y) (x) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the maximum of two values
+#define GBC_MIN(x, y) ((y) ^ (((x) ^ (y)) & -((x) < (y)))) ///> Finds the minimum of two values
+#define GBC_MAX(x, y) ((x) ^ (((x) ^ (y)) & -((x) < (y)))) ///> Finds the maximum of two values
 #define GBC_POINT_TO_OFFSET(x, y) ((x) & (GBC_TILEMAP_WIDTH - 1)) + ((y) & (GBC_TILEMAP_HEIGHT - 1)) * GBC_TILEMAP_WIDTH ///> Converts an x, y point on a bg map to the tile/attrmap offset
+#define GBC_SUB_FLOOR(a, b) ((a) - GBC_MIN((a), (b))) ///> Subtracts b from a flooring at zero
+#define GBC_ADD_CEIL(a, b, m) GBC_MIN((a) + (b), (m)) ///> Adds a to b, ceil at m
+#define GBC_GET_RED(c) (((c) >> 4) & 0b11)
+#define GBC_GET_BLUE(c) (((c) >> 2) & 0b11)
+#define GBC_GET_GREEN(c) (((c) >> 0) & 0b11)
+#define GBC_MAKE_COLOR(r, g, b) (0b11000000 | ((r) << 4) | ((g) << 2) | ((b) << 0))
 
 /** Predefined Screen boundaries for convenience*/
 #if defined(PBL_ROUND)
@@ -133,6 +145,7 @@
 
 /** Colors for black and white palettes */
 #define GBC_COLOR_BLACK 0b00
+#define GBC_COLOR_ALPHA_GRAY 0b01 // Won't actually show up, but is useful for alpha operations
 #define GBC_COLOR_GRAY 0b10
 #define GBC_COLOR_WHITE 0b11
 
@@ -153,6 +166,25 @@ struct _gbc_graphics {
      *      e.g. @ z = 0, sprite renders on top of BG 1 and below BG 2, BG 3, BG 4
      */
     uint8_t lcdc;
+    /**
+     * The Alpha Mode Word
+     *  -Bit 0: BG 1 Display Enable - Setting bit to 1 enables alpha mode on BG 1
+     *  -Bits 1-3: BG 1 Alpha Mode - Sets the alpha mode for BG 1
+     *      -Mode 0: Normal Mode - Alpha layer renders normally
+     *      -Mode 1: Alpha Mode Add - Adds alpha layer colors to current colors
+     *      -Mode 2: Alpha Mode Subtract - Subtracts alpha layer colors from current colors
+     *      -Mode 3: Alpha Mode Average - Averages alpha layer colors with current colors
+     *      -Mode 4: Alpha Mode AND - ANDs the alpha layer colors with current colors
+     *      -Mode 5: Alpha Mode OR - ORs the alpha layer colors with current colors
+     *      -Mode 6: Alpha Mode XOR - XORs the alpha layer colors with current colors
+     *  -Bit 4: BG 2 Display Enable - Setting bit to 1 enables alpha mode on BG 2
+     *  -Bits 5-7: BG 2 Alpha Mode - Sets the alpha mode for BG 2
+     *  -Bit 8: BG 3 Display Enable - Setting bit to 1 enables alpha mode on BG 3
+     *  -Bits 9-11: BG 3 Alpha Mode - Sets the alpha mode for BG 3
+     *  -Bit 12: BG 4 Display Enable - Setting bit to 1 enables alpha mode on BG 4
+     *  -Bits 13-15: BG 4 Alpha Mode - Sets the alpha mode for BG 4
+    */
+    uint16_t a_mode;
     /**
      * VRAM Buffer - Stores the tiles for the backgrounds and sprites in a 4bpp format
      * Originally, the VRAM contained 4 banks of 8192 bytes, for a total of 32768 bytes
@@ -525,6 +557,24 @@ void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled
  * 
 */
 void GBC_Graphics_lcdc_set_sprite_layer_z(GBC_Graphics *self, uint8_t layer_z);
+
+/**
+ * Sets the alpha mode enabled bit for a background of the alpha mode word
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param bg_num The background to set, 0-3
+ * @param enabled Should the bit be enabled?
+ */
+void GBC_Graphics_alpha_mode_set_bg_enabled(GBC_Graphics *self, uint8_t bg_num, bool enabled);
+
+/**
+ * Sets the alpha mode for a background of the alpha mode word
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param bg_num The background to set, 0-3
+ * @param enabled The alpha mode, 0-7
+ */
+void GBC_Graphics_alpha_mode_set_mode(GBC_Graphics *self, uint8_t bg_num, uint8_t mode);
 
 /**
  * Gets the current line being rendered

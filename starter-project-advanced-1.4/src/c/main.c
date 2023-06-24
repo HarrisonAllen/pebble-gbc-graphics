@@ -23,6 +23,8 @@
 
 #if defined(PBL_COLOR)
 static uint8_t black = 0b11000000;
+static uint8_t dark_gray = 0b11010101;
+static uint8_t light_gray = 0b11101010;
 static uint8_t white = 0b11111111;
 static uint8_t full_palette[] = {
     0b11110000,
@@ -56,6 +58,8 @@ static uint8_t color_pairs[][2] = {
 };
 #else
 static uint8_t black = GBC_COLOR_BLACK;
+static uint8_t dark_gray = GBC_COLOR_GRAY;
+static uint8_t light_gray = GBC_COLOR_ALPHA_GRAY;
 static uint8_t white = GBC_COLOR_WHITE;
 static uint8_t full_palette[] = {
     GBC_COLOR_BLACK,
@@ -94,6 +98,7 @@ int sprite_palette = 0;
 int sprite_width, sprite_height;
 bool sprite_flip_x, sprite_flip_y;
 int sprite_num = 28;
+int alpha_mode = 0;
 
 
 /**
@@ -120,12 +125,17 @@ static void create_palettes() {
         GBC_Graphics_set_bg_palette(s_gbc_graphics, i, 3, white, color_pairs[i][0], color_pairs[i][1]);
         GBC_Graphics_set_sprite_palette(s_gbc_graphics, i, 3, white, color_pairs[i][0], color_pairs[i][1]);
     }
+    GBC_Graphics_set_bg_palette(s_gbc_graphics, 5, 5, black, black, dark_gray, light_gray, white);
 }
 
 /**
  * Sets the background tiles in a test pattern to demonstrate palettes
  */
 static void generate_backgrounds() {
+    GRect bounds = GBC_Graphics_get_screen_bounds(s_gbc_graphics);
+
+    GBC_Graphics_alpha_mode_set_bg_enabled(s_gbc_graphics, 3, true);
+    // GBC_Graphics_lcdc_set_alpha_blend_mode_enabled(s_gbc_graphics, true);
     for (uint8_t y = 0; y < GBC_TILEMAP_HEIGHT; y++) {
         for (uint8_t x = 0; x < GBC_TILEMAP_WIDTH; x++) {
             uint8_t bg_num = 0;
@@ -151,12 +161,8 @@ static void generate_backgrounds() {
                 GBC_Graphics_bg_set_tile_palette(s_gbc_graphics, bg_num, x, y, bg_num);
             }
             bg_num = 3;
-            if ((x) % 4 < 2 && (y) % 4 < 2) {
-                GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, 16 + bg_num);
-                GBC_Graphics_bg_set_tile_x_flip(s_gbc_graphics, bg_num, x, y, x % 2 == 0);
-                GBC_Graphics_bg_set_tile_y_flip(s_gbc_graphics, bg_num, x, y, y % 2 == 0);
-                GBC_Graphics_bg_set_tile_palette(s_gbc_graphics, bg_num, x, y, bg_num);
-            }
+            GBC_Graphics_bg_set_tile(s_gbc_graphics, bg_num, x, y, 1 + (x/((bounds.size.w / GBC_TILE_WIDTH) / 2)) % 2 + ((y/((bounds.size.h / GBC_TILE_HEIGHT) / 2)) % 2) * 2);
+            GBC_Graphics_bg_set_tile_palette(s_gbc_graphics, bg_num, x, y, 5);
         }
     }
 }
@@ -170,7 +176,7 @@ static void step() {
     GBC_Graphics_bg_move(s_gbc_graphics, 0, 0, 1);
     GBC_Graphics_bg_move(s_gbc_graphics, 1, -1, 0);
     GBC_Graphics_bg_move(s_gbc_graphics, 2, 1, -1);
-    GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
+    // GBC_Graphics_bg_move(s_gbc_graphics, 3, -1, 1);
 
     if (sprite_reverse) {
         GBC_Graphics_oam_move_sprite(s_gbc_graphics, sprite_num, -2, 0);
@@ -184,6 +190,9 @@ static void step() {
 
             sprite_flip_x = !sprite_flip_x;
             GBC_Graphics_oam_set_sprite_x_flip(s_gbc_graphics, sprite_num, sprite_flip_x);
+
+            alpha_mode = (alpha_mode + 1) % 7;
+            GBC_Graphics_alpha_mode_set_mode(s_gbc_graphics, 3, alpha_mode);
         }
     } else {
         GBC_Graphics_oam_move_sprite(s_gbc_graphics, sprite_num, 2, 0);
@@ -194,7 +203,9 @@ static void step() {
             sprite_flip_y = !sprite_flip_y;
             GBC_Graphics_oam_set_sprite_x_flip(s_gbc_graphics, sprite_num, sprite_flip_x);
             GBC_Graphics_oam_set_sprite_y_flip(s_gbc_graphics, sprite_num, sprite_flip_y);
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "%d : %d", sprite_flip_y, GBC_Graphics_attr_is_y_flipped(GBC_Graphics_oam_get_sprite_attrs(s_gbc_graphics, sprite_num)));
+
+            alpha_mode = (alpha_mode + 1) % 7;
+            GBC_Graphics_alpha_mode_set_mode(s_gbc_graphics, 3, alpha_mode);
         }
     }
     
@@ -241,11 +252,6 @@ static void window_load(Window *window) {
     create_palettes();
     generate_backgrounds();
     generate_sprite();
-
-    // GBC_Graphics_lcdc_set_bg_layer_enabled(s_gbc_graphics, 0, false);
-    // GBC_Graphics_lcdc_set_bg_layer_enabled(s_gbc_graphics, 1, false);
-    // GBC_Graphics_lcdc_set_bg_layer_enabled(s_gbc_graphics, 2, false);
-    // GBC_Graphics_lcdc_set_bg_layer_enabled(s_gbc_graphics, 3, false);
 
     // Setup the frame timer that will call the game step function
     s_frame_timer = app_timer_register(FRAME_DURATION, frame_timer_handle, NULL);

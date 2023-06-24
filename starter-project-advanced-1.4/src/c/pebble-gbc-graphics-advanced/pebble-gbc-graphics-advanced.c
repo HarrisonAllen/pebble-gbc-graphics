@@ -227,6 +227,19 @@ static void modify_byte(uint8_t *byte, uint8_t mask, uint8_t new_value, uint8_t 
 }
 
 /**
+ * Sets the bits outlined by mask to new_value
+ * 
+ * @param word A pointer to the word to modify
+ * @param mask The bits to modify
+ * @param new_value The new value to set the bits to
+ * @param byte_start The offset of the data
+ */
+static void modify_word(uint16_t *word, uint16_t mask, uint16_t new_value, uint16_t word_start) {
+    *word = (*word & ~mask) | new_value * word_start;
+}
+
+
+/**
  * Renders the backgrounds and sprites called from an update proc
  * 
  * @param self A pointer to the target GBC Graphics object
@@ -234,6 +247,7 @@ static void modify_byte(uint8_t *byte, uint8_t mask, uint8_t new_value, uint8_t 
  * @param ctx The graphics context for drawing
  */
 static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
+    if (!(self->lcdc & GBC_LCDC_ENABLE_FLAG)) return;
     GBitmap *fb = graphics_capture_frame_buffer(ctx);
 
     // Predefine the variables we'll use in the loop
@@ -264,8 +278,11 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
 
     uint8_t background_start = self->num_backgrounds - 1;
     bool pixel_set;
-    uint8_t sprite_layer_z = (self->lcdc & GBC_LCDC_SPRITE_LAYER_Z_MASK) >> GBC_LCDC_SPRITE_LAYER_Z_SHIFT;
-    sprite_layer_z = GBC_MIN(sprite_layer_z, background_start);
+    uint8_t sprite_layer_z;
+    uint8_t alpha_mode;
+    bool alpha_enabled;
+    uint8_t alpha_result;
+    uint8_t alpha_mode_results[8];
 
     // Start by going through all of the rows
     self->stat &= ~GBC_STAT_VBLANK_FLAG; // No longer in VBlank while we draw
@@ -281,6 +298,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
         uint8_t min_x = GBC_MAX(info.min_x, self->screen_x_origin);
         uint8_t max_x = GBC_MIN(info.max_x+1, self->screen_x_origin + self->screen_width);
 
+        sprite_layer_z = (self->lcdc & GBC_LCDC_SPRITE_LAYER_Z_MASK) >> GBC_LCDC_SPRITE_LAYER_Z_SHIFT;
+        sprite_layer_z = GBC_MIN(sprite_layer_z, background_start);
         num_sprites_on_this_line = 0;
         for (sprite_id = 0; sprite_id < (GBC_NUM_SPRITES & BOOL_MASK[(self->lcdc & GBC_LCDC_SPRITE_ENABLE_FLAG) != 0]); sprite_id++) {
             sprite = &self->oam[sprite_id * GBC_SPRITE_NUM_BYTES];
@@ -353,8 +372,67 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 // Finally, we get the corresponding color from attribute palette
                 new_pixel_color = self->bg_palette_bank[((tile_attr & GBC_ATTR_PALETTE_MASK) << 4) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
 
-                // Now replace the pixel if we have a color
-                pixel_color = (pixel_color & BOOL_MASK[pixel == 0 && bg_num != 0]) + (new_pixel_color & BOOL_MASK[pixel != 0 || bg_num == 0]);
+                // Check if we should do an alpha blend
+                alpha_enabled = (self->a_mode & (GBC_ALPHA_MODE_BG_ENABLED_FLAG << (bg_num << 2))) != 0;
+                alpha_mode = (((self->a_mode & (GBC_ALPHA_MODE_MASK << (bg_num << 2))) >> (bg_num << 2)) >> GBC_ALPHA_MODE_SHIFT) & BOOL_MASK[alpha_enabled];
+                
+                // Create the alpha blends
+                // Mode 0: Normal
+                alpha_mode_results[0] = (pixel_color & BOOL_MASK[pixel == 0 && bg_num != 0]) + (new_pixel_color & BOOL_MASK[pixel != 0 || bg_num == 0]);
+            #if defined(PBL_COLOR)
+                // Mode 1: Add
+                alpha_mode_results[1] = GBC_MAKE_COLOR(
+                    GBC_ADD_CEIL(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color), 0b11),
+                    GBC_ADD_CEIL(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color), 0b11),
+                    GBC_ADD_CEIL(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color), 0b11)
+                );
+                // Mode 2: Subtract
+                alpha_mode_results[2] = GBC_MAKE_COLOR(
+                    GBC_SUB_FLOOR(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color)),
+                    GBC_SUB_FLOOR(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color)),
+                    GBC_SUB_FLOOR(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color))
+                );
+                // Mode 3: Average
+                alpha_mode_results[3] = GBC_MAKE_COLOR(
+                    (GBC_GET_RED(pixel_color) + GBC_GET_RED(new_pixel_color)) >> 1,
+                    (GBC_GET_BLUE(pixel_color) + GBC_GET_BLUE(new_pixel_color)) >> 1,
+                    (GBC_GET_GREEN(pixel_color) + GBC_GET_GREEN(new_pixel_color)) >> 1
+                );
+                // Mode 4: AND
+                alpha_mode_results[4] = GBC_MAKE_COLOR(
+                    GBC_GET_RED(pixel_color) & GBC_GET_RED(new_pixel_color),
+                    GBC_GET_BLUE(pixel_color) & GBC_GET_BLUE(new_pixel_color),
+                    GBC_GET_GREEN(pixel_color) & GBC_GET_GREEN(new_pixel_color)
+                );
+                // Mode 5: OR
+                alpha_mode_results[5] = GBC_MAKE_COLOR(
+                    GBC_GET_RED(pixel_color) | GBC_GET_RED(new_pixel_color),
+                    GBC_GET_BLUE(pixel_color) | GBC_GET_BLUE(new_pixel_color),
+                    GBC_GET_GREEN(pixel_color) | GBC_GET_GREEN(new_pixel_color)
+                );
+                // Mode 6: XOR
+                alpha_mode_results[6] = GBC_MAKE_COLOR(
+                    GBC_GET_RED(pixel_color) ^ GBC_GET_RED(new_pixel_color),
+                    GBC_GET_BLUE(pixel_color) ^ GBC_GET_BLUE(new_pixel_color),
+                    GBC_GET_GREEN(pixel_color) ^ GBC_GET_GREEN(new_pixel_color)
+                );
+            #else
+                // Mode 1: Add
+                alpha_mode_results[1] = GBC_ADD_CEIL(pixel_color, new_pixel_color, 0b11);
+                // Mode 2: Subtract
+                alpha_mode_results[2] = GBC_SUB_FLOOR(pixel_color, new_pixel_color);
+                // Mode 3: Average
+                alpha_mode_results[3] = (pixel_color + new_pixel_color) >> 1;
+                // Mode 4: AND
+                alpha_mode_results[4] = pixel_color & new_pixel_color;
+                // Mode 5: OR
+                alpha_mode_results[5] = pixel_color | new_pixel_color;
+                // Mode 6: XOR
+                alpha_mode_results[6] = pixel_color ^ new_pixel_color;
+            #endif
+
+                // Now pick the appropriate alpha result
+                pixel_color = alpha_mode_results[alpha_mode];
             }
 
             // Draw the sprite layer, but only the sprites on this line
@@ -383,7 +461,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 tile_y = y_on_sprite >> 3; // (y - sprite_y) / GBC_TILE_HEIGHT (8)
                 sprite_tile_offset = tile_x + (tile_y << ((sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_WIDTH_MASK) >> GBC_OAM_SPRITE_WIDTH_SHIFT)); // tile_x + tile_y * (sprite_width)
                 offset = (sprite[GBC_OAM_TILE_POS_BYTE] + sprite_tile_offset) << 5; // (tile_num + sprite_tile_offset) * GBC_TILE_NUM_BYTES (32)
-                tile = self->vram + ((((sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_VRAM_BANK_MASK) >> 3)) << 13) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES (8192) + offset
+                tile = self->vram + (((sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_VRAM_BANK_MASK) >> 3) << 13) + offset; // self->vram + vram_bank_number * GBC_VRAM_BANK_NUM_BYTES (8192) + offset
 
                 // Find the pixel on this tile
                 pixel_x = x_on_sprite & 7; // tile_x % GBC_TILE_WIDTH (8)
@@ -467,8 +545,67 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 // Finally, we get the corresponding color from attribute palette
                 new_pixel_color = self->bg_palette_bank[((tile_attr & GBC_ATTR_PALETTE_MASK) << 4) + pixel]; // (tile_attr & GBC_ATTR_PALETTE_MASK) * GBC_PALETTE_NUM_BYTES + pixel
 
-                // Now replace the pixel if we have a color
-                pixel_color = (pixel_color & BOOL_MASK[pixel == 0]) + (new_pixel_color & BOOL_MASK[pixel != 0]);
+                // Check if we should do an alpha blend
+                alpha_enabled = (self->a_mode & (GBC_ALPHA_MODE_BG_ENABLED_FLAG << (bg_num << 2))) != 0;
+                alpha_mode = (((self->a_mode & (GBC_ALPHA_MODE_MASK << (bg_num << 2))) >> (bg_num << 2)) >> GBC_ALPHA_MODE_SHIFT) & BOOL_MASK[alpha_enabled];
+                
+                // Create the alpha blends
+                // Mode 0: Normal
+                alpha_mode_results[0] = (pixel_color & BOOL_MASK[pixel == 0 && bg_num != 0]) + (new_pixel_color & BOOL_MASK[pixel != 0 || bg_num == 0]);
+            #if defined(PBL_COLOR)
+                // Mode 1: Add
+                alpha_mode_results[1] = GBC_MAKE_COLOR(
+                    GBC_ADD_CEIL(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color), 0b11),
+                    GBC_ADD_CEIL(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color), 0b11),
+                    GBC_ADD_CEIL(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color), 0b11)
+                );
+                // Mode 2: Subtract
+                alpha_mode_results[2] = GBC_MAKE_COLOR(
+                    GBC_SUB_FLOOR(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color)),
+                    GBC_SUB_FLOOR(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color)),
+                    GBC_SUB_FLOOR(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color))
+                );
+                // Mode 3: Average
+                alpha_mode_results[3] = GBC_MAKE_COLOR(
+                    (GBC_GET_RED(pixel_color) + GBC_GET_RED(new_pixel_color)) >> 1,
+                    (GBC_GET_BLUE(pixel_color) + GBC_GET_BLUE(new_pixel_color)) >> 1,
+                    (GBC_GET_GREEN(pixel_color) + GBC_GET_GREEN(new_pixel_color)) >> 1
+                );
+                // Mode 4: AND
+                alpha_mode_results[4] = GBC_MAKE_COLOR(
+                    GBC_GET_RED(pixel_color) & GBC_GET_RED(new_pixel_color),
+                    GBC_GET_BLUE(pixel_color) & GBC_GET_BLUE(new_pixel_color),
+                    GBC_GET_GREEN(pixel_color) & GBC_GET_GREEN(new_pixel_color)
+                );
+                // Mode 5: OR
+                alpha_mode_results[5] = GBC_MAKE_COLOR(
+                    GBC_GET_RED(pixel_color) | GBC_GET_RED(new_pixel_color),
+                    GBC_GET_BLUE(pixel_color) | GBC_GET_BLUE(new_pixel_color),
+                    GBC_GET_GREEN(pixel_color) | GBC_GET_GREEN(new_pixel_color)
+                );
+                // Mode 6: XOR
+                alpha_mode_results[6] = GBC_MAKE_COLOR(
+                    GBC_GET_RED(pixel_color) ^ GBC_GET_RED(new_pixel_color),
+                    GBC_GET_BLUE(pixel_color) ^ GBC_GET_BLUE(new_pixel_color),
+                    GBC_GET_GREEN(pixel_color) ^ GBC_GET_GREEN(new_pixel_color)
+                );
+            #else
+                // Mode 1: Add
+                alpha_mode_results[1] = GBC_ADD_CEIL(pixel_color, new_pixel_color, 0b11);
+                // Mode 2: Subtract
+                alpha_mode_results[2] = GBC_SUB_FLOOR(pixel_color, new_pixel_color);
+                // Mode 3: Average
+                alpha_mode_results[3] = (pixel_color + new_pixel_color) >> 1;
+                // Mode 4: AND
+                alpha_mode_results[4] = pixel_color & new_pixel_color;
+                // Mode 5: OR
+                alpha_mode_results[5] = pixel_color | new_pixel_color;
+                // Mode 6: XOR
+                alpha_mode_results[6] = pixel_color ^ new_pixel_color;
+            #endif
+
+                // Now pick the appropriate alpha result
+                pixel_color = alpha_mode_results[alpha_mode];
             }
 
         #if defined(PBL_COLOR)
@@ -539,6 +676,15 @@ void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled
 void GBC_Graphics_lcdc_set_sprite_layer_z(GBC_Graphics *self, uint8_t layer_z) {
     modify_byte(&self->lcdc, GBC_LCDC_SPRITE_LAYER_Z_MASK, layer_z, GBC_LCDC_SPRITE_LAYER_Z_START);
 }
+
+void GBC_Graphics_alpha_mode_set_bg_enabled(GBC_Graphics *self, uint8_t bg_num, bool enabled) {
+    modify_word(&self->a_mode, GBC_ALPHA_MODE_BG_ENABLED_FLAG << (bg_num * 4), enabled, GBC_ALPHA_MODE_BG_ENABLED_FLAG << (bg_num * 4));
+}
+
+void GBC_Graphics_alpha_mode_set_mode(GBC_Graphics *self, uint8_t bg_num, uint8_t mode) {
+    modify_word(&self->a_mode, GBC_ALPHA_MODE_MASK << (bg_num * 4), mode, GBC_ALPHA_MODE_START << (bg_num * 4));
+}
+
 
 uint8_t GBC_Graphics_stat_get_current_line(GBC_Graphics *self) {
     return self->line_y;
