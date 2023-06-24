@@ -120,8 +120,8 @@
 #define GBC_SUB_FLOOR(a, b) ((a) - GBC_MIN((a), (b))) ///> Subtracts b from a flooring at zero
 #define GBC_ADD_CEIL(a, b, m) GBC_MIN((a) + (b), (m)) ///> Adds a to b, ceil at m
 #define GBC_GET_RED(c) (((c) >> 4) & 0b11)
-#define GBC_GET_BLUE(c) (((c) >> 2) & 0b11)
-#define GBC_GET_GREEN(c) (((c) >> 0) & 0b11)
+#define GBC_GET_GREEN(c) (((c) >> 2) & 0b11)
+#define GBC_GET_BLUE(c) (((c) >> 0) & 0b11)
 #define GBC_MAKE_COLOR(r, g, b) (0b11000000 | ((r) << 4) | ((g) << 2) | ((b) << 0))
 
 /** Predefined Screen boundaries for convenience*/

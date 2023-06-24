@@ -274,15 +274,13 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
     uint8_t sprite_line_index;
     bool on_this_line;
 
-    uint8_t current_pixel_color, new_pixel_color;
+    uint8_t new_pixel_color;
 
     uint8_t background_start = self->num_backgrounds - 1;
-    bool pixel_set;
     uint8_t sprite_layer_z;
     uint8_t alpha_mode;
     bool alpha_enabled;
-    uint8_t alpha_result;
-    uint8_t alpha_mode_results[8];
+    uint8_t alpha_mode_result;
 
     // Start by going through all of the rows
     self->stat &= ~GBC_STAT_VBLANK_FLAG; // No longer in VBlank while we draw
@@ -378,61 +376,89 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 
                 // Create the alpha blends
                 // Mode 0: Normal
-                alpha_mode_results[0] = (pixel_color & BOOL_MASK[pixel == 0 && bg_num != 0]) + (new_pixel_color & BOOL_MASK[pixel != 0 || bg_num == 0]);
+                alpha_mode_result = (pixel_color & BOOL_MASK[pixel == 0 && bg_num != 0]) + (new_pixel_color & BOOL_MASK[pixel != 0 || bg_num == 0]);
             #if defined(PBL_COLOR)
-                // Mode 1: Add
-                alpha_mode_results[1] = GBC_MAKE_COLOR(
-                    GBC_ADD_CEIL(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color), 0b11),
-                    GBC_ADD_CEIL(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color), 0b11),
-                    GBC_ADD_CEIL(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color), 0b11)
-                );
-                // Mode 2: Subtract
-                alpha_mode_results[2] = GBC_MAKE_COLOR(
-                    GBC_SUB_FLOOR(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color)),
-                    GBC_SUB_FLOOR(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color)),
-                    GBC_SUB_FLOOR(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color))
-                );
-                // Mode 3: Average
-                alpha_mode_results[3] = GBC_MAKE_COLOR(
-                    (GBC_GET_RED(pixel_color) + GBC_GET_RED(new_pixel_color)) >> 1,
-                    (GBC_GET_BLUE(pixel_color) + GBC_GET_BLUE(new_pixel_color)) >> 1,
-                    (GBC_GET_GREEN(pixel_color) + GBC_GET_GREEN(new_pixel_color)) >> 1
-                );
-                // Mode 4: AND
-                alpha_mode_results[4] = GBC_MAKE_COLOR(
-                    GBC_GET_RED(pixel_color) & GBC_GET_RED(new_pixel_color),
-                    GBC_GET_BLUE(pixel_color) & GBC_GET_BLUE(new_pixel_color),
-                    GBC_GET_GREEN(pixel_color) & GBC_GET_GREEN(new_pixel_color)
-                );
-                // Mode 5: OR
-                alpha_mode_results[5] = GBC_MAKE_COLOR(
-                    GBC_GET_RED(pixel_color) | GBC_GET_RED(new_pixel_color),
-                    GBC_GET_BLUE(pixel_color) | GBC_GET_BLUE(new_pixel_color),
-                    GBC_GET_GREEN(pixel_color) | GBC_GET_GREEN(new_pixel_color)
-                );
-                // Mode 6: XOR
-                alpha_mode_results[6] = GBC_MAKE_COLOR(
-                    GBC_GET_RED(pixel_color) ^ GBC_GET_RED(new_pixel_color),
-                    GBC_GET_BLUE(pixel_color) ^ GBC_GET_BLUE(new_pixel_color),
-                    GBC_GET_GREEN(pixel_color) ^ GBC_GET_GREEN(new_pixel_color)
-                );
+                switch(alpha_mode) {
+                    case 1:
+                        // Mode 1: Add
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_ADD_CEIL(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color), 0b11),
+                            GBC_ADD_CEIL(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color), 0b11),
+                            GBC_ADD_CEIL(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color), 0b11)
+                        );
+                        break;
+                    case 2:
+                        // Mode 2: Subtract
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_SUB_FLOOR(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color)),
+                            GBC_SUB_FLOOR(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color)),
+                            GBC_SUB_FLOOR(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color))
+                        );
+                        break;
+                    case 3:
+                        // Mode 3: Average
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            (GBC_GET_RED(pixel_color) + GBC_GET_RED(new_pixel_color)) >> 1,
+                            (GBC_GET_GREEN(pixel_color) + GBC_GET_GREEN(new_pixel_color)) >> 1,
+                            (GBC_GET_BLUE(pixel_color) + GBC_GET_BLUE(new_pixel_color)) >> 1
+                        );
+                        break;
+                    case 4:
+                        // Mode 4: AND
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_GET_RED(pixel_color) & GBC_GET_RED(new_pixel_color),
+                            GBC_GET_GREEN(pixel_color) & GBC_GET_GREEN(new_pixel_color),
+                            GBC_GET_BLUE(pixel_color) & GBC_GET_BLUE(new_pixel_color)
+                        );
+                        break;
+                    case 5:
+                        // Mode 5: OR
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_GET_RED(pixel_color) | GBC_GET_RED(new_pixel_color),
+                            GBC_GET_GREEN(pixel_color) | GBC_GET_GREEN(new_pixel_color),
+                            GBC_GET_BLUE(pixel_color) | GBC_GET_BLUE(new_pixel_color)
+                        );
+                        break;
+                    case 6:
+                        // Mode 6: XOR
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_GET_RED(pixel_color) ^ GBC_GET_RED(new_pixel_color),
+                            GBC_GET_GREEN(pixel_color) ^ GBC_GET_GREEN(new_pixel_color),
+                            GBC_GET_BLUE(pixel_color) ^ GBC_GET_BLUE(new_pixel_color)
+                        );
+                        break;
+                }
             #else
-                // Mode 1: Add
-                alpha_mode_results[1] = GBC_ADD_CEIL(pixel_color, new_pixel_color, 0b11);
-                // Mode 2: Subtract
-                alpha_mode_results[2] = GBC_SUB_FLOOR(pixel_color, new_pixel_color);
-                // Mode 3: Average
-                alpha_mode_results[3] = (pixel_color + new_pixel_color) >> 1;
-                // Mode 4: AND
-                alpha_mode_results[4] = pixel_color & new_pixel_color;
-                // Mode 5: OR
-                alpha_mode_results[5] = pixel_color | new_pixel_color;
-                // Mode 6: XOR
-                alpha_mode_results[6] = pixel_color ^ new_pixel_color;
+                switch (alpha_mode) {
+                    case 1:
+                        // Mode 1: Add
+                        alpha_mode_result = GBC_ADD_CEIL(pixel_color, new_pixel_color, 0b11);
+                        break;
+                    case 2:
+                        // Mode 2: Subtract
+                        alpha_mode_result = GBC_SUB_FLOOR(pixel_color, new_pixel_color);
+                        break;
+                    case 3:
+                        // Mode 3: Average
+                        alpha_mode_result = (pixel_color + new_pixel_color) >> 1;
+                        break;
+                    case 4:
+                        // Mode 4: AND
+                        alpha_mode_result = pixel_color & new_pixel_color;
+                        break;
+                    case 5:
+                        // Mode 5: OR
+                        alpha_mode_result = pixel_color | new_pixel_color;
+                        break;
+                    case 6:
+                        // Mode 6: XOR
+                        alpha_mode_result = pixel_color ^ new_pixel_color;
+                        break;
+                }
             #endif
 
                 // Now pick the appropriate alpha result
-                pixel_color = alpha_mode_results[alpha_mode];
+                pixel_color = alpha_mode_result;
             }
 
             // Draw the sprite layer, but only the sprites on this line
@@ -551,61 +577,89 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
                 
                 // Create the alpha blends
                 // Mode 0: Normal
-                alpha_mode_results[0] = (pixel_color & BOOL_MASK[pixel == 0 && bg_num != 0]) + (new_pixel_color & BOOL_MASK[pixel != 0 || bg_num == 0]);
+                alpha_mode_result = (pixel_color & BOOL_MASK[pixel == 0 && bg_num != 0]) + (new_pixel_color & BOOL_MASK[pixel != 0 || bg_num == 0]);
             #if defined(PBL_COLOR)
-                // Mode 1: Add
-                alpha_mode_results[1] = GBC_MAKE_COLOR(
-                    GBC_ADD_CEIL(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color), 0b11),
-                    GBC_ADD_CEIL(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color), 0b11),
-                    GBC_ADD_CEIL(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color), 0b11)
-                );
-                // Mode 2: Subtract
-                alpha_mode_results[2] = GBC_MAKE_COLOR(
-                    GBC_SUB_FLOOR(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color)),
-                    GBC_SUB_FLOOR(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color)),
-                    GBC_SUB_FLOOR(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color))
-                );
-                // Mode 3: Average
-                alpha_mode_results[3] = GBC_MAKE_COLOR(
-                    (GBC_GET_RED(pixel_color) + GBC_GET_RED(new_pixel_color)) >> 1,
-                    (GBC_GET_BLUE(pixel_color) + GBC_GET_BLUE(new_pixel_color)) >> 1,
-                    (GBC_GET_GREEN(pixel_color) + GBC_GET_GREEN(new_pixel_color)) >> 1
-                );
-                // Mode 4: AND
-                alpha_mode_results[4] = GBC_MAKE_COLOR(
-                    GBC_GET_RED(pixel_color) & GBC_GET_RED(new_pixel_color),
-                    GBC_GET_BLUE(pixel_color) & GBC_GET_BLUE(new_pixel_color),
-                    GBC_GET_GREEN(pixel_color) & GBC_GET_GREEN(new_pixel_color)
-                );
-                // Mode 5: OR
-                alpha_mode_results[5] = GBC_MAKE_COLOR(
-                    GBC_GET_RED(pixel_color) | GBC_GET_RED(new_pixel_color),
-                    GBC_GET_BLUE(pixel_color) | GBC_GET_BLUE(new_pixel_color),
-                    GBC_GET_GREEN(pixel_color) | GBC_GET_GREEN(new_pixel_color)
-                );
-                // Mode 6: XOR
-                alpha_mode_results[6] = GBC_MAKE_COLOR(
-                    GBC_GET_RED(pixel_color) ^ GBC_GET_RED(new_pixel_color),
-                    GBC_GET_BLUE(pixel_color) ^ GBC_GET_BLUE(new_pixel_color),
-                    GBC_GET_GREEN(pixel_color) ^ GBC_GET_GREEN(new_pixel_color)
-                );
+                switch(alpha_mode) {
+                    case 1:
+                        // Mode 1: Add
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_ADD_CEIL(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color), 0b11),
+                            GBC_ADD_CEIL(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color), 0b11),
+                            GBC_ADD_CEIL(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color), 0b11)
+                        );
+                        break;
+                    case 2:
+                        // Mode 2: Subtract
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_SUB_FLOOR(GBC_GET_RED(pixel_color), GBC_GET_RED(new_pixel_color)),
+                            GBC_SUB_FLOOR(GBC_GET_GREEN(pixel_color), GBC_GET_GREEN(new_pixel_color)),
+                            GBC_SUB_FLOOR(GBC_GET_BLUE(pixel_color), GBC_GET_BLUE(new_pixel_color))
+                        );
+                        break;
+                    case 3:
+                        // Mode 3: Average
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            (GBC_GET_RED(pixel_color) + GBC_GET_RED(new_pixel_color)) >> 1,
+                            (GBC_GET_GREEN(pixel_color) + GBC_GET_GREEN(new_pixel_color)) >> 1,
+                            (GBC_GET_BLUE(pixel_color) + GBC_GET_BLUE(new_pixel_color)) >> 1
+                        );
+                        break;
+                    case 4:
+                        // Mode 4: AND
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_GET_RED(pixel_color) & GBC_GET_RED(new_pixel_color),
+                            GBC_GET_GREEN(pixel_color) & GBC_GET_GREEN(new_pixel_color),
+                            GBC_GET_BLUE(pixel_color) & GBC_GET_BLUE(new_pixel_color)
+                        );
+                        break;
+                    case 5:
+                        // Mode 5: OR
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_GET_RED(pixel_color) | GBC_GET_RED(new_pixel_color),
+                            GBC_GET_GREEN(pixel_color) | GBC_GET_GREEN(new_pixel_color),
+                            GBC_GET_BLUE(pixel_color) | GBC_GET_BLUE(new_pixel_color)
+                        );
+                        break;
+                    case 6:
+                        // Mode 6: XOR
+                        alpha_mode_result = GBC_MAKE_COLOR(
+                            GBC_GET_RED(pixel_color) ^ GBC_GET_RED(new_pixel_color),
+                            GBC_GET_GREEN(pixel_color) ^ GBC_GET_GREEN(new_pixel_color),
+                            GBC_GET_BLUE(pixel_color) ^ GBC_GET_BLUE(new_pixel_color)
+                        );
+                        break;
+                }
             #else
-                // Mode 1: Add
-                alpha_mode_results[1] = GBC_ADD_CEIL(pixel_color, new_pixel_color, 0b11);
-                // Mode 2: Subtract
-                alpha_mode_results[2] = GBC_SUB_FLOOR(pixel_color, new_pixel_color);
-                // Mode 3: Average
-                alpha_mode_results[3] = (pixel_color + new_pixel_color) >> 1;
-                // Mode 4: AND
-                alpha_mode_results[4] = pixel_color & new_pixel_color;
-                // Mode 5: OR
-                alpha_mode_results[5] = pixel_color | new_pixel_color;
-                // Mode 6: XOR
-                alpha_mode_results[6] = pixel_color ^ new_pixel_color;
+                switch (alpha_mode) {
+                    case 1:
+                        // Mode 1: Add
+                        alpha_mode_result = GBC_ADD_CEIL(pixel_color, new_pixel_color, 0b11);
+                        break;
+                    case 2:
+                        // Mode 2: Subtract
+                        alpha_mode_result = GBC_SUB_FLOOR(pixel_color, new_pixel_color);
+                        break;
+                    case 3:
+                        // Mode 3: Average
+                        alpha_mode_result = (pixel_color + new_pixel_color) >> 1;
+                        break;
+                    case 4:
+                        // Mode 4: AND
+                        alpha_mode_result = pixel_color & new_pixel_color;
+                        break;
+                    case 5:
+                        // Mode 5: OR
+                        alpha_mode_result = pixel_color | new_pixel_color;
+                        break;
+                    case 6:
+                        // Mode 6: XOR
+                        alpha_mode_result = pixel_color ^ new_pixel_color;
+                        break;
+                }
             #endif
 
                 // Now pick the appropriate alpha result
-                pixel_color = alpha_mode_results[alpha_mode];
+                pixel_color = alpha_mode_result;
             }
 
         #if defined(PBL_COLOR)
