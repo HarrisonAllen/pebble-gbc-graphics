@@ -1,7 +1,7 @@
 {
   "name": "starter-project-advanced",
   "author": "Your Name Here",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
   "dependencies": {},

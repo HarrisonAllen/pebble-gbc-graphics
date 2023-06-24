@@ -7,7 +7,7 @@
  * on the Pebble smartwatch, with some Game Boy Advance style modifications
  * @file pebble-gbc-graphics-advanced.h
  * @author Harrison Allen
- * @version 1.4 6/24/2023
+ * @version 1.1.0 6/15/2023
  * 
  * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
@@ -26,8 +26,8 @@
  * 256 tiles per bank * 32 bytes per tile = 8192 bytes
  */
 #define GBC_VRAM_BANK_NUM_BYTES 8192
-#define GBC_TILEMAP_WIDTH 32  ///> Width of the background layers in tiles
-#define GBC_TILEMAP_HEIGHT 32 ///> Height of the background layers in tiles
+#define GBC_TILEMAP_WIDTH 32  ///> Width of the background and window layers in tiles
+#define GBC_TILEMAP_HEIGHT 32 ///> Height of the background and window layers in tiles
 /**
  * Size of the tilemap in bytes, calculated by:
  * 1 byte per tile location * 32 tiles wide * 32 tiles tall = 1024 bytes
@@ -48,20 +48,13 @@
  * 16 bytes per palette * 8 palettes = 128 bytes
  */
 #define GBC_PALETTE_BANK_NUM_BYTES 128
-#define GBC_NUM_SPRITES 40 ///> The maximum number of sprites
-#define GBC_SPRITE_NUM_BYTES 5 ///> The number of bytes per sprite
 /**
  * The size of the OAM, calculated by:
- * 5 bytes per sprite * 40 sprite slots = 160 bytes
+ * 4 bytes per sprite * 40 sprite slots = 160 bytes
  */
-#define GBC_OAM_NUM_BYTES 200
-#define GBC_OAM_X_POS_BYTE 0    ///> The OAM x byte offset
-#define GBC_OAM_Y_POS_BYTE 1    ///> The OAM y byte offset
-#define GBC_OAM_TILE_POS_BYTE 2 ///> The OAM VRAM tile pos byte offset
-#define GBC_OAM_ATTR_BYTE 3     ///> The OAM ATTR byte offset
-#define GBC_OAM_DIMS_BYTE 4     ///> The OAM dimensions byte offset
-#define GBC_SPRITE_OFFSET_X 64  ///> The x offset to allow for offscreen rendering
-#define GBC_SPRITE_OFFSET_Y 64  ///> The y offset to allow for offscreen rendering
+#define GBC_OAM_NUM_BYTES 160
+#define GBC_SPRITE_OFFSET_X 8 ///> The x offset to allow for offscreen rendering
+#define GBC_SPRITE_OFFSET_Y 16 ///> The y offset to allow for offscreen rendering
 
 /** Attribute flags */
 #define GBC_ATTR_PALETTE_MASK 0x07      ///> Mask for the palette number
@@ -74,26 +67,16 @@
 #define GBC_ATTR_VRAM_BANK_03_FLAG 0X18 ///> Convenience flag for bank 3
 #define GBC_ATTR_FLIP_FLAG_X 0x20       ///> Flag for horizontal flip
 #define GBC_ATTR_FLIP_FLAG_Y 0x40       ///> Flag for vertical flip
-#define GBC_ATTR_HIDE_FLAG 0X80         ///> Flag for hide bit
+#define GBC_ATTR_PRIORITY_FLAG 0X80     ///> Flag for priority bit
 
-/** LCDC flags */
-#define GBC_LCDC_ENABLE_FLAG 0x01          ///> Flag for LCDC enable bit
-#define GBC_LCDC_BG_1_ENABLE_FLAG 0x02     ///> Flag for LCDC BG 1 enable bit
-#define GBC_LCDC_BG_2_ENABLE_FLAG 0x04     ///> Flag for LCDC BG 2 enable bit
-#define GBC_LCDC_BG_3_ENABLE_FLAG 0x08     ///> Flag for LCDC BG 3 enable bit
-#define GBC_LCDC_BG_4_ENABLE_FLAG 0x10     ///> Flag for LCDC BG 4 enable bit
-#define GBC_LCDC_SPRITE_ENABLE_FLAG 0X20   ///> Flag for LCDC sprite enable bit
-#define GBC_LCDC_SPRITE_LAYER_Z_MASK 0xC0  ///> Mask for sprite layer z number
-#define GBC_LCDC_SPRITE_LAYER_Z_START 0x40 ///> LSB of the sprite layer z mask
-#define GBC_LCDC_SPRITE_LAYER_Z_SHIFT 6    ///> The bitshift for start of layer z mask
+/** LCDC flags*/
+#define GBC_LCDC_ENABLE_FLAG 0x01        ///> Flag for LCDC enable bit
+#define GBC_LCDC_BCKGND_ENABLE_FLAG 0X02 ///> Flag for LCDC background enable bit
+#define GBC_LCDC_WINDOW_ENABLE_FLAG 0x04 ///> Flag for LCDC window enable bit
+#define GBC_LCDC_SPRITE_ENABLE_FLAG 0X08 ///> Flag for LCDC sprite enable bit
+#define GBC_LCDC_SPRITE_SIZE_FLAG 0x10   ///> Flag for LCDC sprite size bit
 
-/** Alpha Mode flags */
-#define GBC_ALPHA_MODE_BG_ENABLED_FLAG 0x01   ///> Flag for BG Alpha Mode enable bit
-#define GBC_ALPHA_MODE_MASK 0x0E              ///> Mask for alpha mode
-#define GBC_ALPHA_MODE_START 0x02             ///> LSB of the alpha mode
-#define GBC_ALPHA_MODE_SHIFT 1                ///> The bitshift for start of alpha mode
-
-/** STAT flags */
+/** STAT flags*/
 #define GBC_STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
 #define GBC_STAT_VBLANK_FLAG 0X02        ///> Flag for STAT VBlank flag bit
 #define GBC_STAT_LINE_COMP_FLAG 0X04     ///> Flag for STAT line compare flag bit
@@ -105,30 +88,10 @@
 #define GBC_STAT_READ_ONLY_MASK 0x0F     ///> Mask for the read only bits of STAT
 #define GBC_STAT_WRITEABLE_MASK 0xF0     ///> Mask for the writeable bits of STAT
 
-/** OAM flags */
-#define GBC_OAM_SPRITE_WIDTH_MASK 0x03     ///> Mask for OAM sprite width
-#define GBC_OAM_SPRITE_WIDTH_START 0x01    ///> LSB of the OAM sprite width
-#define GBC_OAM_SPRITE_WIDTH_SHIFT 0       ///> The bitshift for start of OAM sprite width
-#define GBC_OAM_SPRITE_HEIGHT_MASK 0x0C    ///> Mask for OAM sprite height
-#define GBC_OAM_SPRITE_HEIGHT_START 0x04   ///> LSB of the OAM sprite height
-#define GBC_OAM_SPRITE_HEIGHT_SHIFT 2      ///> The bitshift for start of OAM sprite height
-#define GBC_OAM_SPRITE_MOSAIC_X_MASK 0x30  ///> Mask for OAM sprite mosaic x
-#define GBC_OAM_SPRITE_MOSAIC_X_START 0x10 ///> LSB of the OAM sprite mosaic x
-#define GBC_OAM_SPRITE_MOSAIC_X_SHIFT 4    ///> The bitshift for start of OAM sprite mosaic x
-#define GBC_OAM_SPRITE_MOSAIC_Y_MASK 0xC0  ///> Mask for OAM sprite mosaic y
-#define GBC_OAM_SPRITE_MOSAIC_Y_START 0x40 ///> LSB of the OAM sprite mosaic y
-#define GBC_OAM_SPRITE_MOSAIC_Y_SHIFT 6    ///> The bitshift for start of OAM sprite mosaic y
-
 /** Helpful macros */
-#define GBC_MIN(x, y) ((y) ^ (((x) ^ (y)) & -((x) < (y)))) ///> Finds the minimum of two values
-#define GBC_MAX(x, y) ((x) ^ (((x) ^ (y)) & -((x) < (y)))) ///> Finds the maximum of two values
-#define GBC_POINT_TO_OFFSET(x, y) ((x) & (GBC_TILEMAP_WIDTH - 1)) + ((y) & (GBC_TILEMAP_HEIGHT - 1)) * GBC_TILEMAP_WIDTH ///> Converts an x, y point on a bg map to the tile/attrmap offset
-#define GBC_SUB_FLOOR(a, b) ((a) - GBC_MIN((a), (b))) ///> Subtracts b from a flooring at zero
-#define GBC_ADD_CEIL(a, b, m) GBC_MIN((a) + (b), (m)) ///> Adds a to b, ceil at m
-#define GBC_GET_RED(c) (((c) >> 4) & 0b11)
-#define GBC_GET_GREEN(c) (((c) >> 2) & 0b11)
-#define GBC_GET_BLUE(c) (((c) >> 0) & 0b11)
-#define GBC_MAKE_COLOR(r, g, b) (0b11000000 | ((r) << 4) | ((g) << 2) | ((b) << 0))
+#define GBC_MIN(x, y) (y) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the minimum of two values
+#define GBC_MAX(x, y) (x) ^ (((x) ^ (y)) & -((x) < (y))) ///> Finds the maximum of two values
+#define GBC_POINT_TO_OFFSET(x, y) ((x) & (GBC_TILEMAP_WIDTH - 1)) + ((y) & (GBC_TILEMAP_HEIGHT - 1)) * GBC_TILEMAP_WIDTH ///> Converts an x, y point on a bg/window map to the tile/attrmap offset
 
 /** Predefined Screen boundaries for convenience*/
 #if defined(PBL_ROUND)
@@ -151,7 +114,6 @@
 
 /** Colors for black and white palettes */
 #define GBC_COLOR_BLACK 0b00
-#define GBC_COLOR_ALPHA_GRAY 0b01 // Won't actually show up, but is useful for alpha operations
 #define GBC_COLOR_GRAY 0b10
 #define GBC_COLOR_WHITE 0b11
 
@@ -161,38 +123,19 @@ struct _gbc_graphics {
     Layer *graphics_layer; ///< The Layer on which to render the graphics
     /**
      * The LCD Control Byte
-     *  -Bit 0: Enable - Setting bit to 0 disables drawing of backgrounds and sprites
-     *  -Bit 1: BG 1 Display Enable - Setting bit to 0 disables drawing of BG 1
-     *  -Bit 2: BG 2 Display Enable - Setting bit to 0 disables drawing of BG 2
-     *  -Bit 3: BG 3 Display Enable - Setting bit to 0 disables drawing of BG 3
-     *  -Bit 4: BG 4 Display Enable - Setting bit to 0 disables drawing of BG 4
-     *  -Bit 5: Sprite Display Enable - Setting bit to 0 disables drawing of sprites
-     *  -Bits 6-7: Sprite Layer Z, from 0 to 3
-     *      e.g. @ z = 3, sprite renders on top of BG 1, BG 2, BG 3, BG 4
-     *      e.g. @ z = 0, sprite renders on top of BG 1 and below BG 2, BG 3, BG 4
+     *  -Bit 0: Enable - Setting bit to 0 disables drawing of background, window, and sprites
+     *  -Bit 1: BG Display Enable - Setting bit to 0 disables drawing of background
+     *  -Bit 2: Window Display Enable - Setting bit to 0 disables drawing of window
+     *  -Bit 3: Sprite Display Enable - Setting bit to 0 disables drawing of sprites
+     *  -Bit 4: Sprite Size - Setting bit to 0 uses one tile per sprite (8x8), 
+     *                        Setting bit to 1 uses two tiles per sprite(8x16)
+     *  -Bit 5: Unused
+     *  -Bit 6: Unused
+     *  -Bit 7: Unused
      */
     uint8_t lcdc;
     /**
-     * The Alpha Mode Word
-     *  -Bit 0: BG 1 Display Enable - Setting bit to 1 enables alpha mode on BG 1
-     *  -Bits 1-3: BG 1 Alpha Mode - Sets the alpha mode for BG 1
-     *      -Mode 0: Normal Mode - Alpha layer renders normally
-     *      -Mode 1: Alpha Mode Add - Adds alpha layer colors to current colors
-     *      -Mode 2: Alpha Mode Subtract - Subtracts alpha layer colors from current colors
-     *      -Mode 3: Alpha Mode Average - Averages alpha layer colors with current colors
-     *      -Mode 4: Alpha Mode AND - ANDs the alpha layer colors with current colors
-     *      -Mode 5: Alpha Mode OR - ORs the alpha layer colors with current colors
-     *      -Mode 6: Alpha Mode XOR - XORs the alpha layer colors with current colors
-     *  -Bit 4: BG 2 Display Enable - Setting bit to 1 enables alpha mode on BG 2
-     *  -Bits 5-7: BG 2 Alpha Mode - Sets the alpha mode for BG 2
-     *  -Bit 8: BG 3 Display Enable - Setting bit to 1 enables alpha mode on BG 3
-     *  -Bits 9-11: BG 3 Alpha Mode - Sets the alpha mode for BG 3
-     *  -Bit 12: BG 4 Display Enable - Setting bit to 1 enables alpha mode on BG 4
-     *  -Bits 13-15: BG 4 Alpha Mode - Sets the alpha mode for BG 4
-    */
-    uint16_t a_mode;
-    /**
-     * VRAM Buffer - Stores the tiles for the backgrounds and sprites in a 4bpp format
+     * VRAM Buffer - Stores the tiles for the background, window, and sprites in a 4bpp format
      * Originally, the VRAM contained 4 banks of 8192 bytes, for a total of 32768 bytes
      * Now, the number of banks is set in the ctor
      * Each bank holds up to 256 tiles in 4bpp format of 32 bytes each
@@ -200,9 +143,11 @@ struct _gbc_graphics {
     uint8_t *vram;
     /**
      * OAM Buffer - Stores the data for the current sprites
-     * The OAM contains 40 slots for 5 bytes of sprite information, which is as follows:
-     *  -Byte 0: Sprite x position, offset by -64 (max sprite width) to allow for off-screen rendering
-     *  -Byte 1: Sprite y position, offset by -64 (max sprite height) to allow for off-screen rendering
+     * The OAM contains 40 slots for 4 bytes of sprite information, which is as follows:
+     *  -Byte 0: Sprite x position, offset by -8 (sprite width) to allow for off-screen rendering
+     *      When x == 0 or x >= screen_width, the sprite will be hidden
+     *  -Byte 1: Sprite y position, offset by -16 (sprite height) to allow for off-screen rendering
+     *      When y == 0 or y >= screen_height, the sprite will be hidden
      *  -Byte 2: Sprite tile position in VRAM bank
      *      Note: When the Sprite Size bit of LCDC is set, the tile at the memory location will be 
      *            on top, and the tile at memory location + 1 will be on the bottom
@@ -211,37 +156,46 @@ struct _gbc_graphics {
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
      *      -Bit 5: X Flip - Setting bit will flip the sprite horizontally when rendered
      *      -Bit 6: Y Flip - Setting bit will flip the sprite vertically when rendered
-     *      -Bit 7: Hide - Setting the bit will make the sprite hidden
-     *  - Byte 4: Sprite size data
-     *      -Bits 0-1: Sprite height, from 0-3
-     *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
-     *      -Bits 2-3: Sprite width, from 0-3
-     *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
-     *      -Bits 4-5: Sprite mosaic x, from 0-3
-     *      -Bits 6-7: Sprite mosaic y, from 0-3
-     *      TODO:
-     *      - Add mosaic helper functions
-     *      - Implement mosaic (should just be pixel_x << mosaic)
+     *      -Bit 7: Priority - Setting bit will make any non-zero background pixel take priority
      */
     uint8_t *oam;
     /**
-     * Background Tilemap buffers
-     * This tilemap contains 1-4 32 x 32 VRAM bank locations of 1 byte each, totaling 512 * num_backgrounds bytes
-     * The offset of the screen view is set by bg_scroll_x and bg_scroll_y
+     * Background Tilemap buffer
+     * This tilemap contains 32 x 32 VRAM bank locations of 1 byte each, totaling 1024 bytes
+     * The offset of the screen view (which is 144x160 pixels) is set by bg_scroll_x and bg_scroll_y
      */
-    uint8_t *bg_tilemaps;
+    uint8_t *bg_tilemap;
     /**
-     * Background Atributemap Buffers
-     * This tilemap contains 4 of 32 x 32 tile attributes of 1 byte each, totaling 4096 bytes
+     * Window Tilemap buffer
+     * This tilemap contains 32 x 32 VRAM bank locations of 1 byte each, totaling 1024 bytes
+     * The window is always drawn starting at the top left corner, and the window location on
+     * the screen is set by window_offset_x and window_offset_y
+     */
+    uint8_t *window_tilemap;
+    /**
+     * Background Atributemap Buffer
+     * This tilemap contains 32 x 32 tile attributes of 1 byte each, totaling 1024 bytes
      * Each attribute corresponds to a tile on the bg_tilemap
      * The attribute byte is defined as:
      *      -Bits 0-2: Palette number, from 0 to 7
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
      *      -Bit 5: X Flip - Setting bit will flip the tile horizontally when rendered
      *      -Bit 6: Y Flip - Setting bit will flip the tile vertically when rendered
-     *      -Bit 7: Hide - Setting the bit will make the tile hidden
+     *      -Bit 7: BG Priority - Setting bit will make any non-zero background pixel take priority over sprites
      */
-    uint8_t *bg_attrmaps;
+    uint8_t *bg_attrmap;
+    /**
+     * Window Atributemap Buffer
+     * This tilemap contains 32 x 32 tile attributes of 1 byte each, totaling 1024 bytes
+     * Each attribute corresponds to a tile on the bg_tilemap
+     * The attribute byte is defined as:
+     *      -Bits 0-2: Palette number, from 0 to 7
+     *      -Bits 3-4: VRAM Bank Select, from 0 to 3
+     *      -Bit 5: X Flip - Setting bit will flip the tile horizontally when rendered
+     *      -Bit 6: Y Flip - Setting bit will flip the tile vertically when rendered
+     *      -Bit 7: Window Priority - Setting bit will make any non-zero window pixel take priority over sprites
+     */
+    uint8_t *window_attrmap;
     /**
      * Background Palette Bank
      * The palette bank contains 8 palettes of 16 colors (1 byte) each, totalling 128 bytes
@@ -253,8 +207,10 @@ struct _gbc_graphics {
      * The 0th color in each palette will be replaced by transparency when rendered.
      */
     uint8_t *sprite_palette_bank;
-    short *bg_scroll_x; ///> Array of 4 x positions of the screen view into the background tilemaps
-    short *bg_scroll_y; ///> Array of 4 y position of the screen view into the background tilemaps
+    short bg_scroll_x; ///> The x position of the screen view into the background tilemap
+    short bg_scroll_y; ///> The y position of the screen view into the background tilemap
+    short window_offset_x; ///> The x offset of the window tilemap in the screen view, >= screen_width == hidden
+    short window_offset_y; ///> The y offset of the window tilemap in the screen view, >= screen_height == hidden
     /**
      * LCD Status Byte
      *  -Bit 0: HBlank Flag - Set to 1 between rendering lines - READ ONLY
@@ -274,7 +230,6 @@ struct _gbc_graphics {
     void (*line_compare_interrupt_callback)(GBC_Graphics *); ///> The callback for the line compare interrupt
     void (*oam_interrupt_callback)(GBC_Graphics *); ///> The callback for the oam interrupt
 
-    uint8_t num_backgrounds; ///> The number of background layers
     uint8_t screen_x_origin; ///> The start x position of the rendered screen
     uint8_t screen_y_origin; ///> The start y position of the rendered screen
     uint8_t screen_width; ///> The width of the rendered screen
@@ -285,8 +240,7 @@ struct _gbc_graphics {
  * Creates a GBC Graphics object
  * 
  * @param window The window in which to display the GBC Graphics object
- * @param num_vram_banks The number of vram banks to generate, can be from 1-4
- * @param num_backgrounds The number of background layers to generate, can be from 1-4
+ * @param num_vram_banks The number of vram banks to generate, up to 4
  * 
  * @return a pointer to the created GBC Graphics object
  * @note I recommend creating the GBC Graphics object in window_load or an equivalent function
@@ -294,7 +248,7 @@ struct _gbc_graphics {
  * loading from static resources on the fly. If designing for Basalt/Chalk/Diorite, then feel free
  * to use as many vram banks as you'd like
  */
-GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks, uint8_t num_backgrounds);
+GBC_Graphics *GBC_Graphics_ctor(Window *window, uint8_t num_vram_banks);
 
 /**
  * Destroys the GBC Graphics display object by freeing any memory it uses
@@ -546,10 +500,17 @@ void GBC_Graphics_lcdc_set_enabled(GBC_Graphics *self, bool enabled);
  * Sets the background layer enabled bit of the LCDC byte
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_num The background to set, 0-3
  * @param enabled Should the bit be enabled?
  */
-void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, uint8_t bg_num, bool enabled);
+void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, bool enabled);
+
+/**
+ * Sets the window layer enabled bit of the LCDC byte
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param enabled Should the bit be enabled?
+ */
+void GBC_Graphics_lcdc_set_window_layer_enabled(GBC_Graphics *self, bool enabled);
 
 /**
  * Sets the sprite layer enabled bit of the LCDC byte
@@ -560,31 +521,12 @@ void GBC_Graphics_lcdc_set_bg_layer_enabled(GBC_Graphics *self, uint8_t bg_num, 
 void GBC_Graphics_lcdc_set_sprite_layer_enabled(GBC_Graphics *self, bool enabled);
 
 /**
- * Sets the sprite layer z bits of the LCDC byte
+ * Sets the sprite mode bit of the LCDC byte
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param layer_z The z position of the sprite layer
- * 
-*/
-void GBC_Graphics_lcdc_set_sprite_layer_z(GBC_Graphics *self, uint8_t layer_z);
-
-/**
- * Sets the alpha mode enabled bit for a background of the alpha mode word
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param bg_num The background to set, 0-3
- * @param enabled Should the bit be enabled?
+ * @param use_8x16_sprites Should the system use 8x16 sprites?
  */
-void GBC_Graphics_alpha_mode_set_bg_enabled(GBC_Graphics *self, uint8_t bg_num, bool enabled);
-
-/**
- * Sets the alpha mode for a background of the alpha mode word
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param bg_num The background to set, 0-3
- * @param enabled The alpha mode, 0-7
- */
-void GBC_Graphics_alpha_mode_set_mode(GBC_Graphics *self, uint8_t bg_num, uint8_t mode);
+void GBC_Graphics_lcdc_set_8x16_sprite_mode_enabled(GBC_Graphics *self, bool use_8x16_sprites);
 
 /**
  * Gets the current line being rendered
@@ -725,13 +667,13 @@ void GBC_Graphics_set_oam_interrupt_callback(GBC_Graphics *self, void (*callback
  * 
  * @param palette The palette to use
  * @param vram_bank The VRAM bank to use
- * @param is_x_flipped Should the tile/sprite be flipped horizontally?
- * @param is_y_flipped Should the tile/sprite be flipped vertically?
- * @param is_hidden Should the tile/sprite be hidden?
+ * @param is_x_flipped Should the tile be flipped horizontally?
+ * @param is_y_flipped Should the tile be flipped vertically?
+ * @param bg_has_priority Does the background have rendering priority?
  * 
  * @return An attribute byte containing the given parameters
  */
-uint8_t GBC_Graphics_attr_make(uint8_t palette, uint8_t vram_bank, bool is_x_flipped, bool is_y_flipped, bool is_hidden);
+uint8_t GBC_Graphics_attr_make(uint8_t palette, uint8_t vram_bank, bool is_x_flipped, bool is_y_flipped, bool bg_has_priority);
 
 /**
  * Extracts the palette number from an attribute byte
@@ -770,199 +712,349 @@ bool GBC_Graphics_attr_is_x_flipped(uint8_t attributes);
 bool GBC_Graphics_attr_is_y_flipped(uint8_t attributes);
 
 /**
- * Checks if the attribute byte has a hide flag
+ * Checks if the attribute byte has a background priority flag
  * 
  * @param attributes An attribute byte
  * 
- * @return true if the attribute has a hide flag
+ * @return true if the attribute has a background priority flag
  */
-bool GBC_Graphics_attr_is_hidden(uint8_t attributes);
-
+bool GBC_Graphics_attr_background_has_priority(uint8_t attributes);
 
 /**
  * Gets the current x position of the background scroll
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * 
  * @return The current x position of the background scroll
  */
-uint8_t GBC_Graphics_bg_get_scroll_x(GBC_Graphics *self, uint8_t bg_layer);
+uint8_t GBC_Graphics_bg_get_scroll_x(GBC_Graphics *self);
 
 /**
  * Gets the current y position of the background scroll
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * 
  * @return The current y position of the background scroll
  */
-uint8_t GBC_Graphics_bg_get_scroll_y(GBC_Graphics *self, uint8_t bg_layer);
+uint8_t GBC_Graphics_bg_get_scroll_y(GBC_Graphics *self);
 
 /**
  * Gets the tile number at the given position on the background
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * 
  * @return The tile number
  */
-uint8_t GBC_Graphics_bg_get_tile(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y);
+uint8_t GBC_Graphics_bg_get_tile(GBC_Graphics *self, uint8_t x, uint8_t y);
 
 /** 
  * Gets the attributes of the tile at the given position on the background
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * 
  * @return The tile attributes
  */
-uint8_t GBC_Graphics_bg_get_attr(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y);
+uint8_t GBC_Graphics_bg_get_attr(GBC_Graphics *self, uint8_t x, uint8_t y);
 
 /**
  * Moves the background scroll by dx and dy
  * X and Y will wrap around if they become < 0 or > MAP_SIZE * GBC_TILE_NUM_BYTES
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param dx The delta x to move the scroll x by
  * @param dy The delta y to move the scroll y by
  */
-void GBC_Graphics_bg_move(GBC_Graphics *self, uint8_t bg_layer, short dx, short dy);
+void GBC_Graphics_bg_move(GBC_Graphics *self, short dx, short dy);
 
 /**
  * Sets the background scroll x
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The new scroll x
  */
-void GBC_Graphics_bg_set_scroll_x(GBC_Graphics *self, uint8_t bg_layer, uint8_t x);
+void GBC_Graphics_bg_set_scroll_x(GBC_Graphics *self, uint8_t x);
 
 /**
  * Sets the background scroll y
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param y The new scroll y
  */
-void GBC_Graphics_bg_set_scroll_y(GBC_Graphics *self, uint8_t bg_layer, uint8_t y);
+void GBC_Graphics_bg_set_scroll_y(GBC_Graphics *self, uint8_t y);
 
 /**
  * Sets the background scroll x and scroll y
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The new scroll x
  * @param y The new scroll y
  */
-void GBC_Graphics_bg_set_scroll_pos(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y);
+void GBC_Graphics_bg_set_scroll_pos(GBC_Graphics *self, uint8_t x, uint8_t y);
 
 /**
  * Sets the tile number at the given position on the background
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * @param tile_number The new tile number
  */
-void GBC_Graphics_bg_set_tile(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, uint8_t tile_number);
+void GBC_Graphics_bg_set_tile(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number);
 
 /**
  * Sets the tile attributes at the given position on the background
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * @param attributes The new attributes
  */
-void GBC_Graphics_bg_set_attrs(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, uint8_t attributes);
+void GBC_Graphics_bg_set_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t attributes);
 
 /**
  * Sets both the tile number and tile attributes at the given position on the background
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * @param tile_number The new tile number
  * @param attributes The new tile number
  */
-void GBC_Graphics_bg_set_tile_and_attrs(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, uint8_t tile_number, uint8_t attributes);
+void GBC_Graphics_bg_set_tile_and_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number, uint8_t attributes);
 
 /**
  * Sets the palette of the tile at the given position on the background
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * @param palette The new palette, from 0 to 7
  */
-void GBC_Graphics_bg_set_tile_palette(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, uint8_t palette);
+void GBC_Graphics_bg_set_tile_palette(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t palette);
 
 /**
  * Sets the VRAM bank of the tile at the given position on the background
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * @param vram_bank The new VRAM bank, from 0 to 3
  */
-void GBC_Graphics_bg_set_tile_vram_bank(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, uint8_t vram_bank);
+void GBC_Graphics_bg_set_tile_vram_bank(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t vram_bank);
 
 /**
  * Sets if the tile at the given position on the background should be flipped horizontally
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * @param flipped If the tile should be flipped horizontally
  */
-void GBC_Graphics_bg_set_tile_x_flip(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, bool flipped);
+void GBC_Graphics_bg_set_tile_x_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped);
 
 /**
  * Sets if the tile at the given position on the background should be flipped vertically
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
  * @param flipped If the tile should be flipped vertically
  */
-void GBC_Graphics_bg_set_tile_y_flip(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, bool flipped);
+void GBC_Graphics_bg_set_tile_y_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped);
 
 /**
- * Sets if the tile at the given position on the background should be hidden
+ * Sets if the tile at the given position on the background should have priority over the sprite layer
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param x The x position on the background, from 0 to 31
  * @param y The y position on the background, from 0 to 31
- * @param hidden If the tile should be hidden
+ * @param has_priority If the tile should have priority over the sprite layer
  */
-void GBC_Graphics_bg_set_tile_hidden(GBC_Graphics *self, uint8_t bg_layer, uint8_t x, uint8_t y, bool hidden);
+void GBC_Graphics_bg_set_tile_priority(GBC_Graphics *self, uint8_t x, uint8_t y, bool has_priority);
 
 /**
  * Moves a tile from one location to another
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param bg_layer The number of the background layer, from 0 to 3
  * @param src_x The x position of the source tile1
  * @param src_y The y position of the source tile1
  * @param dest_x The x position of the destination tile1
  * @param dest_y The y position of the destination tile1
  * @param swap If the src and dest tiles should be swapped, otherwise just copies from dest
  */
-void GBC_Graphics_bg_move_tile(GBC_Graphics *self, uint8_t bg_layer, uint8_t src_x, uint8_t src_y, uint8_t dest_x, uint8_t dest_y, bool swap);
+void GBC_Graphics_bg_move_tile(GBC_Graphics *self, uint8_t src_x, uint8_t src_y, uint8_t dest_x, uint8_t dest_y, bool swap);
+
+/**
+ * Gets the current x position of the window offset
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * 
+ * @return The current x position of the window offset
+ */
+uint8_t GBC_Graphics_window_get_offset_x(GBC_Graphics *self);
+
+/**
+ * Gets the current y position of the window offset
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * 
+ * @return The current y position of the window offset
+ */
+uint8_t GBC_Graphics_window_get_offset_y(GBC_Graphics *self);
+
+/**
+ * Gets the tile number at the given position on the window
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the background, from 0 to 31
+ * @param y The y position on the background, from 0 to 31
+ * 
+ * @return The tile number
+ */
+uint8_t GBC_Graphics_window_get_tile(GBC_Graphics *self, uint8_t x, uint8_t y);
+
+/** 
+ * Gets the attributes of the tile at the given position on the window
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the background, from 0 to 31
+ * @param y The y position on the background, from 0 to 31
+ * 
+ * @return The tile attributes
+ */
+uint8_t GBC_Graphics_window_get_attr(GBC_Graphics *self, uint8_t x, uint8_t y);
+
+/**
+ * Moves the window offset by dx and dy
+ * Clamps x from 0->SCREEN_WIDTH, y from 0->SCREEN_HEIGHT
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param dx The delta x to move the offset x by
+ * @param dy The delta y to move the offset y by
+ */
+void GBC_Graphics_window_move(GBC_Graphics *self, short dx, short dy);
+
+/**
+ * Sets the window offset x
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The new offset x, x > screen_width will hide the window layer
+ */
+void GBC_Graphics_window_set_offset_x(GBC_Graphics *self, uint8_t x);
+
+/**
+ * Sets the window offset y
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param y The new offset y, y > screen_height will hide the window layer
+ */
+void GBC_Graphics_window_set_offset_y(GBC_Graphics *self, uint8_t y);
+
+/**
+ * Sets the window offset x and offset y
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The new offset x, x > screen_width will hide the window layer
+ * @param y The new offset y, y > screen_height will hide the window layer
+ */
+void GBC_Graphics_window_set_offset_pos(GBC_Graphics *self, uint8_t x, uint8_t y);
+
+/**
+ * Sets the tile number at the given position on the window
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param tile_number The new tile number
+ */
+void GBC_Graphics_window_set_tile(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number);
+
+/**
+ * Sets the tile attributes at the given position on the window
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param attributes The new attributes
+ */
+void GBC_Graphics_window_set_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t attributes);
+
+/**
+ * Sets both the tile number and tile attributes at the given position on the window
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param tile_number The new tile number
+ * @param attributes The new tile number
+ */
+void GBC_Graphics_window_set_tile_and_attrs(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t tile_number, uint8_t attributes);
+
+/**
+ * Sets the palette of the tile at the given position on the window
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param palette The new palette, from 0 to 7
+ */
+void GBC_Graphics_window_set_tile_palette(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t palette);
+
+/**
+ * Sets the VRAM bank of the tile at the given position on the window
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param vram_bank The new VRAM bank, from 0 to 3
+ */
+void GBC_Graphics_window_set_tile_vram_bank(GBC_Graphics *self, uint8_t x, uint8_t y, uint8_t vram_bank);
+
+/**
+ * Sets if the tile at the given position on the window should be flipped horizontally
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param flipped If the tile should be flipped horizontally
+ */
+void GBC_Graphics_window_set_tile_x_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped);
+
+/**
+ * Sets if the tile at the given position on the window should be flipped vertically
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param flipped If the tile should be flipped vertically
+ */
+void GBC_Graphics_window_set_tile_y_flip(GBC_Graphics *self, uint8_t x, uint8_t y, bool flipped);
+
+/**
+ * Sets if the tile at the given position on the window should have priority over the sprite layer
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param x The x position on the window, from 0 to 31
+ * @param y The y position on the window, from 0 to 31
+ * @param has_priority If the tile should have priority over the sprite layer
+ */
+void GBC_Graphics_window_set_tile_priority(GBC_Graphics *self, uint8_t x, uint8_t y, bool has_priority);
+
+/**
+ * Moves a tile from one location to another
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param src_x The x position of the source tile1
+ * @param src_y The y position of the source tile1
+ * @param dest_x The x position of the destination tile1
+ * @param dest_y The y position of the destination tile1
+ * @param swap If the src and dest tiles should be swapped, otherwise just copies from dest
+ */
+void GBC_Graphics_window_move_tile(GBC_Graphics *self, uint8_t src_x, uint8_t src_y, uint8_t dest_x, uint8_t dest_y, bool swap);
 
 /**
  * Gets the x position of the sprite
@@ -1005,46 +1097,6 @@ uint8_t GBC_Graphics_oam_get_sprite_tile(GBC_Graphics *self, uint8_t sprite_num)
 uint8_t GBC_Graphics_oam_get_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num);
 
 /**
- * Gets the width of the sprite in pixels
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * 
- * @return The sprite's width in pixels
- */
-uint8_t GBC_Graphics_oam_get_sprite_width(GBC_Graphics *self, uint8_t sprite_num);
-
-/**
- * Gets the height of the sprite in pixels
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * 
- * @return The sprite's height in pixels
- */
-uint8_t GBC_Graphics_oam_get_sprite_height(GBC_Graphics *self, uint8_t sprite_num);
-
-/**
- * Gets the mosaic x of the sprite in pixels
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * 
- * @return The sprite's mosaic x in pixels
- */
-uint8_t GBC_Graphics_oam_get_sprite_mosaic_x(GBC_Graphics *self, uint8_t sprite_num);
-
-/**
- * Gets the mosaic y of the sprite in pixels
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * 
- * @return The sprite's mosaic y in pixels
- */
-uint8_t GBC_Graphics_oam_get_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_num);
-
-/**
  * Creates and sets a sprite in OAM with the given values
  * 
  * @param self A pointer to the target GBC Graphics object
@@ -1053,10 +1105,8 @@ uint8_t GBC_Graphics_oam_get_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_
  * @param y The sprite's y position
  * @param tile_position The tile position in VRAM that the sprite will use to render
  * @param attributes The sprite's attributes
- * @param width The sprite's width (see oam description), 0-3
- * @param height The sprite's height (see oam description), 0-3
  */
-void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height);
+void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes);
 
 /**
  * Moves a sprite on the OAM by dx and dy
@@ -1095,6 +1145,14 @@ void GBC_Graphics_oam_set_sprite_y(GBC_Graphics *self, uint8_t sprite_num, uint8
  * @param y The y position to move the sprite to
  */
 void GBC_Graphics_oam_set_sprite_pos(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y);
+
+/**
+ * Hides a sprite by moving it off-screen
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ * @param sprite_num The sprite's position in OAM
+ */
+void GBC_Graphics_oam_hide_sprite(GBC_Graphics *self, uint8_t sprite_num);
 
 /**
  * Sets the tile position in VRAM that the sprite will use to render
@@ -1149,50 +1207,15 @@ void GBC_Graphics_oam_set_sprite_x_flip(GBC_Graphics *self, uint8_t sprite_num, 
  * @param flipped Should the sprite be flipped vertical?
  */
 void GBC_Graphics_oam_set_sprite_y_flip(GBC_Graphics *self, uint8_t sprite_num, bool flipped);
-/**
- * Sets the sprite's hide bit
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * @param flipped Should the sprite be hidden?
- */
-void GBC_Graphics_oam_set_sprite_hidden(GBC_Graphics *self, uint8_t sprite_num, bool hidden);
 
 /**
- * Sets the sprite's width (see OAM description)
+ * Sets the sprite's priority bit
  * 
  * @param self A pointer to the target GBC Graphics object
  * @param sprite_num The sprite's position in OAM
- * @param width The width of the sprite (see OAM description)
+ * @param flipped Does the bg have priority over the Sprite?
  */
-void GBC_Graphics_oam_set_sprite_width(GBC_Graphics *self, uint8_t sprite_num, uint8_t width);
-
-/**
- * Sets the sprite's height (see OAM description)
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * @param height The height of the sprite (see OAM description)
- */
-void GBC_Graphics_oam_set_sprite_height(GBC_Graphics *self, uint8_t sprite_num, uint8_t height);
-
-/**
- * Sets the sprite's mosaic x (see OAM description)
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * @param mosaic_x The mosaic x of the sprite (see OAM description)
- */
-void GBC_Graphics_oam_set_sprite_mosaic_x(GBC_Graphics *self, uint8_t sprite_num, uint8_t mosaic_x);
-
-/**
- * Sets the sprite's mosaic y (see OAM description)
- * 
- * @param self A pointer to the target GBC Graphics object
- * @param sprite_num The sprite's position in OAM
- * @param mosaic_y The mosaic y of the sprite (see OAM description)
- */
-void GBC_Graphics_oam_set_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_num, uint8_t mosaic_y);
+void GBC_Graphics_oam_set_sprite_priority(GBC_Graphics *self, uint8_t sprite_num, bool bg_has_priority);
 
 /**
  * Moves a sprite from one position in OAM to another
@@ -1241,11 +1264,17 @@ void GBC_Graphics_oam_swap_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num_1
 void GBC_Graphics_oam_swap_sprite_tiles_and_attrs(GBC_Graphics *self, uint8_t sprite_num_1, uint8_t sprite_num_2);
 
 /**
- * Copies the data in one background tilemap and attrmap to 
- * the target tilemap and attrmap
+ * Copies the data in the background tilemap and attrmap to the
+ * window tilemap and attrmap
  * 
  * @param self A pointer to the target GBC Graphics object
- * @param source_bg_layer The number of the source background layer, from 0 to 3
- * @param target_bg_layer The number of the source background layer, from 0 to 3
-*/
-void GBC_Graphics_copy_background(GBC_Graphics *self, uint8_t source_bg_layer, uint8_t target_bg_layer);
+ */
+void GBC_Graphics_copy_background_to_window(GBC_Graphics *self);
+
+/**
+ * Copies the data in the window tilemap and attrmap to the
+ * background tilemap and attrmap
+ * 
+ * @param self A pointer to the target GBC Graphics object
+ */
+void GBC_Graphics_copy_window_to_background(GBC_Graphics *self);

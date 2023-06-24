@@ -109,16 +109,9 @@ This library allows you to create graphics for your watchface, app, or game (alm
 * [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot) - App - pebble-gbc-graphics v1.2.0
     * A well-documented, full game that demonstrates most of the features in the library
     * ![Tiny Pilot](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot.png) ![Tiny Pilot - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot-bw.png)
-* [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.0.0
-    * ![Starter Project Advanced](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-bw.png)
-* [Starter Project Advanced 1.1](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.1) - App - pebble-gbc-graphics-advanced v1.1.0
-    * ![Starter Project Advanced 1.1](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.1.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.1-bw.png)
-* [Starter Project Advanced 1.2](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.2) - App - pebble-gbc-graphics-advanced v1.2.0
-    * ![Starter Project Advanced 1.2](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.2-bw.png)
-* [Starter Project Advanced 1.3](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.3) - App - pebble-gbc-graphics-advanced v1.3.0
-    * ![Starter Project Advanced 1.3](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.3.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.3-bw.png)
-* [Starter Project Advanced 1.4](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced-1.4) - App - pebble-gbc-graphics-advanced v1.4.0
-    * ![Starter Project Advanced 1.4](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4-bw.png)
+* [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.4.0
+    * A barebones implementation of the advanced graphics library, you can use this as a template!
+    * ![Starter Project Advanced](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4.png) ![Starter Project Advanced - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4-bw.png)
     
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
@@ -139,7 +132,12 @@ If you are unfamiliar with how graphics worked on the Game Boy Color, I recommen
     * This is an excellent rundown of, as the title says, how the graphics worked on the gameboy color
 * [Pan Docs](http://bgb.bircd.org/pandocs.htm#videodisplay)
     * For a low level analysis, check this one out. You don't need to really understand this to use the library, but it's useful to know if you want to do some more advanced techniques
-    
+If you want to get more information about graphics on the Game Boy Advance:
+* [How Graphics worked on the Nintendo Game Boy Advance | MVB](https://www.youtube.com/watch?v=mpNWEbZdXNw)
+    * Like the GBC rundown but for GBA
+* [Tonc](https://www.coranac.com/tonc/text/toc.htm)
+    * This is a bit more geared toward programming for a GBA, but there's written descriptions of how the graphics work as well.
+
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 ## Key Differences
