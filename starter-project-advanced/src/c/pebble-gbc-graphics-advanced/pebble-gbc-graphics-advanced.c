@@ -952,14 +952,16 @@ uint8_t GBC_Graphics_oam_get_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_
     return (self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_MOSAIC_Y_MASK) >> GBC_OAM_SPRITE_MOSAIC_Y_SHIFT;
 }
 
-void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height) {
+void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height, uint8_t mosaic_x, uint8_t mosaic_y) {
     self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_X_POS_BYTE] = x;
     self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_Y_POS_BYTE] = y;
     self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_TILE_POS_BYTE] = tile_position;
     self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_ATTR_BYTE] = attributes;
     self->oam[sprite_num * GBC_SPRITE_NUM_BYTES + GBC_OAM_DIMS_BYTE] = (
         ((width & (GBC_OAM_SPRITE_WIDTH_MASK >> GBC_OAM_SPRITE_WIDTH_SHIFT)) << GBC_OAM_SPRITE_WIDTH_SHIFT) |
-        ((height & (GBC_OAM_SPRITE_HEIGHT_MASK >> GBC_OAM_SPRITE_HEIGHT_SHIFT)) << GBC_OAM_SPRITE_HEIGHT_SHIFT));
+        ((height & (GBC_OAM_SPRITE_HEIGHT_MASK >> GBC_OAM_SPRITE_HEIGHT_SHIFT)) << GBC_OAM_SPRITE_HEIGHT_SHIFT) |
+        ((mosaic_x & (GBC_OAM_SPRITE_MOSAIC_X_MASK >> GBC_OAM_SPRITE_MOSAIC_X_SHIFT)) << GBC_OAM_SPRITE_MOSAIC_X_SHIFT) |
+        ((mosaic_y & (GBC_OAM_SPRITE_MOSAIC_Y_MASK >> GBC_OAM_SPRITE_MOSAIC_Y_SHIFT)) << GBC_OAM_SPRITE_MOSAIC_Y_SHIFT));
 }
 
 void GBC_Graphics_oam_move_sprite(GBC_Graphics *self, uint8_t sprite_num, short dx, short dy) {

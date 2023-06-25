@@ -7,7 +7,7 @@
  * on the Pebble smartwatch, with some Game Boy Advance style modifications
  * @file pebble-gbc-graphics-advanced.h
  * @author Harrison Allen
- * @version 1.4 6/24/2023
+ * @version 1.4.1 6/25/2023
  * 
  * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
@@ -204,8 +204,6 @@ struct _gbc_graphics {
      *  -Byte 0: Sprite x position, offset by -64 (max sprite width) to allow for off-screen rendering
      *  -Byte 1: Sprite y position, offset by -64 (max sprite height) to allow for off-screen rendering
      *  -Byte 2: Sprite tile position in VRAM bank
-     *      Note: When the Sprite Size bit of LCDC is set, the tile at the memory location will be 
-     *            on top, and the tile at memory location + 1 will be on the bottom
      *  -Byte 3: Sprite attribute data:
      *      -Bits 0-2: Palette number, from 0 to 7
      *      -Bits 3-4: VRAM Bank Select, from 0 to 3
@@ -1052,8 +1050,10 @@ uint8_t GBC_Graphics_oam_get_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_
  * @param attributes The sprite's attributes
  * @param width The sprite's width (see oam description), 0-3
  * @param height The sprite's height (see oam description), 0-3
+ * @param mosaic_x The sprite's mosaic x
+ * @param mosaix_y The sprite's mosaic y
  */
-void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height);
+void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height, uint8_t mosaic_x, uint8_t mosaic_y);
 
 /**
  * Moves a sprite on the OAM by dx and dy
