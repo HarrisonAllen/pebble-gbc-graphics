@@ -266,7 +266,7 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
     uint8_t *sprite;
     uint8_t sprite_w, sprite_h;
     uint8_t sprite_tile_offset;
-    uint8_t sprite_x, sprite_y;
+    short sprite_x, sprite_y;
     uint8_t sprite_mos_x, sprite_mos_y;
     short sprite_id;
 
@@ -308,8 +308,8 @@ static void render_graphics(GBC_Graphics *self, Layer *layer, GContext *ctx) {
             sprite_h = GBC_TILE_HEIGHT << ((sprite[GBC_OAM_DIMS_BYTE] & GBC_OAM_SPRITE_HEIGHT_MASK) >> GBC_OAM_SPRITE_HEIGHT_SHIFT); // tile_height * (2 ^ sprite_height)
             on_this_line = self->line_y >= sprite_y && self->line_y < (sprite_y + sprite_h)
                             && (sprite[GBC_OAM_ATTR_BYTE] & GBC_ATTR_HIDE_FLAG) == 0 
-                            && sprite_x <= max_x && (sprite_x + sprite_w) >= min_x  ;
-
+                            && sprite_x <= max_x && (sprite_x + sprite_w) >= min_x;
+                            
             sprites_on_this_line[num_sprites_on_this_line] = sprite_id & BOOL_MASK[on_this_line];
             num_sprites_on_this_line += on_this_line;
         }

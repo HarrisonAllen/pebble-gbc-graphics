@@ -7,7 +7,7 @@
  * on the Pebble smartwatch, with some Game Boy Advance style modifications
  * @file pebble-gbc-graphics-advanced.h
  * @author Harrison Allen
- * @version 1.4.1 6/25/2023
+ * @version 1.4.2 6/28/2023
  * 
  * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
@@ -43,6 +43,7 @@
  * 1 byte per color * 16 colors per palette = 16 bytes
  */
 #define GBC_PALETTE_NUM_BYTES 16
+#define GBC_PALETTE_NUM_PALETTES 8 ///> The number of palettes
 /**
  * The size of one palette bank, calculated by:
  * 16 bytes per palette * 8 palettes = 128 bytes
@@ -1005,7 +1006,7 @@ uint8_t GBC_Graphics_oam_get_sprite_attrs(GBC_Graphics *self, uint8_t sprite_num
  * @param self A pointer to the target GBC Graphics object
  * @param sprite_num The sprite's position in OAM
  * 
- * @return The sprite's width in pixels
+ * @return The sprite's width value
  */
 uint8_t GBC_Graphics_oam_get_sprite_width(GBC_Graphics *self, uint8_t sprite_num);
 
@@ -1015,7 +1016,7 @@ uint8_t GBC_Graphics_oam_get_sprite_width(GBC_Graphics *self, uint8_t sprite_num
  * @param self A pointer to the target GBC Graphics object
  * @param sprite_num The sprite's position in OAM
  * 
- * @return The sprite's height in pixels
+ * @return The sprite's height value
  */
 uint8_t GBC_Graphics_oam_get_sprite_height(GBC_Graphics *self, uint8_t sprite_num);
 
