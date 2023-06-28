@@ -3,7 +3,10 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
-Current version of pebble-gbc-graphics-advanced: **v1.4.0**
+Current version of pebble-gbc-graphics-advanced: **v1.4.2**
+For Aplite projects, there are RAM limitations:
+* Maximum of 1 VRAM bank
+* Maximum of 3 background layers
 Changelogs:
 * v1.0.0
     * Tiles are now 4bpp, i.e. 16 colors per tile/palette
@@ -109,7 +112,7 @@ This library allows you to create graphics for your watchface, app, or game (alm
 * [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot) - App - pebble-gbc-graphics v1.2.0
     * A well-documented, full game that demonstrates most of the features in the library
     * ![Tiny Pilot](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot.png) ![Tiny Pilot - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot-bw.png)
-* [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.4.0
+* [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.4.2
     * A barebones implementation of the advanced graphics library, you can use this as a template!
     * ![Starter Project Advanced](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4.png) ![Starter Project Advanced - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4-bw.png)
     
