@@ -7,7 +7,7 @@
  * on the Pebble smartwatch, with some Game Boy Advance style modifications
  * @file pebble-gbc-graphics-advanced.h
  * @author Harrison Allen
- * @version 1.4.2 6/28/2023
+ * @version 1.4.3 7/4/2023
  * 
  * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
@@ -21,6 +21,7 @@
  * 256 bits / 8 bits per byte = 32 bytes
  */
 #define GBC_TILE_NUM_BYTES 32
+#define GBC_VRAM_BANK_NUM_TILES 256 ///> The number of tiles per VRAM bank
 /**
  * Number of bytes per VRAM bank, calculated by:
  * 256 tiles per bank * 32 bytes per tile = 8192 bytes
@@ -93,6 +94,14 @@
 #define GBC_ALPHA_MODE_MASK 0x0E              ///> Mask for alpha mode
 #define GBC_ALPHA_MODE_START 0x02             ///> LSB of the alpha mode
 #define GBC_ALPHA_MODE_SHIFT 1                ///> The bitshift for start of alpha mode
+/** Alpha Modes */
+#define GBC_ALPHA_MODE_NORMAL 0   ///> Normal Mode - Alpha layer renders normally
+#define GBC_ALPHA_MODE_ADD 1      ///> Alpha Mode Add - Adds alpha layer colors to current colors
+#define GBC_ALPHA_MODE_SUBTRACT 2 ///> Alpha Mode Subtract - Subtracts alpha layer colors from current colors
+#define GBC_ALPHA_MODE_AVERAGE 3  ///> Alpha Mode Average - Averages alpha layer colors with current colors
+#define GBC_ALPHA_MODE_AND 4      ///> Alpha Mode AND - ANDs the alpha layer colors with current colors
+#define GBC_ALPHA_MODE_OR 5       ///> Alpha Mode OR - ORs the alpha layer colors with current colors
+#define GBC_ALPHA_MODE_XOR 6      ///> Alpha Mode XOR - XORs the alpha layer colors with current colors
 
 /** STAT flags */
 #define GBC_STAT_HBLANK_FLAG 0x01        ///> Flag for STAT HBlank flag bit
