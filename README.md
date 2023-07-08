@@ -3,7 +3,7 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
-Current version of pebble-gbc-graphics-advanced: **v1.4.2**
+Current version of pebble-gbc-graphics-advanced: **v1.5.0**
 For Aplite projects, there are RAM limitations:
 * Maximum of 1 VRAM bank
 * Maximum of 3 background layers
@@ -50,6 +50,12 @@ Changelogs:
     * Optimization notes:
         * Disable alpha blending
         * Enable fewer backgrounds (e.g. disable a menu background when doing gameplay)
+* v1.5.0
+    * Changes how sprite width and height work:
+        * Now they are just number of extra tiles.
+            * e.g. a width of 5 would make a sprite 6 tiles wide
+        * Maximum of 16x16 tiles (or 128x128 pixels)
+    * Increases maximum x and y to allow for large 128x128 pixel sprites to be off-screen
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 

@@ -7,7 +7,7 @@
  * on the Pebble smartwatch, with some Game Boy Advance style modifications
  * @file pebble-gbc-graphics-advanced.h
  * @author Harrison Allen
- * @version 1.5.0 7/7/2023
+ * @version 1.4.3 7/4/2023
  * 
  * Questions? Feel free to send me an email at harrisonallen555@gmail.com
  */
@@ -51,24 +51,19 @@
  */
 #define GBC_PALETTE_BANK_NUM_BYTES 128
 #define GBC_NUM_SPRITES 40 ///> The maximum number of sprites
-#define GBC_SPRITE_NUM_BYTES 6 ///> The number of bytes per sprite
+#define GBC_SPRITE_NUM_BYTES 5 ///> The number of bytes per sprite
 /**
  * The size of the OAM, calculated by:
- * 6 bytes per sprite * 40 sprite slots = 240 bytes
+ * 5 bytes per sprite * 40 sprite slots = 160 bytes
  */
-#define GBC_OAM_NUM_BYTES 240
+#define GBC_OAM_NUM_BYTES 200
 #define GBC_OAM_X_POS_BYTE 0    ///> The OAM x byte offset
 #define GBC_OAM_Y_POS_BYTE 1    ///> The OAM y byte offset
 #define GBC_OAM_TILE_POS_BYTE 2 ///> The OAM VRAM tile pos byte offset
 #define GBC_OAM_ATTR_BYTE 3     ///> The OAM ATTR byte offset
 #define GBC_OAM_DIMS_BYTE 4     ///> The OAM dimensions byte offset
-#define GBC_OAM_EXTRA_BYTE 5    ///> The OAM extra byte offset
-#define GBC_SPRITE_OFFSET_X 128 ///> The x offset to allow for offscreen rendering
-#define GBC_SPRITE_OFFSET_Y 128 ///> The y offset to allow for offscreen rendering
-#define GBC_SPRITE_MAX_X 0x01FF ///> The max of a sprite's x position
-#define GBC_SPRITE_MAX_Y 0x01FF ///> The max of a sprite's y position
-#define GBC_SPRITE_MAX_WIDTH 15  ///> The max of a sprite's width
-#define GBC_SPRITE_MAX_HEIGHT 15 ///> The max of a sprite's height
+#define GBC_SPRITE_OFFSET_X 64  ///> The x offset to allow for offscreen rendering
+#define GBC_SPRITE_OFFSET_Y 64  ///> The y offset to allow for offscreen rendering
 
 /** Attribute flags */
 #define GBC_ATTR_PALETTE_MASK 0x07      ///> Mask for the palette number
@@ -121,15 +116,12 @@
 #define GBC_STAT_WRITEABLE_MASK 0xF0     ///> Mask for the writeable bits of STAT
 
 /** OAM flags */
-#define GBC_OAM_SPRITE_WIDTH_MASK 0x0F     ///> Mask for OAM sprite width
+#define GBC_OAM_SPRITE_WIDTH_MASK 0x03     ///> Mask for OAM sprite width
 #define GBC_OAM_SPRITE_WIDTH_START 0x01    ///> LSB of the OAM sprite width
 #define GBC_OAM_SPRITE_WIDTH_SHIFT 0       ///> The bitshift for start of OAM sprite width
-#define GBC_OAM_SPRITE_HEIGHT_MASK 0xF0    ///> Mask for OAM sprite height
-#define GBC_OAM_SPRITE_HEIGHT_START 0x10   ///> LSB of the OAM sprite height
-#define GBC_OAM_SPRITE_HEIGHT_SHIFT 4      ///> The bitshift for start of OAM sprite height
-
-#define GBC_OAM_SPRITE_UPPER_X_BIT_FLAG 0x01 ///> The upper bit for the sprite x position
-#define GBC_OAM_SPRITE_UPPER_Y_BIT_FLAG 0x02 ///> The upper bit for the sprite y position
+#define GBC_OAM_SPRITE_HEIGHT_MASK 0x0C    ///> Mask for OAM sprite height
+#define GBC_OAM_SPRITE_HEIGHT_START 0x04   ///> LSB of the OAM sprite height
+#define GBC_OAM_SPRITE_HEIGHT_SHIFT 2      ///> The bitshift for start of OAM sprite height
 #define GBC_OAM_SPRITE_MOSAIC_X_MASK 0x30  ///> Mask for OAM sprite mosaic x
 #define GBC_OAM_SPRITE_MOSAIC_X_START 0x10 ///> LSB of the OAM sprite mosaic x
 #define GBC_OAM_SPRITE_MOSAIC_X_SHIFT 4    ///> The bitshift for start of OAM sprite mosaic x
@@ -219,8 +211,8 @@ struct _gbc_graphics {
     /**
      * OAM Buffer - Stores the data for the current sprites
      * The OAM contains 40 slots for 5 bytes of sprite information, which is as follows:
-     *  -Byte 0: Sprite x position, offset by -128 (max sprite width) to allow for off-screen rendering
-     *  -Byte 1: Sprite y position, offset by -128 (max sprite height) to allow for off-screen rendering
+     *  -Byte 0: Sprite x position, offset by -64 (max sprite width) to allow for off-screen rendering
+     *  -Byte 1: Sprite y position, offset by -64 (max sprite height) to allow for off-screen rendering
      *  -Byte 2: Sprite tile position in VRAM bank
      *  -Byte 3: Sprite attribute data:
      *      -Bits 0-2: Palette number, from 0 to 7
@@ -229,13 +221,10 @@ struct _gbc_graphics {
      *      -Bit 6: Y Flip - Setting bit will flip the sprite vertically when rendered
      *      -Bit 7: Hide - Setting the bit will make the sprite hidden
      *  - Byte 4: Sprite size data
-     *      -Bits 0-3: Sprite width in tiles
-     *      -Bits 4-7: Sprite height in tiles (+1), from 0-15
-     *          e.g. width 3 is 4 tiles, height 8 is 9 tiles (+1), from 0-15
-     *  - Byte 5: Extra sprite data
-     *      -Bit 0: Upper sprite x position bit
-     *      -Bit 1: Upper sprite y position bit
-     *      -Bits 2-3: Unused
+     *      -Bits 0-1: Sprite height, from 0-3
+     *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
+     *      -Bits 2-3: Sprite width, from 0-3
+     *          Options are: 0 = 8px, 1 = 16px, 2 = 32px, 3 = 64px
      *      -Bits 4-5: Sprite mosaic x, from 0-3
      *      -Bits 6-7: Sprite mosaic y, from 0-3
      */
@@ -988,7 +977,7 @@ void GBC_Graphics_bg_move_tile(GBC_Graphics *self, uint8_t bg_layer, uint8_t src
  * 
  * @return The sprite's x position
  */
-uint16_t GBC_Graphics_oam_get_sprite_x(GBC_Graphics *self, uint8_t sprite_num);
+uint8_t GBC_Graphics_oam_get_sprite_x(GBC_Graphics *self, uint8_t sprite_num);
 
 /**
  * Gets the y position of the sprite
@@ -998,7 +987,7 @@ uint16_t GBC_Graphics_oam_get_sprite_x(GBC_Graphics *self, uint8_t sprite_num);
  * 
  * @return The sprite's y position
  */
-uint16_t GBC_Graphics_oam_get_sprite_y(GBC_Graphics *self, uint8_t sprite_num);
+uint8_t GBC_Graphics_oam_get_sprite_y(GBC_Graphics *self, uint8_t sprite_num);
 
 /**
  * Gets the tile of the sprite
@@ -1069,13 +1058,12 @@ uint8_t GBC_Graphics_oam_get_sprite_mosaic_y(GBC_Graphics *self, uint8_t sprite_
  * @param y The sprite's y position
  * @param tile_position The tile position in VRAM that the sprite will use to render
  * @param attributes The sprite's attributes
- * @param width The sprite's width in tiles + 1, 0-15
- * @param height The sprite's height in tiles + 1, 0-15
+ * @param width The sprite's width (see oam description), 0-3
+ * @param height The sprite's height (see oam description), 0-3
  * @param mosaic_x The sprite's mosaic x
  * @param mosaix_y The sprite's mosaic y
  */
-void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint16_t x, uint16_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height, uint8_t mosaic_x, uint8_t mosaic_y);
-
+void GBC_Graphics_oam_set_sprite(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y, uint8_t tile_position, uint8_t attributes, uint8_t width, uint8_t height, uint8_t mosaic_x, uint8_t mosaic_y);
 
 /**
  * Moves a sprite on the OAM by dx and dy
@@ -1094,7 +1082,7 @@ void GBC_Graphics_oam_move_sprite(GBC_Graphics *self, uint8_t sprite_num, short 
  * @param sprite_num The sprite's position in OAM
  * @param x The x position to move the sprite to
  */
-void GBC_Graphics_oam_set_sprite_x(GBC_Graphics *self, uint8_t sprite_num, uint16_t x);
+void GBC_Graphics_oam_set_sprite_x(GBC_Graphics *self, uint8_t sprite_num, uint8_t x);
 
 /**
  * Sets the sprite's y position
@@ -1103,7 +1091,7 @@ void GBC_Graphics_oam_set_sprite_x(GBC_Graphics *self, uint8_t sprite_num, uint1
  * @param sprite_num The sprite's position in OAM
  * @param y The y position to move the sprite to
  */
-void GBC_Graphics_oam_set_sprite_y(GBC_Graphics *self, uint8_t sprite_num, uint16_t y);
+void GBC_Graphics_oam_set_sprite_y(GBC_Graphics *self, uint8_t sprite_num, uint8_t y);
 
 /**
  * Sets the sprite's x and y position
@@ -1113,7 +1101,7 @@ void GBC_Graphics_oam_set_sprite_y(GBC_Graphics *self, uint8_t sprite_num, uint1
  * @param x The x position to move the sprite to
  * @param y The y position to move the sprite to
  */
-void GBC_Graphics_oam_set_sprite_pos(GBC_Graphics *self, uint8_t sprite_num, uint16_t x, uint16_t y);
+void GBC_Graphics_oam_set_sprite_pos(GBC_Graphics *self, uint8_t sprite_num, uint8_t x, uint8_t y);
 
 /**
  * Sets the tile position in VRAM that the sprite will use to render
