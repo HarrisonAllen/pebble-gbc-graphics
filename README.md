@@ -7,55 +7,6 @@ Current version of pebble-gbc-graphics-advanced: **v1.5.0**
 For Aplite projects, there are RAM limitations:
 * Maximum of 1 VRAM bank
 * Maximum of 3 background layers
-Changelogs:
-* v1.0.0
-    * Tiles are now 4bpp, i.e. 16 colors per tile/palette
-* v1.1.0
-    * Background layers now use transparency for the 0th pixel
-* v1.2.0
-    * Removed window layer
-    * Increased number of background layers to 4
-    * Disabled priority, sprites always render on top (temporary until sprite update)
-* v1.3.0
-    * Sprites now render on a layer
-    * The sprite layer can now be positioned between layers (instead of priority)
-    * LCDC now has individual background enable bits
-    * 8x16 bit removed from LCDC
-    * Sprites have additional byte defining dimensions: width and height
-
-    | width/height | 0 | 1 | 2 | 3 |
-    | --- | --- | --- | --- | --- |
-    | 0 | 1x1 tiles<br>8x8 pixels | 2x1 tiles<br>16x8 pixels | 4x1 tiles<br>32x8 pixels | 8x1 tiles<br>64x8 pixels |
-    | 1 | 1x tiles<br>8x2 pixels | 2x2 tiles<br>16x16 pixels | 4x2 tiles<br>32x16 pixels | 8x2 tiles<br>64x16 pixels |
-    | 2 | 1x tiles<br>8x4 pixels | 2x4 tiles<br>16x32 pixels | 4x4 tiles<br>32x32 pixels | 8x4 tiles<br>64x32 pixels |
-    | 3 | 1x tiles<br>8x8 pixels | 2x8 tiles<br>16x64 pixels | 4x8 tiles<br>32x64 pixels | 8x8 tiles<br>64x64 pixels |
-
-    * Sprites draw from the tile bank starting at the sprite tile offset then left to right, top to bottom. So for a 2x4 tile sprite, it looks like this:
-
-    | 0 | 1 |
-    | --- | --- |
-    | 2 | 3 |
-    | 4 | 5 |
-    | 6 | 7 |
-* v1.4.0
-    * Adds alpha blending modes
-        * Mode 0: Normal rendering
-        * Mode 1: Add - adds two colors together
-        * Mode 2: Subtract - subtracts alpha color from lower color
-        * Mode 3: Average - averages two colors together
-        * Mode 4: AND - performs bitwise AND (&) on two colors
-        * Mode 5: OR - performs bitwise OR (|) on two colors
-        * Mode 6: XOR - performs bitwise XOR (^) on two colors
-    * Adds sprite mosaic effects
-    * Optimization notes:
-        * Disable alpha blending
-        * Enable fewer backgrounds (e.g. disable a menu background when doing gameplay)
-* v1.5.0
-    * Changes how sprite width and height work:
-        * Now they are just number of extra tiles.
-            * e.g. a width of 5 would make a sprite 6 tiles wide
-        * Maximum of 16x16 tiles (or 128x128 pixels)
-    * Increases maximum x and y to allow for large 128x128 pixel sprites to be off-screen
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
@@ -64,6 +15,8 @@ You can check out my published [Pebble projects here!](https://apps.rebble.io/en
 # Table of Contents
 
 [**Downloads**](https://github.com/HarrisonAllen/pebble-gbc-graphics#downloads)
+
+[**Changelogs**](https://github.com/HarrisonAllen/pebble-gbc-graphics#changelogs)
 
 [**Introduction**](https://github.com/HarrisonAllen/pebble-gbc-graphics#introduction)
 * [In This Repo](https://github.com/HarrisonAllen/pebble-gbc-graphics#in-this-repo)
@@ -100,6 +53,61 @@ You can check out my published [Pebble projects here!](https://apps.rebble.io/en
 * [Tiny Pilot Tilesheets](https://github.com/HarrisonAllen/pebble-gbc-graphics#tiny-pilot-tilesheets)
 
 [**Closing Remarks**](https://github.com/HarrisonAllen/pebble-gbc-graphics#closing-remarks)
+
+# Changelogs
+## v1.0.0
+* Tiles are now 4bpp, i.e. 16 colors per tile/palette
+
+## v1.1.0
+* Background layers now use transparency for the 0th pixel
+
+## v1.2.0
+* Removed window layer
+* Increased number of background layers to 4
+* Disabled priority, sprites always render on top (temporary until sprite update)
+
+## v1.3.0
+* Sprites now render on a layer
+* The sprite layer can now be positioned between layers (instead of priority)
+* LCDC now has individual background enable bits
+* 8x16 bit removed from LCDC
+* Sprites have additional byte defining dimensions: width and height
+
+| width/height | 0 | 1 | 2 | 3 |
+| --- | --- | --- | --- | --- |
+| 0 | 1x1 tiles<br>8x8 pixels | 2x1 tiles<br>16x8 pixels | 4x1 tiles<br>32x8 pixels | 8x1 tiles<br>64x8 pixels |
+| 1 | 1x tiles<br>8x2 pixels | 2x2 tiles<br>16x16 pixels | 4x2 tiles<br>32x16 pixels | 8x2 tiles<br>64x16 pixels |
+| 2 | 1x tiles<br>8x4 pixels | 2x4 tiles<br>16x32 pixels | 4x4 tiles<br>32x32 pixels | 8x4 tiles<br>64x32 pixels |
+| 3 | 1x tiles<br>8x8 pixels | 2x8 tiles<br>16x64 pixels | 4x8 tiles<br>32x64 pixels | 8x8 tiles<br>64x64 pixels |
+
+* Sprites draw from the tile bank starting at the sprite tile offset then left to right, top to bottom. So for a 2x4 tile sprite, it looks like this:
+
+| 0 | 1 |
+| --- | --- |
+| 2 | 3 |
+| 4 | 5 |
+| 6 | 7 |
+
+## v1.4.0
+* Adds alpha blending modes
+  * Mode 0: Normal rendering
+  * Mode 1: Add - adds two colors together
+  * Mode 2: Subtract - subtracts alpha color from lower color
+  * Mode 3: Average - averages two colors together
+  * Mode 4: AND - performs bitwise AND (&) on two colors
+  * Mode 5: OR - performs bitwise OR (|) on two colors
+  * Mode 6: XOR - performs bitwise XOR (^) on two colors
+* Adds sprite mosaic effects
+* Optimization notes:
+  * Disable alpha blending
+  * Enable fewer backgrounds (e.g. disable a menu background when doing gameplay)
+
+## v1.5.0
+* Changes how sprite width and height work:
+  * Now they are just number of extra tiles.
+      * e.g. a width of 5 would make a sprite 6 tiles wide
+  * Maximum of 16x16 tiles (or 128x128 pixels)
+* Increases maximum x and y to allow for large 128x128 pixel sprites to be off-screen
 
 # Downloads
 You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-graphics/releases) for the library (.zip), Tiny Pilot (.pbw), and the Starter Project (.pbw). You can also go to the [downloads directory](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/downloads) and download them there.
