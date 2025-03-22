@@ -1,0 +1,35 @@
+{
+  "name": "background-tile-example",
+  "author": "Your Name Here",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "background-tile-example",
+    "uuid": "000be4b1-9c72-440d-a7e0-9d43dc24a060",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "dummy"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "raw",
+          "name": "TILESHEET",
+          "file": "Tilesheet.bin"
+        }
+      ]
+    }
+  }
+}

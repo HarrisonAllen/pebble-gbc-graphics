@@ -36,6 +36,7 @@ You can check out my published [Pebble projects here!](https://apps.rebble.io/en
 * [Understanding OAM](https://github.com/HarrisonAllen/pebble-gbc-graphics#understanding-oam)
 
 [**Using the Library**](https://github.com/HarrisonAllen/pebble-gbc-graphics#using-the-library)
+* [Smaller Examples](https://github.com/HarrisonAllen/pebble-gbc-graphics#smaller-examples)
 * [Quick Start](https://github.com/HarrisonAllen/pebble-gbc-graphics#quick-start)
 * [Using a GBC_Graphics Object](https://github.com/HarrisonAllen/pebble-gbc-graphics#using-a-gbc_graphics-object)
 * [Adjusting the Viewport](https://github.com/HarrisonAllen/pebble-gbc-graphics#adjusting-the-viewport)
@@ -182,6 +183,7 @@ Let's get started! First, I'll go over some basics about the engine.
 The Game Boy Color uses tiles to render its graphics. A tile is an 8 pixel by 8 pixel image that can have 4 colors. These colors are defined in a palette.
 
 The tile itself is stored in a format known as 2 bits per pixel, or 2bpp. A pixel corresponding to 00 will take the first color in a palette, a pixel corresponding to 01 will take the second color in a palette, etc. If we map those pixels to various shades of gray (00 = black, 01 = dark gray, 10 = light gray, 11 = white), then we can come up with a visual representation of the tile.
+* Note: as of 1.0.0 tiles are now in 4bpp format, increasing the number of colors to 16
 
 Let's take an example of a small tree, and see what it would look like before and after we apply a palette.
 
@@ -223,6 +225,8 @@ For the background and window layers, tiles are placed on a 32 by 32 tile attrib
 ## Understanding Layers
 The Game Boy Color (and this library) use 3 layers for rendering. The background layer, the window layer, and the sprite layer.
 
+* Note: as of 1.2.0 There are 5 layers: 4 background layers and 1 sprite layer
+
 ![Layers](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/Layers.png)
 
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
@@ -239,6 +243,8 @@ You may notice that the score bar isn't included in the viewport. Check out the 
 
 ### The Window Layer
 
+* Note: The window layer has been remove in 1.2.0
+
 ![Window Layer](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Mockups/WindowExplained.png)
 
 The window layer also consists of a 32 tile by 32 tile tilemap. The entire window layer moves relative to the viewport, via window offset x and window offset y. The window layer is rendered on top of the background layer, and has no transparency.
@@ -254,6 +260,7 @@ The sprite layer is really a rendering space for the sprites. Sprites data is st
 The sprite layer has transparency! This means that any pixels that use the 1st palette color (00) will be rendered as transparency, no matter what the palette color actually is.
 
 The sprite layer actually starts off-screen, with the x position being 8 pixels left of the origin, and the y position being 16 pixels above the origin.
+* Note: as of 1.0.0 this offset is -128 by -128 pixels
 
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
@@ -267,6 +274,7 @@ Each sprite in the OAM stores the following data:
 * The sprite's attributes
 
 A sprite can either consist of one tile (8px by 8px), or have two tiles (8px by 16px) such as in Tiny Pilot. If in the 8x16 mode, the sprite will take the tile at the tile offset for the top, and the tile at the next offset (+1) for the bottom.
+* Note: as of 1.5.0 sprites are now defined as height and width in tiles, with a maximum of 16x16 tiles
 
 When two sprites overlap, the sprite with the lower index in OAM will be rendered on top. For example, sprite 0 will render on top of sprite 7.
 
@@ -274,6 +282,9 @@ When two sprites overlap, the sprite with the lower index in OAM will be rendere
 
 # Using the Library
 Now, let's get more technical. I'm going to go through various things that you may want to do, and provide examples shown in the [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) and [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot).
+
+## Smaller examples
+I have provided a number of minimal examples for specific features. See [examples](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/examples) for more information.
 
 ## Quick Start
 The [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) has a basic setup for you to get started with. It demonstrates loading a tilesheet, setting palettes, and placing tiles on the background layer. Be sure to change the `uuid` in `project.json`!
@@ -541,6 +552,8 @@ These apply to both the background and window layers, so I'm putting them here.
 
 
 # Creating Tilesheets
+* Notes: See the `examples` folder for an up to date tilesheet generator.
+
 The process for creating tilesheets from an image has a few specific steps, I personally use [GIMP](https://www.gimp.org/):
 1. Create the spritesheet using the [2bpp palette](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/2bpp.gpl)
     * For the easiest setup, just modify [SampleTilesheet.xcf](https://github.com/HarrisonAllen/pebble-gbc-graphics/raw/main/assets/tilesheets/SampleTilesheet.xcf). The image should already be in an indexed color mode, and the palette should already exist as `Colormap of image #xx` in the Palettes window (`Windows`->`Dockable Dialogs`->`Palettes`).
