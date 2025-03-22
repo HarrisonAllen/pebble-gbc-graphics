@@ -1,14 +1,14 @@
 This directory contains some minimal examples for using the library
 
-[**Example: Background Tile Example**](https://github.com/HarrisonAllen/pebble-gbc-graphics/examples#background-tile-animation)
+[**Example: Background Tile Example**](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/examples#background-tile-animation)
 
-[**Tilesheet generation**](https://github.com/HarrisonAllen/pebble-gbc-graphics/examples#tilesheet-generation)
+[**Tilesheet generation**](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/examples#tilesheet-generation)
 
 ## Background tile example
 
 This example demonstrates how to display and animate tiles on a background. This project also demonstrates an implementation of "blocks", which are groups of tiles to represent a larger object.
 
-[Background Tile Example](https://github.com/HarrisonAllen/pebble-gbc-graphics/examples/background-tile-example)
+[Background Tile Example](https://github.com/HarrisonAllen/pebble-gbc-graphics/blob/main/examples/background-tile-example)
 
 ![Example tilesheet](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/examples/background-tile-animation/animation.gif)
 
