@@ -176,6 +176,10 @@ Some key differences between the Game Boy Color and this graphics engine:
   * Maximum of 16x16 tiles (or 128x128 pixels)
 * Increases maximum x and y to allow for large 128x128 pixel sprites to be off-screen
 
+## Advanced v1.5.1
+* Adds function to allow loading from buffer to vram
+* Fixes sprite rendering bug (x offset was relative to absolute 0 rather than screen 0)
+
 # Understanding the Engine
 Let's get started! First, I'll go over some basics about the engine.
 
