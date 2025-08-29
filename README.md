@@ -1,6 +1,11 @@
 # pebble-gbc-graphics
 This is the repository and tutorial for the GBC Graphics library for the Pebble smartwatch.
 
+# Introduction
+This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. It is compatible with all Pebbles.
+
+*NEW* `pebble-gbc-graphics-advanced` provides more features, closer to what the GBA offers
+
 Current version of pebble-gbc-graphics: **v1.2.0**
 
 Current version of pebble-gbc-graphics-advanced: **v1.5.0**
@@ -10,7 +15,36 @@ For Aplite projects, there are RAM limitations:
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
+# Downloads
+You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-graphics/releases) for the library (.zip), Tiny Pilot (.pbw), and the Starter Project (.pbw). You can also go to the [downloads directory](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/downloads) and download them there.
+
 You can check out my published [Pebble projects here!](https://apps.rebble.io/en_US/developer/5e28ea923dd3109f151c7e08/1)
+
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
+
+## In This Repo
+* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) - App - pebble-gbc-graphics v1.2.0
+    * A barebones implementation of the graphics library, you can use this as a template!
+    * ![Starter Project](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProject.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProject-bw.png)
+* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot) - App - pebble-gbc-graphics v1.2.0
+    * A well-documented, full game that demonstrates most of the features in the library
+    * ![Tiny Pilot](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot.png) ![Tiny Pilot - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot-bw.png)
+* [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.4.2
+    * A barebones implementation of the advanced graphics library, you can use this as a template!
+    * ![Starter Project Advanced](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4.png) ![Starter Project Advanced - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4-bw.png)
+    
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
+
+## Other Projects
+* [Pebblemon](https://github.com/HarrisonAllen/pebble-gbc-graphics-demo/tree/master/pebblemon) - App - pebble-gbc-graphics v1.0.0
+    * ![Pebblemon](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon.png) ![Pebblemon - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon-bw.png)
+    * A mini Pokemon adventure that does some very neat things using the engine
+    * The codebase is too large to fit on the Aplite platform, there isn't enough ram available.
+* [Pebblemon Time](https://github.com/HarrisonAllen/pebblemon-watchface) - Watchface - pebble-gbc-graphics v1.1.0
+    * ![Pebblemon Time](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime.png) ![Pebblemon Time - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime-bw.png)
+    * A stripped down version of Pebblemon that demonstrates a less-frequent draw cycle, as well as combining standard Pebble graphics with the engine.
+    
+[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 # Table of Contents
 
@@ -19,7 +53,10 @@ You can check out my published [Pebble projects here!](https://apps.rebble.io/en
 [**Introduction**](https://github.com/HarrisonAllen/pebble-gbc-graphics#introduction)
 * [In This Repo](https://github.com/HarrisonAllen/pebble-gbc-graphics#in-this-repo)
 * [Other Projects](https://github.com/HarrisonAllen/pebble-gbc-graphics#other-projects)
-* [Background Information](https://github.com/HarrisonAllen/pebble-gbc-graphics#background-information)
+
+(Table of contents)
+
+[**Background Information**](https://github.com/HarrisonAllen/pebble-gbc-graphics#background-information)
 * [Key Differences](https://github.com/HarrisonAllen/pebble-gbc-graphics#key-differences)
 * [Other Notes](https://github.com/HarrisonAllen/pebble-gbc-graphics#other-notes)
 
@@ -55,41 +92,7 @@ You can check out my published [Pebble projects here!](https://apps.rebble.io/en
 
 [**Closing Remarks**](https://github.com/HarrisonAllen/pebble-gbc-graphics#closing-remarks)
 
-# Downloads
-You can visit the [releases tab](https://github.com/HarrisonAllen/pebble-gbc-graphics/releases) for the library (.zip), Tiny Pilot (.pbw), and the Starter Project (.pbw). You can also go to the [downloads directory](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/downloads) and download them there.
-
-[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
-
-# Introduction
-This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. It is compatible with all Pebbles.
-
-*NEW* `pebble-gbc-graphics-advanced` provides more features, closer to what the GBA offers
-
-## In This Repo
-* [Starter Project](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project) - App - pebble-gbc-graphics v1.2.0
-    * A barebones implementation of the graphics library, you can use this as a template!
-    * ![Starter Project](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProject.png) ![Starter Project - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProject-bw.png)
-* [Tiny Pilot](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/tiny-pilot) - App - pebble-gbc-graphics v1.2.0
-    * A well-documented, full game that demonstrates most of the features in the library
-    * ![Tiny Pilot](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot.png) ![Tiny Pilot - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/TinyPilot-bw.png)
-* [Starter Project Advanced](https://github.com/HarrisonAllen/pebble-gbc-graphics/tree/main/starter-project-advanced) - App - pebble-gbc-graphics-advanced v1.4.2
-    * A barebones implementation of the advanced graphics library, you can use this as a template!
-    * ![Starter Project Advanced](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4.png) ![Starter Project Advanced - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/StarterProjectAdvanced-1.4-bw.png)
-    
-[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
-
-## Other Projects
-* [Pebblemon](https://github.com/HarrisonAllen/pebble-gbc-graphics-demo/tree/master/pebblemon) - App - pebble-gbc-graphics v1.0.0
-    * ![Pebblemon](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon.png) ![Pebblemon - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/Pebblemon-bw.png)
-    * A mini Pokemon adventure that does some very neat things using the engine
-    * The codebase is too large to fit on the Aplite platform, there isn't enough ram available.
-* [Pebblemon Time](https://github.com/HarrisonAllen/pebblemon-watchface) - Watchface - pebble-gbc-graphics v1.1.0
-    * ![Pebblemon Time](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime.png) ![Pebblemon Time - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime-bw.png)
-    * A stripped down version of Pebblemon that demonstrates a less-frequent draw cycle, as well as combining standard Pebble graphics with the engine.
-    
-[*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
-
-## Background Information
+# Background Information
 If you are unfamiliar with how graphics worked on the Game Boy Color, I recommend you check out the following links:
 * [How Graphics worked on the Nintendo Game Boy Color | MVG](https://youtu.be/ZEJVOH6Pxkg?t=201) (started from 3:21)
     * This is an excellent rundown of, as the title says, how the graphics worked on the gameboy color
