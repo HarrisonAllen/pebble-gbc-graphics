@@ -2,16 +2,18 @@
 This is the repository and tutorial for the GBC Graphics library for the Pebble smartwatch.
 
 # Introduction
-This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color renders them. It is compatible with all Pebbles.
+This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color and Game Boy Advance renders them. It is compatible with all Pebbles.
 
-*NEW* `pebble-gbc-graphics-advanced` provides more features, closer to what the GBA offers
+# Which should I use?
+* I highly recommend using `pebble-gbc-graphics-advanced`. It's got way more options for sprites, backgrounds, colors, features, customizability etc. etc.
+  * If you need more space and don't need all of the features, try `pebble-gbc-graphics-advanced-lite`
+* If you want to build for Aplite or are extremely limited on space, then I'd recommend using `pebble-gbc-graphics`
 
 Current version of pebble-gbc-graphics: **v1.2.0**
 
-Current version of pebble-gbc-graphics-advanced: **v1.5.0**
-For Aplite projects, there are RAM limitations:
-* Maximum of 1 VRAM bank
-* Maximum of 3 background layers
+Current version of pebble-gbc-graphics-advanced: **v1.5.1**
+
+Current version of pebble-gbc-graphics-advanced-lite: **v1.0.0**
 
 Want to create an app or watchface for the Pebble, but don't know where to start? Come check out the [Rebble Discord](https://rebble.io/discord) and we'll help you get set up.
 
@@ -43,6 +45,9 @@ You can check out my published [Pebble projects here!](https://apps.rebble.io/en
 * [Pebblemon Time](https://github.com/HarrisonAllen/pebblemon-watchface) - Watchface - pebble-gbc-graphics v1.1.0
     * ![Pebblemon Time](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime.png) ![Pebblemon Time - bw](https://raw.githubusercontent.com/HarrisonAllen/pebble-gbc-graphics/main/assets/readme_resources/PebblemonTime-bw.png)
     * A stripped down version of Pebblemon that demonstrates a less-frequent draw cycle, as well as combining standard Pebble graphics with the engine.
+* [Retro Watchfaces](https://github.com/HarrisonAllen/retro-watchfaces) - Watchfaces - pebble-gbc-graphics-advanced v1.4.3
+    * ![Mario](https://raw.githubusercontent.com/HarrisonAllen/retro-watchfaces/main/Mario/Super%20Mario%20Bros/appstore/Basalt.gif) ![Mega Man](https://raw.githubusercontent.com/HarrisonAllen/retro-watchfaces/main/Mega%20Man/Mega%20Man%202/appstore/basalt/1.png) ![Metroid](https://raw.githubusercontent.com/HarrisonAllen/retro-watchfaces/main/Metroid/Super%20Metroid/appstore/basalt.gif) ![Pokemon](https://raw.githubusercontent.com/HarrisonAllen/retro-watchfaces/main/Pokemon/Gen2/appstore/basalt.gif) ![Sonic](https://raw.githubusercontent.com/HarrisonAllen/retro-watchfaces/main/SonicTheHedgehog/SonicTheHedgehog2/appstore/basalt/Basalt.gif)
+    * A collection of watchfaces showcasing the advanced version of the engine
     
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
@@ -125,18 +130,19 @@ Some key differences between the Game Boy Color and this graphics engine:
 [*Back to Table of Contents*](https://github.com/HarrisonAllen/pebble-gbc-graphics#table-of-contents)
 
 # Changelogs
-## Advanced v1.0.0
+## Advanced 
+### v1.0.0
 * Tiles are now 4bpp, i.e. 16 colors per tile/palette
 
-## Advanced v1.1.0
+### v1.1.0
 * Background layers now use transparency for the 0th pixel
 
-## Advanced v1.2.0
+### v1.2.0
 * Removed window layer
 * Increased number of background layers to 4
 * Disabled priority, sprites always render on top (temporary until sprite update)
 
-## Advanced v1.3.0
+### v1.3.0
 * Sprites now render on a layer
 * The sprite layer can now be positioned between layers (instead of priority)
 * LCDC now has individual background enable bits
@@ -158,7 +164,7 @@ Some key differences between the Game Boy Color and this graphics engine:
 | 4 | 5 |
 | 6 | 7 |
 
-## Advanced v1.4.0
+### v1.4.0
 * Adds alpha blending modes
   * Mode 0: Normal rendering
   * Mode 1: Add - adds two colors together
@@ -172,16 +178,19 @@ Some key differences between the Game Boy Color and this graphics engine:
   * Disable alpha blending
   * Enable fewer backgrounds (e.g. disable a menu background when doing gameplay)
 
-## Advanced v1.5.0
+### v1.5.0
 * Changes how sprite width and height work:
   * Now they are just number of extra tiles.
       * e.g. a width of 5 would make a sprite 6 tiles wide
   * Maximum of 16x16 tiles (or 128x128 pixels)
 * Increases maximum x and y to allow for large 128x128 pixel sprites to be off-screen
 
-## Advanced v1.5.1
+### v1.5.1
 * Adds function to allow loading from buffer to vram
 * Fixes sprite rendering bug (x offset was relative to absolute 0 rather than screen 0)
+
+## Advanced Lite
+## v1.0.0
 
 # Understanding the Engine
 Let's get started! First, I'll go over some basics about the engine.
