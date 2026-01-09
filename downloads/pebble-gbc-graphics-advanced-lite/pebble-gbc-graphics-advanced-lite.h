@@ -186,10 +186,10 @@ static const uint8_t ZOOM_TABLE[] = { ///> Table for each zoom level
     #define GBC_SCREEN_BOUNDS_TALL GRect(18, 2, 144, 176)    ///> Tallscreen, square stretched vertically to max even vertical tiles
     #define GBC_SCREEN_BOUNDS_SMALL GRect(26, 26, 128, 128)  ///> Smaller square
 #elif defined(PBL_PLATFORM_EMERY)
-    #define SCREEN_BOUNDS_FULL GRect(0, 2, 200, 224)     ///> Fullscreen to get the most pixels
-    #define SCREEN_BOUNDS_LARGE GRect(4, 2, 192, 224)    ///> Gets rid of the extra tile column on the x axis
-    #define SCREEN_BOUNDS_SQUARE GRect(28, 42, 144, 144) ///> Square to get more fps
-    #define SCREN_BOUNDS_SMALL GRect(36, 48, 128, 128)   ///> Small square
+    #define GBC_SCREEN_BOUNDS_FULL GRect(0, 2, 200, 224)     ///> Fullscreen to get the most pixels
+    #define GBC_SCREEN_BOUNDS_LARGE GRect(4, 2, 192, 224)    ///> Gets rid of the extra tile column on the x axis
+    #define GBC_SCREEN_BOUNDS_SQUARE GRect(28, 42, 144, 144) ///> Square to get more fps
+    #define GBC_SCREN_BOUNDS_SMALL GRect(36, 48, 128, 128)   ///> Small square
 #else
     #define GBC_SCREEN_BOUNDS_FULL GRect(0, 0, 144, 168)    ///> Fullscreen
     #define GBC_SCREEN_BOUNDS_LARGE GRect(0, 4, 144, 160)   ///> Largest size that maintains even number of tiles vertically and horizontally
