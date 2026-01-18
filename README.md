@@ -4,6 +4,10 @@ This is the repository and tutorial for the GBC Graphics library for the Pebble 
 # Introduction
 This library allows you to create graphics for your watchface, app, or game (almost) exactly like the Game Boy Color and Game Boy Advance renders them. It is compatible with all Pebbles.
 
+What are GBC/GBA graphics? Check out these videos:
+* [GBC Graphics](https://youtu.be/ZEJVOH6Pxkg)
+* [GBA Graphics](https://youtu.be/mpNWEbZdXNw)
+
 # Which should I use?
 * I highly recommend using `pebble-gbc-graphics-advanced`. It's got way more options for sprites, backgrounds, colors, features, customizability etc. etc.
   * If you need more space and don't need all of the features, try `pebble-gbc-graphics-advanced-lite`
